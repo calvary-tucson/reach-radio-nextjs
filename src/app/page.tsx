@@ -1,3 +1,28 @@
-export default function Home() {
-  return <main className="p-8 text-white bg-gray-900 min-h-screen">Reach Radio</main>
+import type { Metadata } from 'next'
+import { Suspense } from 'react'
+import { RadioPlayer } from '@/components/home/RadioPlayer'
+import { TodaySchedule } from '@/components/home/TodaySchedule'
+import { RadioPlayerSkeleton } from '@/components/skeletons/RadioPlayerSkeleton'
+import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
+
+export const metadata: Metadata = {
+  title: 'Listen',
+  description: 'Reach Radio features Bible teachings and Christian music. Listen online or on the air in Tucson at 106.7FM and 690AM.',
+}
+
+export default function HomePage() {
+  return (
+    <div className="px-3 pt-3 space-y-6 pb-32">
+      <Suspense fallback={<RadioPlayerSkeleton />}>
+        <RadioPlayer />
+      </Suspense>
+
+      <section>
+        <h2 className="text-white font-semibold text-base mb-3">Today&apos;s Schedule</h2>
+        <Suspense fallback={<ScheduleSkeleton />}>
+          <TodaySchedule />
+        </Suspense>
+      </section>
+    </div>
+  )
 }
