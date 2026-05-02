@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { sanityFetch } from '@/lib/sanity/client'
 import { teacherDetailQuery, teacherSlugsQuery } from '@/lib/sanity/queries'
 import type { TeacherDetail } from '@/lib/sanity/types'
+import { PersonSchema } from '@/components/seo/PersonSchema'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -57,6 +58,13 @@ export default async function TeacherDetailPage({ params }: Props) {
       <Link href="/teachers" className="text-white/60 text-sm mb-6 block hover:text-white">
         ← Teachers
       </Link>
+
+      <PersonSchema
+        name={teacher.name}
+        jobTitle={teacher.title}
+        imageUrl={teacher.photo}
+        url={`https://reach-radio.com/teachers/${teacher.slug}`}
+      />
 
       {teacher.photo && (
         <Image

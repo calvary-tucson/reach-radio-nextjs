@@ -4,6 +4,7 @@ import { RadioPlayer } from '@/components/home/RadioPlayer'
 import { TodaySchedule } from '@/components/home/TodaySchedule'
 import { RadioPlayerSkeleton } from '@/components/skeletons/RadioPlayerSkeleton'
 import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
+import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 
 export const metadata: Metadata = {
   title: 'Listen',
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="px-3 pt-3 space-y-6 pb-32">
+      <RadioStationSchema />
+
       <Suspense fallback={<RadioPlayerSkeleton />}>
         <RadioPlayer />
       </Suspense>
