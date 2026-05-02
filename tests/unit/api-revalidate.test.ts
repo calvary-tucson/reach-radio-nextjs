@@ -40,6 +40,6 @@ describe('POST /api/revalidate', () => {
     })
     const res = await POST(req)
     expect(res.status).toBe(200)
-    expect(revalidateTag).toHaveBeenCalledWith('teachers')
+    expect(revalidateTag).toHaveBeenCalledWith('teachers', 'max')
   })
 })

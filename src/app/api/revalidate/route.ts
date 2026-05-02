@@ -23,7 +23,7 @@ export async function POST(req: Request): Promise<Response> {
   const tag = body._type ? TAG_MAP[body._type] : undefined
 
   if (tag) {
-    revalidateTag(tag)
+    revalidateTag(tag, 'max')
     return Response.json({ revalidated: true, tag })
   }
 
