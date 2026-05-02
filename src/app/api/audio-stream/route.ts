@@ -1,0 +1,24 @@
+const STREAM_URL = 'http://stream.radiojar.com/g4d600bv6p5tv'
+
+export async function GET(): Promise<Response> {
+  try {
+    const upstream = await fetch(STREAM_URL, {
+      signal: AbortSignal.timeout(10_000),
+    })
+
+    if (!upstream.ok || !upstream.body) {
+      return new Response('Upstream error', { status: 502 })
+    }
+
+    return new Response(upstream.body, {
+      status: 200,
+      headers: {
+        'Content-Type': upstream.headers.get('content-type') ?? 'audio/mpeg',
+        'Cache-Control': 'no-cache, no-store',
+        'Access-Control-Allow-Origin': '*',
+      },
+    })
+  } catch {
+    return new Response('Stream unavailable', { status: 502 })
+  }
+}
