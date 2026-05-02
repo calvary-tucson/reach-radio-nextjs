@@ -1,7 +1,37 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  experimental: {
+    serverComponentsHmrCache: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        pathname: '/images/**',
+      },
+    ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ]
+  },
+  async redirects() {
+    return [
+      { source: '/speakers/:slug*', destination: '/teachers/:slug*', permanent: true },
+    ]
+  },
+}
 
-export default nextConfig;
+export default nextConfig
