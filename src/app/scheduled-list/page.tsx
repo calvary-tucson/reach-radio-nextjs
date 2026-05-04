@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: 'Full programming schedule for Reach Radio 106.7FM / 690AM',
 }
 
+export const revalidate = 60
+
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 interface RawTeacher {

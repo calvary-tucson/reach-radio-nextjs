@@ -3,8 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = { title: 'Privacy Policy' }
 
-export default async function PrivacyPolicyPage() {
-  'use cache'
+export default function PrivacyPolicyPage() {
   return (
     <div className="px-4 py-6 max-w-2xl mx-auto prose prose-invert">
       <Link href="/about" className="text-white/60 text-sm mb-6 block hover:text-white not-prose">

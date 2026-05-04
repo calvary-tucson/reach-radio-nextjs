@@ -1,6 +1,5 @@
-import { Suspense } from 'react'
-import { headers } from 'next/headers'
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { MediaBar } from '@/components/media-bar/MediaBar'
 import { BridgeInit } from '@/components/bridge/BridgeInit'
 import { Header } from '@/components/layout/Header'
@@ -14,27 +13,18 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://reach-radio.com'),
 }
 
-async function MobileAppChrome() {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers()
   const isMobileApp = headersList.get('mobile-app') === 'true'
-  if (!isMobileApp) return null
-  return (
-    <style>{`#site-header,#site-footer,#site-nav{display:none!important}`}</style>
-  )
-}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="bg-[var(--color-brand-purple)] text-white min-h-screen">
         <BridgeInit />
-        <Suspense>
-          <MobileAppChrome />
-        </Suspense>
-        <Header />
+        {!isMobileApp && <Header />}
         <main>{children}</main>
-        <Footer />
-        <MobileNav />
+        {!isMobileApp && <Footer />}
+        {!isMobileApp && <MobileNav />}
         <MediaBar />
       </body>
     </html>
