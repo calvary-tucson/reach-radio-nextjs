@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
 
-const TIMER_OPTIONS = [15, 30, 45, 60, 90]
+const TIMER_OPTIONS = [5, 10, 15, 30, 45, 60]
 
 export default function SleepTimerPage() {
   const [selectedMinutes, setSelectedMinutes] = useState<number | null>(null)
