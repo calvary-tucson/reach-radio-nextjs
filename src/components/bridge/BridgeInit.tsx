@@ -31,5 +31,15 @@ export function BridgeInit() {
     postMessageToNative(JSON.stringify({ location: pathname }))
   }, [pathname])
 
+  useEffect(() => {
+    function handleMessage() {
+      if (!document.cookie.includes('mobile-app=true')) {
+        document.cookie = 'mobile-app=true; path=/; max-age=315360000'
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
+
   return null
 }
