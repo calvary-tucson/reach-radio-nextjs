@@ -1,6 +1,5 @@
-import 'server-only'
 import { createClient } from '@sanity/client'
-import { cache } from 'react'
+import { cacheTag, cacheLife } from 'next/cache'
 
 function getClient() {
   return createClient({
@@ -12,18 +11,16 @@ function getClient() {
   })
 }
 
-export const sanityFetch = cache(
-  async <T>(
-    query: string,
-    params: Record<string, unknown> = {},
-    options: { tags?: string[]; revalidate?: number } = {}
-  ): Promise<T> => {
-    const { tags, revalidate } = options
-    return getClient().fetch<T>(query, params, {
-      next: {
-        ...(tags ? { tags } : {}),
-        ...(revalidate !== undefined ? { revalidate } : {}),
-      },
-    })
+export async function sanityFetch<T>(
+  query: string,
+  params: Record<string, unknown> = {},
+  options: { tags?: string[] } = {}
+): Promise<T> {
+  'use cache'
+  const { tags } = options
+  cacheLife('days')
+  if (tags?.length) {
+    cacheTag(...tags)
   }
-)
+  return getClient().fetch<T>(query, params)
+}
