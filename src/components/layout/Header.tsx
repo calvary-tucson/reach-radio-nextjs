@@ -3,6 +3,7 @@ import Link from 'next/link'
 export function Header() {
   return (
     <header
+      id="site-header"
       style={{ viewTransitionName: 'site-header' }}
       className="bg-[var(--color-brand-gray)] px-4 py-3 flex items-center justify-between"
     >

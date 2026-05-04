@@ -18,7 +18,7 @@ export function MobileNav() {
   if (!showMobileNav) return null
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-brand-purple)] border-t border-white/10 flex justify-around py-2 z-40">
+    <nav id="site-nav" className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-brand-purple)] border-t border-white/10 flex justify-around py-2 z-40">
       {navItems.map((item) => {
         const isActive = item.href === '/'
           ? pathname === '/'

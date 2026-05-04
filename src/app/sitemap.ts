@@ -2,8 +2,6 @@ import type { MetadataRoute } from 'next'
 import { sanityFetch } from '@/lib/sanity/client'
 import { teacherSlugsQuery } from '@/lib/sanity/queries'
 
-export const dynamic = 'force-dynamic'
-
 const BASE_URL = 'https://reach-radio.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

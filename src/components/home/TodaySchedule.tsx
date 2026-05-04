@@ -1,3 +1,4 @@
+import { connection } from 'next/server'
 import { sanityFetch } from '@/lib/sanity/client'
 import { scheduleQuery } from '@/lib/sanity/queries'
 import type { ScheduleTeacher } from '@/lib/sanity/types'
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export async function TodaySchedule({ timezone: tz = 'America/Phoenix' }: Props) {
+  await connection()
   const day = dayjs().tz(tz).format('dddd')
 
   const raw = await sanityFetch<{
