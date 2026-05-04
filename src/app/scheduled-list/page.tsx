@@ -25,7 +25,7 @@ export default async function ScheduledListPage() {
   const teachers = await sanityFetch<RawTeacher[]>(
     fullScheduleQuery,
     {},
-    { tags: ['schedule'], revalidate: 60 }
+    { tags: ['schedule'] }
   )
 
   const byDay = DAYS.map((day) => ({

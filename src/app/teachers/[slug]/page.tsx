@@ -1,3 +1,4 @@
+import { ViewTransition } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
@@ -12,12 +13,16 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const slugs = await sanityFetch<{ slug: string }[]>(
-    teacherSlugsQuery,
-    {},
-    { tags: ['teachers'] }
-  )
-  return slugs.map((t) => ({ slug: t.slug }))
+  try {
+    const slugs = await sanityFetch<{ slug: string }[]>(
+      teacherSlugsQuery,
+      {},
+      { tags: ['teachers'] }
+    )
+    return slugs.map((t) => ({ slug: t.slug }))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -55,7 +60,7 @@ export default async function TeacherDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <Link href="/teachers" className="text-white/60 text-sm mb-6 block hover:text-white">
+      <Link href="/teachers" transitionTypes={['nav-back']} className="text-white/60 text-sm mb-6 block hover:text-white">
         ← Teachers
       </Link>
 
@@ -67,14 +72,16 @@ export default async function TeacherDetailPage({ params }: Props) {
       />
 
       {teacher.photo && (
-        <Image
-          src={teacher.photo}
-          alt={teacher.name}
-          width={420}
-          height={420}
-          className="w-full max-w-sm mx-auto rounded object-cover mb-6"
-          priority
-        />
+        <ViewTransition name={`teacher-${teacher.slug}`}>
+          <Image
+            src={teacher.photo}
+            alt={teacher.name}
+            width={420}
+            height={420}
+            className="w-full max-w-sm mx-auto rounded object-cover mb-6"
+            priority
+          />
+        </ViewTransition>
       )}
 
       <h1 className="text-white text-3xl font-bold">{teacher.name}</h1>

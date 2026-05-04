@@ -23,7 +23,7 @@ export async function TodaySchedule({ timezone: tz = 'America/Phoenix' }: Props)
     title: string
     photo: string
     schedule: { day: string; times: { startTime: string; endTime: string }[] }[]
-  }[]>(scheduleQuery, { day }, { tags: ['schedule'], revalidate: 60 })
+  }[]>(scheduleQuery, { day }, { tags: ['schedule'] })
 
   const teachers: ScheduleTeacher[] = raw
     .filter((t) => t.schedule?.[0]?.times?.[0])
