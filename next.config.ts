@@ -25,6 +25,23 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' cdn.sanity.io data: blob: https://www.google.com",
+              "media-src 'self'",
+              "connect-src 'self' api.sanity.io cdn.sanity.io *.radiojar.com https://formspree.io https://www.google.com",
+              "font-src 'self'",
+              "object-src 'none'",
+              "frame-src https://forms.ministryforms.net",
+              "frame-ancestors 'self'",
+              "base-uri 'self'",
+              "form-action 'self' https://formspree.io",
+            ].join('; '),
+          },
         ],
       },
     ]
