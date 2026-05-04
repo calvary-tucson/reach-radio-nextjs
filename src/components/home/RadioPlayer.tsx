@@ -1,8 +1,10 @@
 'use client'
 
+import { useEffect } from 'react'
 import Image from 'next/image'
 import { useMediaStore } from '@/lib/store/media-store'
 import { PlayPauseButton } from '@/components/media-bar/PlayPauseButton'
+import { VolumeControl } from './VolumeControl'
 
 export function RadioPlayer() {
   const image = useMediaStore((s) => s.image)
@@ -10,9 +12,9 @@ export function RadioPlayer() {
   const artist = useMediaStore((s) => s.artist)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
 
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     setShowMediaBar(true)
-  }
+  }, [setShowMediaBar])
 
   return (
     <div className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
@@ -33,6 +35,7 @@ export function RadioPlayer() {
         </div>
         <div className="flex gap-8 items-center justify-center">
           <PlayPauseButton />
+          <VolumeControl />
         </div>
       </div>
     </div>

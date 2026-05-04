@@ -34,7 +34,7 @@ export const useMediaStore = create<MediaState>((set) => ({
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
   setIsMuted: (v) => set({ isMuted: v }),
-  setVolume: (v) => set({ volume: v }),
+  setVolume: (v) => set({ volume: v, isMuted: v === 0 }),
   setNowPlaying: (title, artist, image) => set({ title, artist, image }),
   setShowMediaBar: (v) => set({ showMediaBar: v }),
   setShowMobileNav: (v) => set({ showMobileNav: v }),
