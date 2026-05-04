@@ -59,10 +59,16 @@ export default async function TeacherDetailPage({ params }: Props) {
   )
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      <Link href="/teachers" transitionTypes={['nav-back']} className="text-white/60 text-sm mb-6 block hover:text-white">
-        ← Teachers
-      </Link>
+    <div>
+      <div className="px-4 py-4">
+        <Link
+          href="/teachers"
+          transitionTypes={['nav-back']}
+          className="text-white/60 text-sm hover:text-white inline-flex items-center gap-1"
+        >
+          <span aria-hidden="true">←</span> Teachers
+        </Link>
+      </div>
 
       <PersonSchema
         name={teacher.name}
@@ -71,58 +77,63 @@ export default async function TeacherDetailPage({ params }: Props) {
         url={`https://reach-radio.com/teachers/${teacher.slug}`}
       />
 
-      {teacher.photo && (
-        <ViewTransition name={`teacher-${teacher.slug}`}>
-          <Image
-            src={teacher.photo}
-            alt={teacher.name}
-            width={420}
-            height={420}
-            className="w-full max-w-sm mx-auto rounded object-cover mb-6"
-            priority
-          />
-        </ViewTransition>
-      )}
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-x-16 gap-y-5 text-white">
+        {teacher.photo && (
+          <ViewTransition name={`teacher-${teacher.slug}`}>
+            <Image
+              src={teacher.photo}
+              alt={teacher.name}
+              width={600}
+              height={600}
+              className="w-full md:rounded-br-3xl aspect-square object-cover"
+              priority
+            />
+          </ViewTransition>
+        )}
 
-      <h1 className="text-white text-3xl font-bold">{teacher.name}</h1>
-      <p className="text-white/70 mt-1">
-        {teacher.title}{teacher.subtitle ? `: ${teacher.subtitle}` : ''}
-      </p>
+        <div className="md:mt-5 md:px-0 md:pr-3 px-3">
+          <h1 className="text-4xl">{teacher.name}</h1>
+          {teacher.title && (
+            <h2 className="uppercase font-bold mt-1 text-white/80">
+              {teacher.title}{teacher.subtitle ? `: ${teacher.subtitle}` : ''}
+            </h2>
+          )}
 
-      {sortedSchedule.length > 0 && (
-        <section className="mt-6">
-          <h2 className="text-white font-semibold mb-3">Schedule</h2>
-          <ul className="space-y-1">
-            {sortedSchedule.map((day) =>
-              day.times.map((t, i) => (
-                <li key={`${day.day}-${i}`} className="text-white/70 text-sm">
-                  <span className="font-medium text-white">{day.day}</span> — {t.startTime} – {t.endTime}
-                </li>
-              ))
-            )}
-          </ul>
-        </section>
-      )}
-
-      {teacher.links && teacher.links.length > 0 && (
-        <section className="mt-6">
-          <h2 className="text-white font-semibold mb-3">Links</h2>
-          <ul className="space-y-2">
-            {teacher.links.map((link) => (
-              <li key={link.url}>
+          {teacher.links && teacher.links.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {teacher.links.map((link) => (
                 <a
+                  key={link.url}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[var(--color-brand-green)] hover:underline text-sm"
+                  className="bg-[var(--color-brand-green)] text-white px-4 py-2 rounded text-sm font-medium hover:opacity-90 transition-opacity"
                 >
                   {link.title}
                 </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+              ))}
+            </div>
+          )}
+
+          {sortedSchedule.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-2xl mb-3">Schedule</h2>
+              {sortedSchedule.map((day) => (
+                <div key={day.day} className="mb-5">
+                  <h3 className="font-bold text-lg mb-2">{day.day}</h3>
+                  <div className="flex flex-col gap-2">
+                    {day.times.map((t, i) => (
+                      <div key={i} className="bg-gray-700 p-3 rounded text-sm">
+                        {t.startTime} – {t.endTime}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
