@@ -30,6 +30,8 @@ export function TeacherCard({ teacher }: { teacher: TeacherSummary }) {
             width={300}
             height={300}
             className="w-full aspect-square object-cover"
+            placeholder={teacher.lqip ? 'blur' : 'empty'}
+            blurDataURL={teacher.lqip}
           />
         </ViewTransition>
       ) : (
