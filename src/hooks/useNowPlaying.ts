@@ -23,6 +23,9 @@ export function useNowPlaying(): void {
       }
     }
 
+    // close on error to prevent the browser's automatic infinite reconnect loop
+    es.onerror = () => es.close()
+
     return () => es.close()
   }, [setNowPlaying])
 }

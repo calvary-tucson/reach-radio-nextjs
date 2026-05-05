@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useMediaStore } from '@/lib/store/media-store'
+import { postMessageToNative } from '@/lib/bridge/post-message'
 import { PlayPauseButton } from '@/components/media-bar/PlayPauseButton'
 import { VolumeControl } from './VolumeControl'
 import { SleepTimerButton } from './SleepTimerButton'
@@ -16,11 +17,6 @@ export function RadioPlayer() {
   const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setShowMediaBar(false)
-    return () => setShowMediaBar(true)
-  }, [setShowMediaBar])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -38,17 +34,29 @@ export function RadioPlayer() {
     return () => observer.disconnect()
   }, [setShowMediaBar])
 
+  function togglePlay() {
+    const next = !isPlaying
+    setIsPlaying(next)
+    postMessageToNative(JSON.stringify({ isPlaying: next }))
+  }
+
+  const altText = title ? `Now playing: ${title}${artist ? ` by ${artist}` : ''}` : 'Now playing album art'
+
   return (
     <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
         <Image
           src={image}
-          alt="Now playing album art"
-          width={420}
-          height={420}
-          className="max-w-[420px] max-h-64 rounded object-contain cursor-pointer"
-          onClick={() => setIsPlaying(!isPlaying)}
+          alt={altText}
+          width={256}
+          height={256}
+          className="max-w-[420px] max-h-64 rounded object-contain cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={togglePlay}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePlay() } }}
+          role="button"
+          tabIndex={0}
+          aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
           priority
         />
       </div>

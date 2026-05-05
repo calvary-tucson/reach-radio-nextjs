@@ -19,11 +19,11 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
     const el = audioRef.current
     if (!el) return
     if (isPlaying) {
-      el.load()
+      el.play().catch(() => setIsPlaying(false))
     } else {
       el.pause()
     }
-  }, [isPlaying])
+  }, [isPlaying, setIsPlaying])
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume / 100
@@ -37,13 +37,15 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
     <audio
       ref={audioRef}
       src={streamUrl}
+      preload="none"
       onLoadStart={() => setIsBuffering(true)}
       onWaiting={() => setIsBuffering(true)}
       onPlaying={() => setIsBuffering(false)}
-      onCanPlay={(e) => {
-        if (isPlaying) e.currentTarget.play()
-      }}
       onPause={() => {
+        setIsPlaying(false)
+        setIsBuffering(false)
+      }}
+      onError={() => {
         setIsPlaying(false)
         setIsBuffering(false)
       }}

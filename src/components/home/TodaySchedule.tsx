@@ -39,10 +39,16 @@ export async function TodaySchedule({ timezone: tz = 'America/Phoenix' }: Props)
     .sort((a, b) => a.startTime.localeCompare(b.startTime))
 
   if (teachers.length === 0) {
-    return <p className="text-white/60 text-sm">No scheduled programs today.</p>
+    return (
+      <p className="text-white/80 text-sm">
+        No scheduled programs today.{' '}
+        <a href="/scheduled-list" className="underline hover:text-white">View full schedule</a>
+      </p>
+    )
   }
 
   return (
+    <section aria-label="Today's schedule">
     <ul className="space-y-2">
       {teachers.map((teacher) => (
         <li key={`${teacher.slug}-${teacher.startTime}`}>
@@ -61,12 +67,13 @@ export async function TodaySchedule({ timezone: tz = 'America/Phoenix' }: Props)
             )}
             <div className="flex-1 min-w-0">
               <p className="text-white font-medium text-sm truncate">{teacher.name}</p>
-              <p className="text-white/60 text-xs truncate">{teacher.title}</p>
+              <p className="text-white/80 text-xs truncate">{teacher.title}</p>
             </div>
             <span className="text-white/50 text-xs flex-shrink-0">{teacher.time}</span>
           </Link>
         </li>
       ))}
     </ul>
+    </section>
   )
 }

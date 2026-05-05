@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { AudioProvider } from '@/components/AudioProvider'
+import { SleepTimerProvider } from '@/components/SleepTimerProvider'
 import { sanityFetch } from '@/lib/sanity/client'
 import './globals.css'
 
@@ -13,9 +14,13 @@ export const metadata: Metadata = {
   title: { default: 'Reach Radio', template: '%s | Reach Radio' },
   description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
   metadataBase: new URL('https://reach-radio.com'),
+  openGraph: {
+    images: ['/og-image.png'],
+  },
 }
 
-const FALLBACK_STREAM_URL = 'http://stream.radiojar.com/g4d600bv6p5tv'
+const FALLBACK_STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
+const APP_SETTINGS_ID = 'a2939b52-e844-45f4-ba97-c335991cea4b'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers()
@@ -23,9 +28,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   const { radioAudioURL } = await sanityFetch<{ radioAudioURL: string }>(
     `*[_type == "appSettings" && _id == $id][0]{ radioAudioURL }`,
-    { id: 'a2939b52-e844-45f4-ba97-c335991cea4b' },
+    { id: APP_SETTINGS_ID },
     { tags: ['appSettings'] }
-  ).catch(() => ({ radioAudioURL: FALLBACK_STREAM_URL }))
+  ).catch((err) => {
+    console.error('Failed to fetch appSettings:', err)
+    return { radioAudioURL: FALLBACK_STREAM_URL }
+  })
 
   const streamUrl = radioAudioURL || FALLBACK_STREAM_URL
 
@@ -37,6 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <BridgeInit />
         {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
+        <SleepTimerProvider />
         {!isMobileApp && <Header />}
         <main id="main-content">{children}</main>
         {!isMobileApp && <Footer />}

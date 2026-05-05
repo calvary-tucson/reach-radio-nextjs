@@ -10,9 +10,6 @@ declare global {
         isMuted: { set: (v: boolean) => void }
         showMediaBar: { set: (v: boolean) => void }
       }
-      mobileNavState: {
-        showMobileNav: { set: (v: boolean) => void }
-      }
     }
     globalActions: {
       goToPage: (path: string) => void
@@ -35,9 +32,6 @@ export function initBridgeProxy(router?: { push: (path: string) => void }): void
       isBuffering: { set: (v) => useMediaStore.getState().setIsBuffering(v) },
       isMuted: { set: (v) => useMediaStore.getState().setIsMuted(v) },
       showMediaBar: { set: (v) => useMediaStore.getState().setShowMediaBar(v) },
-    },
-    mobileNavState: {
-      showMobileNav: { set: (v) => useMediaStore.getState().setShowMobileNav(v) },
     },
   }
 

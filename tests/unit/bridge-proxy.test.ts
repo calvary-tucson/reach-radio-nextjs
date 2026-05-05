@@ -9,9 +9,6 @@ vi.mock('@/lib/bridge/proxy', () => ({
         isPlaying: { set: (v: boolean) => useMediaStore.getState().setIsPlaying(v) },
         isBuffering: { set: (v: boolean) => useMediaStore.getState().setIsBuffering(v) },
       },
-      mobileNavState: {
-        showMobileNav: { set: (v: boolean) => useMediaStore.getState().setShowMobileNav(v) },
-      },
     }
     ;(window as any).globalActions = {
       goToPage: vi.fn(),
@@ -27,7 +24,7 @@ import { initBridgeProxy } from '@/lib/bridge/proxy'
 
 describe('bridge proxy', () => {
   beforeEach(() => {
-    useMediaStore.setState({ isPlaying: false, isBuffering: false, showMobileNav: true })
+    useMediaStore.setState({ isPlaying: false, isBuffering: false })
     initBridgeProxy()
   })
 

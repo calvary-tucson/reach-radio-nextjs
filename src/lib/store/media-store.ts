@@ -11,14 +11,16 @@ interface MediaState {
   artist: string
   image: string
   showMediaBar: boolean
-  showMobileNav: boolean
+  sleepTimerActive: boolean
+  remainingSleepSeconds: number
   setIsPlaying: (v: boolean) => void
   setIsBuffering: (v: boolean) => void
   setIsMuted: (v: boolean) => void
   setVolume: (v: number) => void
   setNowPlaying: (title: string, artist: string, image: string) => void
   setShowMediaBar: (v: boolean) => void
-  setShowMobileNav: (v: boolean) => void
+  setSleepTimerActive: (active: boolean) => void
+  setRemainingSleepSeconds: (s: number) => void
 }
 
 export const useMediaStore = create<MediaState>((set) => ({
@@ -30,12 +32,14 @@ export const useMediaStore = create<MediaState>((set) => ({
   artist: '',
   image: DEFAULT_IMAGE,
   showMediaBar: false,
-  showMobileNav: true,
+  sleepTimerActive: false,
+  remainingSleepSeconds: 0,
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
   setIsMuted: (v) => set({ isMuted: v }),
   setVolume: (v) => set({ volume: v, isMuted: v === 0 }),
   setNowPlaying: (title, artist, image) => set({ title, artist, image }),
   setShowMediaBar: (v) => set({ showMediaBar: v }),
-  setShowMobileNav: (v) => set({ showMobileNav: v }),
+  setSleepTimerActive: (active) => set({ sleepTimerActive: active }),
+  setRemainingSleepSeconds: (s) => set({ remainingSleepSeconds: s }),
 }))

@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useMediaStore } from '@/lib/store/media-store'
 
 const navItems = [
   { href: '/', label: 'Listen', icon: 'play' },
@@ -13,9 +12,6 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname()
-  const showMobileNav = useMediaStore((s) => s.showMobileNav)
-
-  if (!showMobileNav) return null
 
   return (
     <nav id="site-nav" className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-brand-purple)] border-t border-white/10 flex justify-around py-2 z-40">
@@ -27,7 +23,8 @@ export function MobileNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-col items-center gap-1 text-xs px-3 ${isActive ? 'text-white' : 'text-white/60'}`}
+            aria-current={isActive ? 'page' : undefined}
+            className={`flex flex-col items-center gap-1 text-xs px-4 py-3 ${isActive ? 'text-white' : 'text-white/80'}`}
           >
             <span className="text-lg">{item.label}</span>
           </Link>

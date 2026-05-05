@@ -21,7 +21,7 @@ export function PlayPauseButton() {
       className="w-10 h-10 rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0"
     >
       {isBuffering ? (
-        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin" />
       ) : isPlaying ? (
         <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
           <rect x="6" y="4" width="4" height="16" />

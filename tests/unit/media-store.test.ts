@@ -12,7 +12,6 @@ describe('useMediaStore', () => {
       artist: '',
       image: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg',
       showMediaBar: false,
-      showMobileNav: true,
     })
   })
 
@@ -37,10 +36,5 @@ describe('useMediaStore', () => {
   it('setShowMediaBar updates showMediaBar', () => {
     useMediaStore.getState().setShowMediaBar(true)
     expect(useMediaStore.getState().showMediaBar).toBe(true)
-  })
-
-  it('setShowMobileNav updates showMobileNav', () => {
-    useMediaStore.getState().setShowMobileNav(false)
-    expect(useMediaStore.getState().showMobileNav).toBe(false)
   })
 })
