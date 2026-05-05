@@ -2,13 +2,11 @@
 
 import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
-import { useNowPlaying } from '@/hooks/useNowPlaying'
 import { PlayPauseButton } from './PlayPauseButton'
 import { NowPlayingInfo } from './NowPlayingInfo'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 
 export function MediaBar() {
-  useNowPlaying()
   const showMediaBar = useMediaStore((s) => s.showMediaBar)
   const isPlaying = useMediaStore((s) => s.isPlaying)
   const title = useMediaStore((s) => s.title)

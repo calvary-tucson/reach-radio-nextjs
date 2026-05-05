@@ -12,6 +12,9 @@ class MockEventSource {
   simulateMessage(data: string) {
     this.onmessage?.({ data })
   }
+  simulateError() {
+    this.onerror?.()
+  }
 }
 
 let mockES: MockEventSource
@@ -23,6 +26,7 @@ vi.stubGlobal('EventSource', vi.fn(function (url: string) {
 
 describe('useNowPlaying', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     useMediaStore.setState({
       title: 'Reach Radio',
       artist: '',
@@ -32,6 +36,7 @@ describe('useNowPlaying', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   it('updates store when SSE message arrives', () => {
@@ -54,5 +59,42 @@ describe('useNowPlaying', () => {
     })
 
     expect(useMediaStore.getState().title).toBe('Reach Radio')
+  })
+
+  it('does not close permanently on first error — retries after delay', async () => {
+    renderHook(() => useNowPlaying())
+
+    act(() => {
+      mockES.simulateError()
+    })
+
+    // After first error, close is NOT called immediately — retry is scheduled
+    expect(mockES.close).not.toHaveBeenCalled()
+
+    // Advance past the 1s retry delay — a new EventSource is created
+    act(() => {
+      vi.advanceTimersByTime(1100)
+    })
+
+    expect(EventSource).toHaveBeenCalledTimes(2)
+  })
+
+  it('closes permanently after max retries exhausted', async () => {
+    renderHook(() => useNowPlaying())
+    const EventSourceSpy = vi.mocked(EventSource)
+
+    // Exhaust 5 retries (delays: 1s, 2s, 4s, 8s, 16s = 31s total)
+    for (let i = 0; i < 5; i++) {
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(32_000) })
+    }
+
+    const callsAfterExhaustion = EventSourceSpy.mock.calls.length
+
+    // One more error after exhaustion should not create new EventSource
+    act(() => { mockES.simulateError() })
+    act(() => { vi.advanceTimersByTime(32_000) })
+
+    expect(EventSourceSpy.mock.calls.length).toBe(callsAfterExhaustion)
   })
 })

@@ -12,6 +12,8 @@ describe('useMediaStore', () => {
       artist: '',
       image: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg',
       showMediaBar: false,
+      sleepTimerActive: false,
+      remainingSleepSeconds: 0,
     })
   })
 
@@ -36,5 +38,18 @@ describe('useMediaStore', () => {
   it('setShowMediaBar updates showMediaBar', () => {
     useMediaStore.getState().setShowMediaBar(true)
     expect(useMediaStore.getState().showMediaBar).toBe(true)
+  })
+
+  it('startSleepTimer sets remainingSleepSeconds and sleepTimerActive atomically', () => {
+    useMediaStore.getState().startSleepTimer(1800)
+    const { remainingSleepSeconds, sleepTimerActive } = useMediaStore.getState()
+    expect(remainingSleepSeconds).toBe(1800)
+    expect(sleepTimerActive).toBe(true)
+  })
+
+  it('startSleepTimer(0) activates timer with 0 seconds', () => {
+    useMediaStore.getState().startSleepTimer(0)
+    expect(useMediaStore.getState().sleepTimerActive).toBe(true)
+    expect(useMediaStore.getState().remainingSleepSeconds).toBe(0)
   })
 })

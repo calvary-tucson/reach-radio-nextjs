@@ -21,6 +21,7 @@ interface MediaState {
   setShowMediaBar: (v: boolean) => void
   setSleepTimerActive: (active: boolean) => void
   setRemainingSleepSeconds: (s: number) => void
+  startSleepTimer: (seconds: number) => void
 }
 
 export const useMediaStore = create<MediaState>((set) => ({
@@ -42,4 +43,5 @@ export const useMediaStore = create<MediaState>((set) => ({
   setShowMediaBar: (v) => set({ showMediaBar: v }),
   setSleepTimerActive: (active) => set({ sleepTimerActive: active }),
   setRemainingSleepSeconds: (s) => set({ remainingSleepSeconds: s }),
+  startSleepTimer: (seconds) => set({ remainingSleepSeconds: seconds, sleepTimerActive: true }),
 }))

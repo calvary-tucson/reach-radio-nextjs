@@ -27,7 +27,7 @@ export async function GET(): Promise<Response> {
       }
 
       await poll()
-      const interval = setInterval(poll, 10_000)
+      const interval = setInterval(poll, 30_000)
 
       return () => clearInterval(interval)
     },

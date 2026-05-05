@@ -7,12 +7,12 @@ const TIMER_OPTIONS = [5, 10, 15, 30, 45, 60]
 export default function SleepTimerPage() {
   const active = useMediaStore((s) => s.sleepTimerActive)
   const remainingSeconds = useMediaStore((s) => s.remainingSleepSeconds)
+  const startSleepTimer = useMediaStore((s) => s.startSleepTimer)
   const setSleepTimerActive = useMediaStore((s) => s.setSleepTimerActive)
   const setRemainingSleepSeconds = useMediaStore((s) => s.setRemainingSleepSeconds)
 
   function start(minutes: number) {
-    setRemainingSleepSeconds(minutes * 60)
-    setSleepTimerActive(true)
+    startSleepTimer(minutes * 60)
   }
 
   function cancel() {

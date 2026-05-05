@@ -2,12 +2,14 @@
 
 import { useEffect, useRef } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
+import { useNowPlaying } from '@/hooks/useNowPlaying'
 
 interface AudioProviderProps {
   streamUrl: string
 }
 
 export function AudioProvider({ streamUrl }: AudioProviderProps) {
+  useNowPlaying()
   const audioRef = useRef<HTMLAudioElement>(null)
   const isPlaying = useMediaStore((s) => s.isPlaying)
   const volume = useMediaStore((s) => s.volume)
@@ -19,7 +21,10 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
     const el = audioRef.current
     if (!el) return
     if (isPlaying) {
-      el.play().catch(() => setIsPlaying(false))
+      el.play().catch((err: unknown) => {
+        console.error('[AudioProvider] play failed:', err)
+        setIsPlaying(false)
+      })
     } else {
       el.pause()
     }

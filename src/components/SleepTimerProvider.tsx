@@ -28,7 +28,7 @@ export function SleepTimerProvider() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [sleepTimerActive, setIsPlaying, setSleepTimerActive, setRemainingSleepSeconds])
+  }, [sleepTimerActive])
 
   return null
 }
