@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { useMediaStore } from '@/lib/store/media-store'
 import { PlayPauseButton } from '@/components/media-bar/PlayPauseButton'
 import { VolumeControl } from './VolumeControl'
+import { SleepTimerButton } from './SleepTimerButton'
+import { SleepTimerOverlay } from './SleepTimerOverlay'
 
 export function RadioPlayer() {
   const image = useMediaStore((s) => s.image)
@@ -19,6 +21,7 @@ export function RadioPlayer() {
   return (
     <div className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
       <div className="relative flex items-center justify-center w-full">
+        <SleepTimerOverlay />
         <Image
           src={image}
           alt="Now playing album art"
@@ -35,6 +38,7 @@ export function RadioPlayer() {
         </div>
         <div className="flex gap-8 items-center justify-center">
           <PlayPauseButton />
+          <SleepTimerButton />
           <VolumeControl />
         </div>
       </div>
