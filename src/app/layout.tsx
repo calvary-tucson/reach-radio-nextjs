@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { MediaBar } from '@/components/media-bar/MediaBar'
 import { BridgeInit } from '@/components/bridge/BridgeInit'
 import { Header } from '@/components/layout/Header'
+import { MobileHeader } from '@/components/layout/MobileHeader'
 import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { AudioProvider } from '@/components/AudioProvider'
@@ -47,7 +48,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
         <SleepTimerProvider />
         {!isMobileApp && <Header />}
-        <main id="main-content">{children}</main>
+        {!isMobileApp && <MobileHeader />}
+        <main id="main-content" className={!isMobileApp ? 'pt-16 pb-36' : ''}>{children}</main>
         {!isMobileApp && <Footer />}
         {!isMobileApp && <MobileNav />}
         <MediaBar />

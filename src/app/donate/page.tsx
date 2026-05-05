@@ -71,7 +71,6 @@ export default function DonatePage() {
         title="Donation Form"
         onLoad={handleLoad}
         className={`w-full min-h-[1000px] border-0 ${loaded ? 'block' : 'hidden'}`}
-        loading="lazy"
       />
     </div>
   )

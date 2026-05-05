@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+vi.mock('next/headers', () => ({
+  headers: vi.fn().mockResolvedValue({ get: vi.fn().mockReturnValue(null) }),
+}))
+
 describe('submitContact Server Action', () => {
   beforeEach(() => {
-    vi.resetAllMocks()
+    vi.clearAllMocks()
     vi.resetModules()
     process.env.RECAPTCHA_SECRET_KEY = 'test-key'
     process.env.FORMSPREE_ENDPOINT = 'https://formspree.io/f/test'
@@ -13,7 +17,8 @@ describe('submitContact Server Action', () => {
     const formData = new FormData()
     formData.set('name', 'John')
     formData.set('email', 'john@example.com')
-    formData.set('message', 'Hello')
+    formData.set('message', 'Hello there, this is a test message for the contact form.')
+    formData.set('gdprConsent', 'on')
     const result = await submitContact({ success: false }, formData)
     expect(result.success).toBe(false)
     expect(result.error).toContain('verification')
@@ -28,7 +33,8 @@ describe('submitContact Server Action', () => {
     const formData = new FormData()
     formData.set('name', 'John')
     formData.set('email', 'john@example.com')
-    formData.set('message', 'Hello')
+    formData.set('message', 'Hello there, this is a test message for the contact form.')
+    formData.set('gdprConsent', 'on')
     formData.set('recaptchaToken', 'bad-token')
     const result = await submitContact({ success: false }, formData)
     expect(result.success).toBe(false)

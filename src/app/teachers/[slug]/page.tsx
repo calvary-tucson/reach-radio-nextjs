@@ -80,16 +80,18 @@ export default async function TeacherDetailPage({ params }: Props) {
       <div className="grid md:grid-cols-2 grid-cols-1 gap-x-16 gap-y-5 text-white">
         {teacher.photo && (
           <ViewTransition name={`teacher-${teacher.slug}`}>
-            <Image
-              src={teacher.photo}
-              alt={teacher.name}
-              width={600}
-              height={600}
-              className="w-full md:rounded-br-3xl aspect-square object-cover"
-              placeholder={teacher.lqip ? 'blur' : 'empty'}
-              blurDataURL={teacher.lqip}
-              priority
-            />
+            <div className="relative aspect-square md:rounded-br-3xl overflow-hidden">
+              <Image
+                src={teacher.photo}
+                alt={teacher.name}
+                fill
+                className="object-cover"
+                placeholder={teacher.lqip ? 'blur' : 'empty'}
+                blurDataURL={teacher.lqip}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            </div>
           </ViewTransition>
         )}
 

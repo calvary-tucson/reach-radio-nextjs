@@ -24,15 +24,17 @@ export function TeacherCard({ teacher }: { teacher: TeacherSummary }) {
     >
       {teacher.photo ? (
         <ViewTransition name={`teacher-${teacher.slug}`}>
-          <Image
-            src={teacher.photo}
-            alt={teacher.name}
-            width={300}
-            height={300}
-            className="w-full aspect-square object-cover"
-            placeholder={teacher.lqip ? 'blur' : 'empty'}
-            blurDataURL={teacher.lqip}
-          />
+          <div className="relative aspect-square">
+            <Image
+              src={teacher.photo}
+              alt={teacher.name}
+              fill
+              className="object-cover"
+              placeholder={teacher.lqip ? 'blur' : 'empty'}
+              blurDataURL={teacher.lqip}
+              sizes="(max-width: 640px) 50vw, 25vw"
+            />
+          </div>
         </ViewTransition>
       ) : (
         <TeacherInitials name={teacher.name} />
