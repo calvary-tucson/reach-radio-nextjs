@@ -4,10 +4,17 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { teacherSearchQuery } from '@/lib/sanity/queries'
 import type { TeacherSummary } from '@/lib/sanity/types'
 import { TeacherCard } from '@/components/teachers/TeacherCard'
+import { TeacherGridSkeleton } from '@/components/skeletons/TeacherCardSkeleton'
 import { SearchBar } from '@/components/teachers/SearchBar'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Teacher Search' }
+export const revalidate = 86400
+
+export const metadata: Metadata = {
+  title: 'Teacher Search',
+  description: 'Search for Bible teachers on Reach Radio Tucson.',
+  robots: { index: false },
+}
 
 interface Props {
   searchParams: Promise<{ q?: string }>
@@ -15,7 +22,7 @@ interface Props {
 
 async function SearchResults({ searchParams }: { searchParams: Props['searchParams'] }) {
   const { q = '' } = await searchParams
-  const query = q.trim()
+  const query = q.trim().slice(0, 100)
 
   const teachers = query.length > 0
     ? await sanityFetch<TeacherSummary[]>(teacherSearchQuery, { query: `*${query}*` })
@@ -23,11 +30,13 @@ async function SearchResults({ searchParams }: { searchParams: Props['searchPara
 
   return (
     <>
-      {query && (
-        <p className="text-white/60 text-sm mb-4">
-          {teachers.length} result{teachers.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
-        </p>
-      )}
+      <div aria-live="polite" aria-atomic="true">
+        {query && (
+          <p className="text-white/60 text-sm mb-4">
+            {teachers.length} result{teachers.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
+          </p>
+        )}
+      </div>
       {teachers.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {teachers.map((teacher) => (
@@ -44,13 +53,11 @@ async function SearchResults({ searchParams }: { searchParams: Props['searchPara
 export default function TeacherSearchPage({ searchParams }: Props) {
   return (
     <div className="px-4 py-6">
-      <Link href="/teachers" className="text-white/60 text-sm mb-4 block hover:text-white">
-        ← All Teachers
+      <Link href="/teachers" aria-label="All Teachers" className="text-white/60 text-sm mb-4 block hover:text-white">
+        <span aria-hidden="true">←</span> All Teachers
       </Link>
-      <Suspense>
-        <SearchBar />
-      </Suspense>
-      <Suspense>
+      <SearchBar />
+      <Suspense fallback={<TeacherGridSkeleton />}>
         <SearchResults searchParams={searchParams} />
       </Suspense>
     </div>

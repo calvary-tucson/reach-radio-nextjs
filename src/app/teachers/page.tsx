@@ -32,7 +32,7 @@ export default function TeachersPage() {
   return (
     <div className="px-4 py-6">
       <h1 className="text-white text-2xl font-bold mb-6">Teachers</h1>
-      <Suspense>
+      <Suspense fallback={<div className="h-[52px] mb-6" />}>
         <SearchBar />
       </Suspense>
       <Suspense fallback={<TeacherGridSkeleton />}>

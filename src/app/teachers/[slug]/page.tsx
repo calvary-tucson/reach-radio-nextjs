@@ -1,4 +1,4 @@
-import { ViewTransition } from 'react'
+import { cache, ViewTransition } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
@@ -11,6 +11,14 @@ import { PersonSchema } from '@/components/seo/PersonSchema'
 interface Props {
   params: Promise<{ slug: string }>
 }
+
+const getTeacher = cache(async (slug: string): Promise<TeacherDetail | null> => {
+  return sanityFetch<TeacherDetail | null>(
+    teacherDetailQuery,
+    { slug },
+    { tags: ['teachers'] }
+  )
+})
 
 export async function generateStaticParams() {
   try {
@@ -27,11 +35,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const teacher = await sanityFetch<TeacherDetail | null>(
-    teacherDetailQuery,
-    { slug },
-    { tags: ['teachers'] }
-  )
+  const teacher = await getTeacher(slug)
   if (!teacher) return { title: 'Teacher Not Found' }
   return {
     title: teacher.name,
@@ -44,11 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function TeacherDetailPage({ params }: Props) {
   const { slug } = await params
-  const teacher = await sanityFetch<TeacherDetail | null>(
-    teacherDetailQuery,
-    { slug },
-    { tags: ['teachers'] }
-  )
+  const teacher = await getTeacher(slug)
 
   if (!teacher) notFound()
 
@@ -86,6 +86,8 @@ export default async function TeacherDetailPage({ params }: Props) {
               width={600}
               height={600}
               className="w-full md:rounded-br-3xl aspect-square object-cover"
+              placeholder={teacher.lqip ? 'blur' : 'empty'}
+              blurDataURL={teacher.lqip}
               priority
             />
           </ViewTransition>

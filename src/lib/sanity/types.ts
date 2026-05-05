@@ -3,6 +3,7 @@ export interface TeacherSummary {
   slug: string
   title: string
   photo: string
+  lqip?: string
 }
 
 export interface ScheduleTime {
@@ -30,6 +31,8 @@ export interface ScheduleTeacher {
   startTime: string
   endTime: string
 }
+
+export type TeacherWithSchedule = TeacherSummary & { schedule: ScheduleDay[] }
 
 export interface NowPlaying {
   title: string

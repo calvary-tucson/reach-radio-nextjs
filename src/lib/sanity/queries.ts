@@ -3,7 +3,8 @@ export const teacherListQuery = `
     "name": name.first + " " + name.last,
     "slug": slug.current,
     title,
-    "photo": photo.asset->url
+    "photo": photo.asset->url,
+    "lqip": photo.asset->metadata.lqip
   }
 `
 
@@ -16,7 +17,8 @@ export const teacherSearchQuery = `
     "name": name.first + " " + name.last,
     "slug": slug.current,
     title,
-    "photo": photo.asset->url
+    "photo": photo.asset->url,
+    "lqip": photo.asset->metadata.lqip
   }
 `
 
@@ -27,6 +29,7 @@ export const teacherDetailQuery = `
     title,
     subtitle,
     "photo": photo.asset->url,
+    "lqip": photo.asset->metadata.lqip,
     links[] { title, url },
     schedule[] {
       day,
