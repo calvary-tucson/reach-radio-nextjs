@@ -1,7 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+  /* Green scale matched to Astro/reach-radio-web tailwind.config.mjs */
+  --color-green-50: #F2F8ED;
+  --color-green-100: #E6F0DB;
+  --color-green-200: #CFE3BA;
+  --color-green-300: #B5D496;
+  --color-green-400: #9CC671;
+  --color-green-500: #84B84F;
+  --color-green-600: #69953C;
+  --color-green-700: #4F712D;
+  --color-green-800: #364C1F;
+  --color-green-900: #1A240F;
+  --color-green-950: #0D1207;
+}
+
 :root {
-  --color-brand-green: oklch(67% 0.18 130);
+  --color-brand-green: #84B84F;
   --color-brand-purple: oklch(24% 0.05 280);
   --color-brand-gray: oklch(30% 0.02 280);
 }

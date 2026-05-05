@@ -20,7 +20,7 @@ export function MediaBar() {
   if (!showMediaBar) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[var(--color-brand-gray)] border-t border-white/10 px-4 py-2 flex items-center gap-3 z-50">
+    <div className="fixed bottom-[72px] md:bottom-0 left-0 right-0 bg-[var(--color-brand-gray)] border-t border-white/10 px-4 py-2 flex items-center gap-3 z-50">
       <NowPlayingInfo />
       <PlayPauseButton />
     </div>
