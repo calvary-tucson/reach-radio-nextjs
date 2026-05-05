@@ -18,7 +18,7 @@ export function PlayPauseButton() {
     <button
       onClick={toggle}
       aria-label={isPlaying ? 'Pause' : 'Play'}
-      className="w-10 h-10 rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0"
+      className="w-11 h-11 rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0"
     >
       {isBuffering ? (
         <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin" />

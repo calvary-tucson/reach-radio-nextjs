@@ -10,27 +10,31 @@ export function SearchBar() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const q = new FormData(e.currentTarget).get('q') as string
+    const q = (new FormData(e.currentTarget).get('q') as string).trim().slice(0, 100)
     startTransition(() => {
-      router.push(`/teachers/search?q=${encodeURIComponent(q.trim())}`)
+      router.push(`/teachers/search?q=${encodeURIComponent(q)}`)
     })
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+      <label htmlFor="teacher-search" className="sr-only">Search teachers</label>
       <input
+        id="teacher-search"
         name="q"
         type="search"
         defaultValue={searchParams.get('q') ?? ''}
         placeholder="Search teachers..."
+        maxLength={100}
         className="flex-1 bg-gray-700/50 text-white placeholder:text-white/40 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20"
       />
       <button
         type="submit"
         disabled={isPending}
-        className="bg-[var(--color-brand-green)] text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
+        aria-busy={isPending}
+        className="bg-[var(--color-brand-green)] text-white px-4 py-2 min-h-[44px] rounded text-sm font-medium disabled:opacity-50"
       >
-        {isPending ? '...' : 'Search'}
+        {isPending ? 'Searching...' : 'Search'}
       </button>
     </form>
   )

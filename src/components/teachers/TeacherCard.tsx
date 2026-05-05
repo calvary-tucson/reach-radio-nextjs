@@ -20,7 +20,7 @@ export function TeacherCard({ teacher }: { teacher: TeacherSummary }) {
     <Link
       href={`/teachers/${teacher.slug}`}
       transitionTypes={['nav-forward']}
-      className="block rounded overflow-hidden border border-green-700 [box-shadow:0_0_28px_-10px_#517987] hover:scale-105 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      className="block rounded overflow-hidden border border-green-700 [box-shadow:0_0_28px_-10px_#517987] motion-safe:hover:scale-105 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
       {teacher.photo ? (
         <ViewTransition name={`teacher-${teacher.slug}`}>

@@ -31,7 +31,10 @@ export function RadioPlayer() {
       { threshold: 0.1 }
     )
     observer.observe(containerRef.current)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      setShowMediaBar(false)
+    }
   }, [setShowMediaBar])
 
   function togglePlay() {
@@ -46,19 +49,20 @@ export function RadioPlayer() {
     <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
-        <Image
-          src={image}
-          alt={altText}
-          width={256}
-          height={256}
-          className="max-w-[420px] max-h-64 rounded object-contain cursor-pointer hover:opacity-90 transition-opacity"
+        <button
           onClick={togglePlay}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePlay() } }}
-          role="button"
-          tabIndex={0}
           aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
-          priority
-        />
+          className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded"
+        >
+          <Image
+            src={image}
+            alt={altText}
+            width={420}
+            height={420}
+            className="max-w-[420px] max-h-64 rounded object-contain hover:opacity-90 transition-opacity"
+            priority
+          />
+        </button>
       </div>
       <div className="flex flex-col items-center gap-4 mt-5">
         <div className="flex flex-col items-center gap-1 w-full px-2 text-center">

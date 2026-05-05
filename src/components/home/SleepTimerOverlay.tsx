@@ -37,7 +37,11 @@ export function SleepTimerOverlay() {
   }
 
   return (
-    <div className="absolute inset-0 z-10 bg-black/80 rounded flex flex-col items-center justify-center gap-4">
+    <div
+      role="dialog"
+      aria-label="Sleep timer active"
+      className="absolute inset-0 z-10 bg-black/80 rounded flex flex-col items-center justify-center gap-4"
+    >
       <p
         className="text-white text-4xl font-mono"
         aria-live="polite"
@@ -49,7 +53,7 @@ export function SleepTimerOverlay() {
         ref={cancelBtnRef}
         onClick={cancel}
         aria-label="Cancel sleep timer"
-        className="text-white/70 text-sm underline hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded"
+        className="bg-white/20 text-white px-4 py-2 rounded text-sm hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
       >
         Cancel
       </button>

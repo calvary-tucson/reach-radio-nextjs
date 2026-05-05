@@ -18,7 +18,7 @@ export function VolumeControl() {
       <button
         onClick={toggleMute}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
-        className="md:hidden w-9 h-9 flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded-full"
+        className="md:hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white rounded-full"
       >
         <VolumeIcon muted={isMuted} volume={volume} />
       </button>
@@ -28,7 +28,7 @@ export function VolumeControl() {
         <button
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
-          className="flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded"
+          className="flex-shrink-0 focus-visible:ring-2 focus-visible:ring-white rounded"
         >
           <VolumeIcon muted={isMuted} volume={volume} />
         </button>
@@ -38,7 +38,7 @@ export function VolumeControl() {
           max={100}
           value={volume}
           onChange={(e) => setVolume(Number(e.target.value))}
-          className="w-full accent-white"
+          className="w-full accent-white focus-visible:ring-2 focus-visible:ring-white rounded"
           aria-label="Volume"
         />
       </div>
