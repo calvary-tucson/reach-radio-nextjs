@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useMediaStore } from '@/lib/store/media-store'
 import { PlayPauseButton } from '@/components/media-bar/PlayPauseButton'
@@ -12,14 +12,34 @@ export function RadioPlayer() {
   const image = useMediaStore((s) => s.image)
   const title = useMediaStore((s) => s.title)
   const artist = useMediaStore((s) => s.artist)
+  const isPlaying = useMediaStore((s) => s.isPlaying)
+  const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setShowMediaBar(true)
+    setShowMediaBar(false)
+    return () => setShowMediaBar(true)
+  }, [setShowMediaBar])
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowMediaBar(false)
+        } else if (window.scrollY > 100) {
+          setShowMediaBar(true)
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
   }, [setShowMediaBar])
 
   return (
-    <div className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
+    <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
         <Image
@@ -27,7 +47,8 @@ export function RadioPlayer() {
           alt="Now playing album art"
           width={420}
           height={420}
-          className="max-w-[420px] max-h-64 rounded object-contain"
+          className="max-w-[420px] max-h-64 rounded object-contain cursor-pointer"
+          onClick={() => setIsPlaying(!isPlaying)}
           priority
         />
       </div>
