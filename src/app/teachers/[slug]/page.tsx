@@ -73,7 +73,7 @@ export default async function TeacherDetailPage({ params }: Props) {
       <PersonSchema
         name={teacher.name}
         jobTitle={teacher.title}
-        imageUrl={teacher.photo}
+        imageUrl={teacher.photo ?? undefined}
         url={`https://reach-radio.com/teachers/${teacher.slug}`}
       />
 
