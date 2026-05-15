@@ -23,7 +23,7 @@ export function PersonSchema({ name, jobTitle, imageUrl, url }: Props) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/<\/script>/gi, '<\\/script>') }}
     />
   )
 }
