@@ -48,7 +48,6 @@ export async function submitContact(
   if (!emailRegex.test(email)) {
     return { success: false, error: 'Please enter a valid email address.' }
   }
-  }
 
   if (message.length < 10 || message.length > 2000) {
     return { success: false, error: 'Message must be 10–2000 characters.' }
