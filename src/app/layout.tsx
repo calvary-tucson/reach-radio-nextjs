@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <BridgeInit />
         {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
-        <SleepTimerProvider />
+        {!isMobileApp && <SleepTimerProvider />}
         {!isMobileApp && <Header />}
         {!isMobileApp && <MobileHeader />}
         <main id="main-content" className={!isMobileApp ? 'pt-16 pb-36' : ''}>{children}</main>
