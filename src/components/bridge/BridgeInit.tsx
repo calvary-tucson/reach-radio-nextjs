@@ -32,7 +32,9 @@ export function BridgeInit() {
   }, [pathname])
 
   useEffect(() => {
-    function handleMessage() {
+    function handleMessage(e: MessageEvent) {
+      // Allow same-origin and null-origin (native WebView postMessage)
+      if (e.origin !== '' && e.origin !== window.location.origin) return
       if (!document.cookie.includes('mobile-app=true')) {
         document.cookie = 'mobile-app=true; path=/; max-age=315360000'
       }
