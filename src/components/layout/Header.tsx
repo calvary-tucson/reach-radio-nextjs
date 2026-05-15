@@ -48,10 +48,10 @@ export function Header() {
       style={{ viewTransitionName: 'site-header', transition: 'transform 0.5s, opacity 0.5s' }}
       className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 border-b border-b-green-500/20 px-6"
     >
-      <Link href="/" className="flex items-center w-[clamp(130px,16vw,186px)]">
+      <Link href="/" aria-label="Reach Radio home" className="flex items-center w-[clamp(130px,16vw,186px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded">
         <Image
           src="/reach_radio_logo.svg"
-          alt="Reach Radio"
+          alt=""
           width={186}
           height={40}
           className="h-10 w-auto"
@@ -69,7 +69,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
-              className="relative flex flex-col items-center justify-center h-16 px-3"
+              className="relative flex flex-col items-center justify-center h-16 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
             >
               {isActive && (
                 <>
@@ -91,7 +91,7 @@ export function Header() {
           target="_blank"
           rel="noopener noreferrer"
           title="Facebook"
-          className="w-7 fill-slate-300 hover:fill-white transition-colors duration-500"
+          className="w-7 fill-slate-300 hover:fill-white transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">
@@ -100,7 +100,7 @@ export function Header() {
         </a>
         <Link
           href="/about#aboutGotQuestions"
-          className="flex items-center px-3 py-1.5 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 transition-colors"
+          className="flex items-center px-3 py-1.5 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
         >
           Contact
         </Link>
