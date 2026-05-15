@@ -7,6 +7,7 @@ const DONATE_URL =
   'https://forms.ministryforms.net/viewForm.aspx?formid=32b9c82a-1472-4180-b023-73b42532b63e&direct-link=true&embed=false'
 const EXPECTED_ORIGIN = 'https://forms.ministryforms.net'
 
+
 export default function DonatePage() {
   const [loaded, setLoaded] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -54,7 +55,7 @@ export default function DonatePage() {
       <p className="text-white/70 mb-6">Your generous support keeps Reach Radio on the air.</p>
 
       {!loaded && (
-        <div className="animate-pulse flex flex-col gap-4 h-[800px] bg-black rounded p-4">
+        <div className="animate-pulse flex flex-col gap-4 h-[1000px] bg-black rounded p-4">
           <div className="h-[60px] bg-gray-700 rounded" />
           <div className="h-[1.2em] w-[90%] bg-gray-700 rounded" />
           <div className="h-[1.2em] w-[60%] bg-gray-700 rounded" />
@@ -70,6 +71,7 @@ export default function DonatePage() {
         src={DONATE_URL}
         title="Donation Form"
         onLoad={handleLoad}
+        sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
         className={`w-full min-h-[1000px] border-0 ${loaded ? 'block' : 'hidden'}`}
       />
     </div>
