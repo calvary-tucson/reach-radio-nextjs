@@ -19,6 +19,7 @@ export function TeacherCard({ teacher }: { teacher: TeacherSummary }) {
   return (
     <Link
       href={`/teachers/${teacher.slug}`}
+      aria-label={teacher.name}
       transitionTypes={['nav-forward']}
       className="block rounded overflow-hidden border border-green-700 [box-shadow:0_0_28px_-10px_#517987] motion-safe:hover:scale-105 transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
@@ -27,7 +28,7 @@ export function TeacherCard({ teacher }: { teacher: TeacherSummary }) {
           <div className="relative aspect-square">
             <Image
               src={teacher.photo}
-              alt={teacher.name}
+              alt=""
               fill
               className="object-cover"
               placeholder={teacher.lqip ? 'blur' : 'empty'}
@@ -40,8 +41,8 @@ export function TeacherCard({ teacher }: { teacher: TeacherSummary }) {
         <TeacherInitials name={teacher.name} />
       )}
       <div className="p-3">
-        <p className="text-white font-semibold text-sm">{teacher.name}</p>
-        <p className="text-white/80 text-xs mt-1">{teacher.title}</p>
+        <p className="text-white font-semibold text-sm" aria-hidden="true">{teacher.name}</p>
+        <p className="text-white/80 text-xs mt-1" aria-hidden="true">{teacher.title}</p>
       </div>
     </Link>
   )
