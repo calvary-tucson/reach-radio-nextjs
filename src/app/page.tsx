@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="px-3 pt-3 space-y-6 pb-32">
+      <h1 className="sr-only">Reach Radio</h1>
       <RadioStationSchema />
 
       <Suspense fallback={<RadioPlayerSkeleton />}>
