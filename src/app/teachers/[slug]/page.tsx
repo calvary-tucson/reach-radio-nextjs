@@ -8,6 +8,8 @@ import { teacherDetailQuery, teacherSlugsQuery } from '@/lib/sanity/queries'
 import type { TeacherDetail } from '@/lib/sanity/types'
 import { PersonSchema } from '@/components/seo/PersonSchema'
 
+export const revalidate = 3600
+
 interface Props {
   params: Promise<{ slug: string }>
 }
@@ -40,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: teacher.name,
     description: `${teacher.title} on Reach Radio Tucson`,
+    alternates: { canonical: `/teachers/${slug}` },
     openGraph: {
       images: teacher.photo ? [{ url: teacher.photo }] : [],
     },

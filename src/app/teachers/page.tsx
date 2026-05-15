@@ -7,9 +7,12 @@ import { TeacherCard } from '@/components/teachers/TeacherCard'
 import { SearchBar } from '@/components/teachers/SearchBar'
 import { TeacherGridSkeleton } from '@/components/skeletons/TeacherCardSkeleton'
 
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   title: 'Teachers',
   description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+  alternates: { canonical: '/teachers' },
 }
 
 async function TeacherGrid() {
