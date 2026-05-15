@@ -9,6 +9,7 @@ import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 export const metadata: Metadata = {
   title: 'Listen',
   description: 'Reach Radio features Bible teachings and Christian music. Listen online or on the air in Tucson at 106.7FM and 690AM.',
+  alternates: { canonical: '/' },
 }
 
 export default function HomePage() {

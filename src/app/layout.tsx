@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   title: { default: 'Reach Radio', template: '%s | Reach Radio' },
   description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
   metadataBase: new URL('https://reach-radio.com'),
-  openGraph: {
-    images: ['/og-image.png'],
+  alternates: {
+    canonical: '/',
   },
 }
 

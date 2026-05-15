@@ -6,6 +6,7 @@ import { ContactForm } from '@/components/about/ContactForm'
 export const metadata: Metadata = {
   title: 'About',
   description: 'About Reach Radio — 106.7FM / 690AM in Tucson, AZ',
+  alternates: { canonical: '/about' },
 }
 
 export default async function AboutPage() {
