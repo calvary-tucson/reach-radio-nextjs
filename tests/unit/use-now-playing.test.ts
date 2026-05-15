@@ -71,9 +71,9 @@ describe('useNowPlaying', () => {
     // After first error, close is NOT called immediately — retry is scheduled
     expect(mockES.close).not.toHaveBeenCalled()
 
-    // Advance past the 1s retry delay — a new EventSource is created
+    // Advance past the 1s + up to 500ms jitter retry delay — a new EventSource is created
     act(() => {
-      vi.advanceTimersByTime(1100)
+      vi.advanceTimersByTime(1600)
     })
 
     expect(EventSource).toHaveBeenCalledTimes(2)

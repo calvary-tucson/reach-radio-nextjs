@@ -37,9 +37,12 @@ describe('TeacherCard', () => {
     expect(screen.getByText('John MacArthur')).toBeInTheDocument()
   })
 
-  it('renders image with correct alt when photo exists', () => {
+  it('renders image with decorative alt and link aria-label when photo exists', () => {
     render(<TeacherCard teacher={teacher} />)
-    expect(screen.getByAltText('John MacArthur')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'John MacArthur' })).toBeInTheDocument()
+    // alt="" makes image presentational — verify via DOM query
+    const img = document.querySelector('img')
+    expect(img).toHaveAttribute('alt', '')
   })
 
   it('renders no image when photo is absent', () => {

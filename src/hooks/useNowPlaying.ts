@@ -36,7 +36,6 @@ export function useNowPlaying(): void {
         if (retries >= MAX_RETRIES) return
         const delay = Math.pow(2, retries) * 1000 + Math.random() * 500
         retries++
-        es?.close()
         retryTimer = setTimeout(connect, delay)
       }
     }
