@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<Response> {
   const encoder = new TextEncoder()
+  let interval: ReturnType<typeof setInterval> | undefined
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -13,7 +14,6 @@ export async function GET(): Promise<Response> {
             signal: AbortSignal.timeout(5_000),
           })
           const text = await res.text()
-          // Strip JSONP wrapper: `({"song":{...}});`
           const json = JSON.parse(text.substring(1, text.length - 2)) as {
             song?: { title?: string; artist?: string }
           }
@@ -27,9 +27,10 @@ export async function GET(): Promise<Response> {
       }
 
       await poll()
-      const interval = setInterval(poll, 30_000)
-
-      return () => clearInterval(interval)
+      interval = setInterval(poll, 30_000)
+    },
+    cancel() {
+      clearInterval(interval)
     },
   })
 
