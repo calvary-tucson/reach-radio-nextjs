@@ -17,7 +17,7 @@ export function SearchBar() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+    <form onSubmit={handleSubmit} role="search" className="flex gap-2 mb-6">
       <label htmlFor="teacher-search" className="sr-only">Search teachers</label>
       <input
         id="teacher-search"
@@ -26,7 +26,7 @@ export function SearchBar() {
         defaultValue={searchParams.get('q') ?? ''}
         placeholder="Search teachers..."
         maxLength={100}
-        className="flex-1 bg-gray-700/50 text-white placeholder:text-white/40 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20"
+        className="flex-1 min-h-[44px] bg-gray-700/50 text-white placeholder:text-white/40 rounded px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-white"
       />
       <button
         type="submit"
