@@ -1,7 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Script from 'next/script'
 import { useMediaStore } from '@/lib/store/media-store'
+
+declare const iFrameResize: ((options: object, selector: string) => void) | undefined
 
 const DONATE_URL =
   'https://forms.ministryforms.net/viewForm.aspx?formid=32b9c82a-1472-4180-b023-73b42532b63e&direct-link=true&embed=false'
@@ -34,6 +37,12 @@ export default function DonatePage() {
 
   function handleLoad() {
     setLoaded(true)
+    if (typeof iFrameResize === 'function') {
+      iFrameResize(
+        { log: false, heightCalculationMethod: 'bodyOffset' },
+        '#donation-iframe'
+      )
+    }
     const attempts = { count: 0 }
     function trySend() {
       if (attempts.count >= 5) return
@@ -67,6 +76,7 @@ export default function DonatePage() {
       )}
 
       <iframe
+        id="donation-iframe"
         ref={iframeRef}
         src={DONATE_URL}
         title="Donation Form"
@@ -74,6 +84,7 @@ export default function DonatePage() {
         sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
         className={`w-full min-h-[1000px] border-0 ${loaded ? 'block' : 'hidden'}`}
       />
+      <Script src="/js/iFrameResizer.min.js" strategy="lazyOnload" />
     </div>
   )
 }
