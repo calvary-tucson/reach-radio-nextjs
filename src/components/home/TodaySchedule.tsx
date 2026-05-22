@@ -5,11 +5,9 @@ import Link from 'next/link'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
-dayjs.extend(customParseFormat)
 
 const MUSIC_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
 const TZ = 'America/Phoenix'
@@ -131,7 +129,7 @@ export async function TodaySchedule() {
                 alt={item.isMusic ? 'Music' : item.name}
                 fill
                 className="object-cover rounded"
-                sizes="80px"
+                sizes="(max-width: 768px) 64px, 80px"
               />
             </div>
             <div>
@@ -145,7 +143,7 @@ export async function TodaySchedule() {
         if (item.isMusic || !item.slug) {
           return (
             <div
-              key={`${item.startTime}-${idx}`}
+              key={`music-${item.startTime}-${item.endTime}`}
               className="flex gap-5 bg-gray-700 p-2 rounded"
             >
               {content}
