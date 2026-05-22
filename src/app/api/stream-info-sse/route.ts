@@ -15,10 +15,11 @@ export async function GET(): Promise<Response> {
           })
           const text = await res.text()
           const json = JSON.parse(text.substring(1, text.length - 2)) as {
-            song?: { title?: string; artist?: string }
+            title?: string
+            artist?: string
           }
-          const title = json.song?.title || 'Reach Radio'
-          const artist = json.song?.artist || ''
+          const title = json.title || 'Reach Radio'
+          const artist = json.artist || ''
           const data = JSON.stringify({ title, artist })
           controller.enqueue(encoder.encode(`data: ${data}\n\n`))
         } catch {
