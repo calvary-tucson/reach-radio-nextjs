@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { ContactForm } from '@/components/about/ContactForm'
+import { sanityFetch } from '@/lib/sanity/client'
+import { siteSettingsQuery } from '@/lib/sanity/queries'
+import { OrganizationSchema } from '@/components/seo/OrganizationSchema'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -13,8 +16,30 @@ export default async function AboutPage() {
   const headersList = await headers()
   const isMobileApp = headersList.get('mobile-app') === 'true'
 
+  const siteSettings = await sanityFetch<{
+    siteTitle: string
+    siteDescription?: string
+    siteIconURL?: string
+    twitterHandle?: string
+    facebookPage?: string
+  }>(siteSettingsQuery, {}, { tags: ['siteSettings'] }).catch(() => ({
+    siteTitle: 'Reach Radio',
+    siteDescription: undefined,
+    siteIconURL: undefined,
+    twitterHandle: undefined,
+    facebookPage: undefined,
+  }))
+
   return (
     <div className="px-4 py-6 max-w-2xl mx-auto space-y-6">
+      <OrganizationSchema
+        name={siteSettings.siteTitle}
+        alternateName="Reach Radio Tucson"
+        description={siteSettings.siteDescription}
+        logoUrl={siteSettings.siteIconURL}
+        facebookUrl={siteSettings.facebookPage}
+        twitterHandle={siteSettings.twitterHandle}
+      />
       {/* Frequency hero */}
       <div className="grid md:grid-cols-2 rounded overflow-hidden">
         <div className="text-center p-5 bg-gradient-to-b from-green-600 to-green-700 flex flex-col justify-center items-center">

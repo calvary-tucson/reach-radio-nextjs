@@ -74,3 +74,13 @@ export const teacherNamesAndPhotosQuery = `
     "photo": photo.asset->url
   }
 `
+
+export const siteSettingsQuery = `
+  *[_type == "siteSettings"][0] {
+    siteTitle,
+    siteDescription,
+    "siteIconURL": siteIconLight.asset->url,
+    twitterHandle,
+    facebookPage
+  }
+`
