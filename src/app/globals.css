@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* Green scale matched to Astro/reach-radio-web tailwind.config.mjs */
