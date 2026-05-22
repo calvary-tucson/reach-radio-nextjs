@@ -64,14 +64,22 @@ export function RadioPlayer() {
           />
         </button>
       </div>
-      <div className="flex flex-col items-center gap-4 mt-5">
-        <div className="flex flex-col items-center gap-1 w-full px-2 text-center">
-          <p className="text-white font-semibold text-lg leading-tight">{title}</p>
-          {artist && <p className="text-white/70 text-sm">{artist}</p>}
+      <div className="flex md:flex-row flex-col items-center justify-between md:gap-0 gap-8 mt-5">
+        <div className="flex flex-col md:items-start items-center md:gap-3 gap-1 w-full md:w-[calc(100%_-_276px)] px-2">
+          <p className="md:text-4xl text-2xl font-normal leading-tight text-white truncate w-full md:text-left text-center">
+            {title}
+          </p>
+          {artist && (
+            <p className="md:font-bold font-medium md:text-lg uppercase text-white/80 truncate w-full md:text-left text-center">
+              {artist}
+            </p>
+          )}
         </div>
-        <div className="flex gap-8 items-center justify-center">
-          <PlayPauseButton />
-          <SleepTimerButton />
+        <div className="flex gap-11">
+          <div className="flex gap-5 md:items-center items-end md:ml-0 ml-14">
+            <PlayPauseButton />
+            <SleepTimerButton />
+          </div>
           <VolumeControl />
         </div>
       </div>
