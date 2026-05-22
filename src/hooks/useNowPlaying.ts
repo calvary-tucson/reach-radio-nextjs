@@ -4,9 +4,23 @@ import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
 
 const MAX_RETRIES = 5
+const DEFAULT_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
 
 export function useNowPlaying(): void {
   const setNowPlaying = useMediaStore((s) => s.setNowPlaying)
+  const setTeachersList = useMediaStore((s) => s.setTeachersList)
+
+  // Fetch teacher list once — used to resolve artist → photo
+  useEffect(() => {
+    fetch('/api/teachers-list')
+      .then((r) => r.json())
+      .then((data: { name: string; photo: string }[]) => {
+        setTeachersList(data)
+      })
+      .catch(() => {
+        // non-critical, best-effort
+      })
+  }, [setTeachersList])
 
   useEffect(() => {
     let retries = 0
@@ -19,12 +33,27 @@ export function useNowPlaying(): void {
 
       es.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data) as { title?: string; artist?: string; image?: string }
-          const { title, artist, image } = useMediaStore.getState()
+          const data = JSON.parse(event.data) as { title?: string; artist?: string }
+          const { teachersList } = useMediaStore.getState()
+
+          let image = DEFAULT_IMAGE
+          let resolvedArtist = data.artist ?? ''
+
+          if (resolvedArtist && teachersList.length > 0) {
+            const match = teachersList.find((t) =>
+              t.name.toLowerCase().includes(resolvedArtist.toLowerCase()) ||
+              resolvedArtist.toLowerCase().includes(t.name.toLowerCase())
+            )
+            if (match) {
+              image = match.photo + '?w=420&fm=webp'
+              resolvedArtist = match.name
+            }
+          }
+
           setNowPlaying(
-            data.title ?? title,
-            data.artist ?? artist,
-            data.image ?? image
+            data.title ?? useMediaStore.getState().title,
+            resolvedArtist,
+            image
           )
           retries = 0
         } catch {

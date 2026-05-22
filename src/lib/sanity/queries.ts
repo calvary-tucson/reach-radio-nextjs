@@ -67,3 +67,10 @@ export const fullScheduleQuery = `
     }
   }
 `
+
+export const teacherNamesAndPhotosQuery = `
+  *[_type == "teacher"] {
+    "name": name.first + " " + name.last,
+    "photo": photo.asset->url
+  }
+`
