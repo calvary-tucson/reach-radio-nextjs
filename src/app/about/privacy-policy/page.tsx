@@ -4,6 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: "Privacy Policy for Reach Radio Tucson's website and mobile applications.",
+  alternates: { canonical: '/about/privacy-policy' },
 }
 
 export default function PrivacyPolicyPage() {
