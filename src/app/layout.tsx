@@ -14,9 +14,21 @@ import './globals.css'
 export const metadata: Metadata = {
   title: { default: 'Reach Radio', template: '%s | Reach Radio' },
   description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
-  metadataBase: new URL('https://reach-radio.com'),
+  metadataBase: new URL('https://reach.radio'),
   alternates: {
     canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'Reach Radio',
+    title: 'Reach Radio',
+    description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
+    url: 'https://reach.radio',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Reach Radio',
+    description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
   },
 }
 

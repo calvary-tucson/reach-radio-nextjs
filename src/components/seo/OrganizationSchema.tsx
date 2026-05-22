@@ -39,14 +39,14 @@ export function OrganizationSchema({
       addressRegion: 'AZ',
       addressCountry: 'US',
     },
-    foundingDate: '2016-02',
+    foundingDate: '2016-02-01',
     ...(sameAs.length > 0 && { sameAs }),
   }
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/<\//g, '<\\/') }}
     />
   )
 }
