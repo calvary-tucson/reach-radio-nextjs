@@ -37,7 +37,7 @@ export function useNowPlaying(): void {
           const { teachersList } = useMediaStore.getState()
 
           let image = DEFAULT_IMAGE
-          let resolvedArtist = data.artist ?? ''
+          let resolvedArtist = data.artist ?? useMediaStore.getState().artist
 
           if (resolvedArtist && teachersList.length > 0) {
             const match = teachersList.find((t) =>
