@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
 import { useMediaStore } from '@/lib/store/media-store'
 
-declare const iFrameResize: ((options: object, selector: string) => void) | undefined
+declare global {
+  interface Window {
+    iFrameResize?: (options: object, selector: string) => void
+  }
+}
 
 const DONATE_URL =
   'https://forms.ministryforms.net/viewForm.aspx?formid=32b9c82a-1472-4180-b023-73b42532b63e&direct-link=true&embed=false'
@@ -37,23 +41,21 @@ export default function DonatePage() {
 
   function handleLoad() {
     setLoaded(true)
-    if (typeof iFrameResize === 'function') {
-      iFrameResize(
-        { log: false, heightCalculationMethod: 'bodyOffset' },
-        '#donation-iframe'
-      )
-    }
-    const attempts = { count: 0 }
+    window.iFrameResize?.(
+      { log: false, heightCalculationMethod: 'bodyOffset' },
+      '#donation-iframe'
+    )
+    let remaining = 5
     function trySend() {
-      if (attempts.count >= 5) return
-      attempts.count++
       try {
         iframeRef.current?.contentWindow?.postMessage(
           { type: 'initParentInfo', origin: window.location.origin },
           EXPECTED_ORIGIN
         )
-      } catch {}
-      if (attempts.count < 5) setTimeout(trySend, 500)
+      } catch (err) {
+        console.warn('postMessage to donation form failed:', err)
+      }
+      if (--remaining > 0) setTimeout(trySend, 500)
     }
     trySend()
   }
@@ -64,7 +66,7 @@ export default function DonatePage() {
       <p className="text-white/70 mb-6">Your generous support keeps Reach Radio on the air.</p>
 
       {!loaded && (
-        <div className="animate-pulse flex flex-col gap-4 h-[1000px] bg-black rounded p-4">
+        <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[1000px] bg-black rounded p-4">
           <div className="h-[60px] bg-gray-700 rounded" />
           <div className="h-[1.2em] w-[90%] bg-gray-700 rounded" />
           <div className="h-[1.2em] w-[60%] bg-gray-700 rounded" />
@@ -82,9 +84,9 @@ export default function DonatePage() {
         title="Donation Form"
         onLoad={handleLoad}
         sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-        className={`w-full min-h-[1000px] border-0 ${loaded ? 'block' : 'hidden'}`}
+        className={`w-full min-h-[1000px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
       />
-      <Script src="/js/iFrameResizer.min.js" strategy="lazyOnload" />
+      <Script src="/js/iFrameResizer.min.js" strategy="afterInteractive" />
     </div>
   )
 }
