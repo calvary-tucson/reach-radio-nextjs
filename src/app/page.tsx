@@ -23,7 +23,7 @@ export default function HomePage() {
       </Suspense>
 
       <section>
-        <h2 className="text-white font-semibold text-base mb-3">Today&apos;s Schedule</h2>
+        <h2 className="text-white font-bold text-lg px-3 uppercase mb-3">Playing Next</h2>
         <Suspense fallback={<ScheduleSkeleton />}>
           <TodaySchedule />
         </Suspense>
