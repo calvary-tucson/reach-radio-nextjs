@@ -77,7 +77,7 @@ export function RadioPlayer() {
         </div>
         <div className="flex gap-11">
           <div className="flex gap-5 md:items-center items-end md:ml-0 ml-14">
-            <PlayPauseButton />
+            <PlayPauseButton size="lg" />
             <SleepTimerButton />
           </div>
           <VolumeControl />
