@@ -89,9 +89,21 @@ export async function TodaySchedule() {
 
   if (slots.length === 0) {
     return (
-      <p className="text-white/80 text-sm px-3">
-        No more programs scheduled today.
-      </p>
+      <div className="flex items-center gap-5 bg-gray-700 p-2 rounded text-white">
+        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
+          <Image
+            src={MUSIC_IMAGE + '?w=420&fm=webp'}
+            alt="Music"
+            fill
+            className="object-cover rounded"
+            sizes="(max-width: 768px) 64px, 80px"
+          />
+        </div>
+        <div>
+          <div className="font-bold text-base">Music</div>
+          <div className="uppercase text-sm text-white/70">Reach Radio</div>
+        </div>
+      </div>
     )
   }
 
@@ -134,7 +146,7 @@ export async function TodaySchedule() {
             </div>
             <div>
               <div className="font-bold text-base">{item.title}</div>
-              {!item.isMusic && <div className="uppercase text-sm text-white/70">{item.name}</div>}
+              <div className="uppercase text-sm text-white/70">{item.name}</div>
               <div className="text-sm text-white/60">{item.time}</div>
             </div>
           </>
