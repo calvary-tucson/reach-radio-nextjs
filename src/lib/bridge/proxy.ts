@@ -30,7 +30,7 @@ export function initBridgeProxy(router?: { push: (path: string) => void }): void
     mediaBarState: {
       isPlaying: { set: (v) => useMediaStore.getState().setIsPlaying(v) },
       isBuffering: { set: (v) => useMediaStore.getState().setIsBuffering(v) },
-      isMuted: { set: (v) => useMediaStore.getState().setIsMuted(v) },
+      isMuted: { set: (v) => useMediaStore.getState().setMuted(v) },
       showMediaBar: { set: (v) => useMediaStore.getState().setShowMediaBar(v) },
     },
   }

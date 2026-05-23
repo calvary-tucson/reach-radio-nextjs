@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <div className="px-4 py-6 max-w-2xl mx-auto">
+      <ShowMediaBar />
       <Link href="/about" className="text-white/60 text-sm mb-6 block hover:text-white">
         ← About
       </Link>

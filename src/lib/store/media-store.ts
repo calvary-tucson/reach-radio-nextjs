@@ -7,6 +7,7 @@ interface MediaState {
   isBuffering: boolean
   isMuted: boolean
   volume: number
+  previousVolume: number
   title: string
   artist: string
   image: string
@@ -15,8 +16,9 @@ interface MediaState {
   remainingSleepSeconds: number
   setIsPlaying: (v: boolean) => void
   setIsBuffering: (v: boolean) => void
-  setIsMuted: (v: boolean) => void
   setVolume: (v: number) => void
+  toggleMute: () => void
+  setMuted: (v: boolean) => void
   setNowPlaying: (title: string, artist: string, image: string) => void
   setShowMediaBar: (v: boolean) => void
   setSleepTimerActive: (active: boolean) => void
@@ -26,11 +28,12 @@ interface MediaState {
   setTeachersList: (list: { name: string; photo: string }[]) => void
 }
 
-export const useMediaStore = create<MediaState>((set) => ({
+export const useMediaStore = create<MediaState>((set, get) => ({
   isPlaying: false,
   isBuffering: false,
   isMuted: false,
   volume: 100,
+  previousVolume: 100,
   title: 'Reach Radio',
   artist: '',
   image: DEFAULT_IMAGE,
@@ -39,8 +42,23 @@ export const useMediaStore = create<MediaState>((set) => ({
   remainingSleepSeconds: 0,
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
-  setIsMuted: (v) => set({ isMuted: v }),
   setVolume: (v) => set({ volume: v, isMuted: v === 0 }),
+  toggleMute: () => {
+    const { isMuted, volume, previousVolume } = get()
+    if (isMuted) {
+      set({ isMuted: false, volume: previousVolume > 0 ? previousVolume : 100 })
+    } else {
+      set({ isMuted: true, previousVolume: volume, volume: 0 })
+    }
+  },
+  setMuted: (v) => {
+    const { isMuted, volume, previousVolume } = get()
+    if (v && !isMuted) {
+      set({ isMuted: true, previousVolume: volume, volume: 0 })
+    } else if (!v && isMuted) {
+      set({ isMuted: false, volume: previousVolume > 0 ? previousVolume : 100 })
+    }
+  },
   setNowPlaying: (title, artist, image) => set({ title, artist, image }),
   setShowMediaBar: (v) => set({ showMediaBar: v }),
   setSleepTimerActive: (active) => set({ sleepTimerActive: active }),

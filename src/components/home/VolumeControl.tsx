@@ -6,11 +6,7 @@ export function VolumeControl() {
   const volume = useMediaStore((s) => s.volume)
   const isMuted = useMediaStore((s) => s.isMuted)
   const setVolume = useMediaStore((s) => s.setVolume)
-  const setIsMuted = useMediaStore((s) => s.setIsMuted)
-
-  function toggleMute() {
-    setIsMuted(!isMuted)
-  }
+  const toggleMute = useMediaStore((s) => s.toggleMute)
 
   return (
     <>
@@ -18,7 +14,7 @@ export function VolumeControl() {
       <button
         onClick={toggleMute}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
-        className="md:hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white rounded-full"
+        className="md:hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white rounded-full cursor-pointer"
       >
         <VolumeIcon muted={isMuted} volume={volume} />
       </button>
@@ -28,7 +24,7 @@ export function VolumeControl() {
         <button
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
-          className="flex-shrink-0 focus-visible:ring-2 focus-visible:ring-white rounded"
+          className="flex-shrink-0 focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
         >
           <VolumeIcon muted={isMuted} volume={volume} />
         </button>
@@ -38,7 +34,7 @@ export function VolumeControl() {
           max={100}
           value={volume}
           onChange={(e) => setVolume(Number(e.target.value))}
-          className="w-full accent-white focus-visible:ring-2 focus-visible:ring-white rounded"
+          className="w-full accent-white focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
           aria-label="Volume"
         />
       </div>

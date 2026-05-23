@@ -21,9 +21,7 @@ export default function DonatePage() {
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
 
   useEffect(() => {
-    return () => {
-      setShowMediaBar(true)
-    }
+    setShowMediaBar(true)
   }, [setShowMediaBar])
 
   useEffect(() => {

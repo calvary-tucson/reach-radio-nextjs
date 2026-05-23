@@ -5,6 +5,7 @@ import { ContactForm } from '@/components/about/ContactForm'
 import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery } from '@/lib/sanity/queries'
 import { OrganizationSchema } from '@/components/seo/OrganizationSchema'
+import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 
 export const revalidate = 3600
 
@@ -34,6 +35,7 @@ export default async function AboutPage() {
 
   return (
     <div className="px-4 py-6 max-w-2xl mx-auto space-y-6">
+      <ShowMediaBar />
       <OrganizationSchema
         name={siteSettings.siteTitle}
         alternateName="Reach Radio Tucson"

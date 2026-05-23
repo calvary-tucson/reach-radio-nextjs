@@ -6,6 +6,7 @@ import type { TeacherSummary } from '@/lib/sanity/types'
 import { TeacherCard } from '@/components/teachers/TeacherCard'
 import { SearchBar } from '@/components/teachers/SearchBar'
 import { TeacherGridSkeleton } from '@/components/skeletons/TeacherCardSkeleton'
+import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 
 export const revalidate = 3600
 
@@ -34,6 +35,7 @@ async function TeacherGrid() {
 export default function TeachersPage() {
   return (
     <div className="px-4 py-6">
+      <ShowMediaBar />
       <h1 className="text-white text-2xl font-bold mb-6">Teachers</h1>
       <Suspense fallback={<div className="h-[52px] mb-6" />}>
         <SearchBar />

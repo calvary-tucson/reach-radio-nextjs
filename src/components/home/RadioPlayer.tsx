@@ -19,12 +19,16 @@ export function RadioPlayer() {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setShowMediaBar(false)
+  }, [setShowMediaBar])
+
+  useEffect(() => {
     if (!containerRef.current) return
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setShowMediaBar(false)
-        } else if (window.scrollY > 100) {
+        } else if (entry.boundingClientRect.top < 0) {
           setShowMediaBar(true)
         }
       },
@@ -33,7 +37,6 @@ export function RadioPlayer() {
     observer.observe(containerRef.current)
     return () => {
       observer.disconnect()
-      setShowMediaBar(false)
     }
   }, [setShowMediaBar])
 

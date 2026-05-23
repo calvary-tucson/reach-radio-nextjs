@@ -26,7 +26,7 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
     <button
       onClick={toggle}
       aria-label={isPlaying ? 'Pause' : 'Play'}
-      className={`${btnSize} rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0`}
+      className={`${btnSize} rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0 cursor-pointer`}
     >
       {isBuffering ? (
         <span className={`${spinnerSize} border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin`} />

@@ -7,6 +7,7 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { teacherDetailQuery, teacherSlugsQuery } from '@/lib/sanity/queries'
 import type { TeacherDetail } from '@/lib/sanity/types'
 import { PersonSchema } from '@/components/seo/PersonSchema'
+import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 
 export const revalidate = 3600
 
@@ -63,6 +64,7 @@ export default async function TeacherDetailPage({ params }: Props) {
 
   return (
     <div>
+      <ShowMediaBar />
       <div className="px-4 py-4">
         <Link
           href="/teachers"
