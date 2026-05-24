@@ -17,12 +17,13 @@ export function MediaBar() {
     postMessageToNative(JSON.stringify({ isPlaying, title, artist, image }))
   }, [isPlaying, title, artist, image])
 
-  if (!showMediaBar) return null
-
   return (
     <div
       role="region"
       aria-label="Media player"
+      aria-hidden={!showMediaBar}
+      data-media-bar=""
+      data-hidden={!showMediaBar ? '' : undefined}
       className="fixed bottom-[72px] md:bottom-0 left-0 right-0 bg-[var(--color-brand-gray)] border-t border-white/10 px-4 py-2 flex items-center gap-3 z-50"
     >
       <NowPlayingInfo />
