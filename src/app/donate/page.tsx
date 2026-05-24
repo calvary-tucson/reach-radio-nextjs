@@ -17,11 +17,15 @@ const EXPECTED_ORIGIN = 'https://forms.ministryforms.net'
 
 export default function DonatePage() {
   const [loaded, setLoaded] = useState(false)
+  const [failed, setFailed] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
 
   useEffect(() => {
     setShowMediaBar(true)
+    timeoutRef.current = setTimeout(() => setFailed(true), 10000)
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) }
   }, [setShowMediaBar])
 
   useEffect(() => {
@@ -38,6 +42,7 @@ export default function DonatePage() {
   }, [setShowMediaBar])
 
   function handleLoad() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
     setLoaded(true)
     window.iFrameResize?.(
       { log: false, heightCalculationMethod: 'bodyOffset' },
@@ -58,33 +63,54 @@ export default function DonatePage() {
     trySend()
   }
 
+  function handleError() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    setFailed(true)
+  }
+
   return (
     <div className="page-enter px-4 py-6">
       <h1 className="text-white text-2xl font-bold mb-4">Support Reach Radio</h1>
       <p className="text-white/70 mb-6">Your generous support keeps Reach Radio on the air.</p>
 
-      {!loaded && (
-        <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[1000px] bg-black rounded p-4">
-          <div className="h-[60px] bg-gray-700 rounded" />
-          <div className="h-[1.2em] w-[90%] bg-gray-700 rounded" />
-          <div className="h-[1.2em] w-[60%] bg-gray-700 rounded" />
-          <div className="h-[150px] bg-gray-700 rounded" />
-          <div className="h-[1.2em] w-[85%] bg-gray-700 rounded" />
-          <div className="h-[1.2em] w-[75%] bg-gray-700 rounded" />
-          <div className="h-[100px] bg-gray-700 rounded" />
+      {failed ? (
+        <div role="alert" className="text-white/70 text-sm py-8 text-center">
+          <p>Unable to load the donation form.</p>
+          <a
+            href={DONATE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block text-[var(--color-brand-green)] underline"
+          >
+            Open donation form in new tab
+          </a>
         </div>
+      ) : (
+        <>
+          {!loaded && (
+            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[1000px] bg-black rounded p-4">
+              <div className="h-[60px] bg-gray-700 rounded" />
+              <div className="h-[1.2em] w-[90%] bg-gray-700 rounded" />
+              <div className="h-[1.2em] w-[60%] bg-gray-700 rounded" />
+              <div className="h-[150px] bg-gray-700 rounded" />
+              <div className="h-[1.2em] w-[85%] bg-gray-700 rounded" />
+              <div className="h-[1.2em] w-[75%] bg-gray-700 rounded" />
+              <div className="h-[100px] bg-gray-700 rounded" />
+            </div>
+          )}
+          <iframe
+            id="donation-iframe"
+            ref={iframeRef}
+            src={DONATE_URL}
+            title="Donation Form"
+            onLoad={handleLoad}
+            onError={handleError}
+            sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+            className={`w-full min-h-[1000px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
+          />
+        </>
       )}
-
-      <iframe
-        id="donation-iframe"
-        ref={iframeRef}
-        src={DONATE_URL}
-        title="Donation Form"
-        onLoad={handleLoad}
-        sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-        className={`w-full min-h-[1000px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
-      />
-      <Script src="/js/iFrameResizer.min.js" strategy="afterInteractive" />
+      <Script src="/js/iFrameResizer.min.js" strategy="lazyOnload" />
     </div>
   )
 }
