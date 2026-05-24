@@ -1,28 +1,34 @@
-'use client'
-
-import Link from 'next/link'
-
 export function Footer() {
+  const year = new Date().getFullYear()
+
   return (
-    <footer id="site-footer" className="bg-[var(--color-brand-gray)] px-4 py-6 mt-8 text-center text-white/60 text-sm">
-      <p>© {new Date().getFullYear()} Reach Radio / Calvary Chapel of Tucson</p>
-      <div className="flex justify-center gap-4 mt-2">
-        <Link href="/about/privacy-policy" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded">Privacy Policy</Link>
-        <Link href="/about" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded">Contact</Link>
+    <footer className="overflow-hidden relative z-10 border-t border-t-gray-500 px-[clamp(10px,_3vw,_30px)] py-[clamp(20px,_3vw,_30px)] bg-[var(--color-brand-gray)] mt-5">
+      <div className="text-white text-xs">
+        Reach Radio is a ministry of{' '}
+        <a
+          className="font-bold border-b-2 border-b-green-500 pb-1"
+          href="https://calvarytucson.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Calvary Tucson Church
+        </a>{' '}
+        © {year}
       </div>
+
       <div className="mt-8">
-        <div className="w-[50px] border-t border-white/20 mb-1 mx-auto" />
-        <p className="text-white/60 text-xs">
+        <div className="w-[50px] border-t border-gray-300" />
+        <div className="text-gray-300 text-xs mt-1">
           Structured content powered by{' '}
           <a
-            href="https://www.sanity.io/"
+            className="font-bold"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold hover:text-white/60 transition-colors"
+            href="https://www.sanity.io/"
           >
             Sanity.io
           </a>
-        </p>
+        </div>
       </div>
     </footer>
   )

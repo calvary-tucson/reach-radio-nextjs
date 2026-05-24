@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en">
-      <body className="bg-[var(--color-brand-purple)] text-white min-h-screen" data-app={isMobileApp ? 'true' : undefined}>
+      <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
           Skip to main content
         </a>
@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {!isMobileApp && <MobileHeader />}
         <main
           id="main-content"
-          className={!isMobileApp ? 'pt-16 pb-36' : ''}
+          className={!isMobileApp ? 'pt-16' : ''}
           style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
         >{children}</main>
         {!isMobileApp && <Footer />}
