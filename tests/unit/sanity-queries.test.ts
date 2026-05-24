@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { teacherListQuery, teacherDetailQuery, scheduleQuery, teacherSearchQuery, fullScheduleQuery } from '@/lib/sanity/queries'
+import { teacherListQuery, teacherDetailQuery, scheduleQuery, fullScheduleQuery } from '@/lib/sanity/queries'
 
 describe('GROQ queries', () => {
   it('teacherListQuery is a non-empty string', () => {
@@ -24,7 +24,4 @@ describe('GROQ queries', () => {
     expect(teacherDetailQuery).toContain('lqip')
   })
 
-  it('teacherSearchQuery includes lqip projection', () => {
-    expect(teacherSearchQuery).toContain('lqip')
-  })
 })

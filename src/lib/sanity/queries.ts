@@ -8,19 +8,6 @@ export const teacherListQuery = `
   }
 `
 
-export const teacherSearchQuery = `
-  *[_type == "teacher" && (
-    name.first match $query ||
-    name.last match $query ||
-    title match $query
-  )] | order(name.last asc) {
-    "name": name.first + " " + name.last,
-    "slug": slug.current,
-    title,
-    "photo": photo.asset->url,
-    "lqip": photo.asset->metadata.lqip
-  }
-`
 
 export const teacherDetailQuery = `
   *[_type == "teacher" && slug.current == $slug][0] {
