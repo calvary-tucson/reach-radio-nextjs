@@ -1,9 +1,11 @@
 export function TeacherCardSkeleton() {
   return (
-    <div className="bg-gray-700/50 rounded p-4 animate-pulse">
-      <div className="w-full aspect-square bg-gray-700 rounded mb-3" />
-      <div className="h-4 w-3/4 bg-gray-700 rounded mb-2" />
-      <div className="h-3 w-1/2 bg-gray-700 rounded" />
+    <div className="bg-gray-700/50 rounded overflow-hidden border border-white/5 animate-pulse">
+      <div className="w-full aspect-square bg-gray-700" />
+      <div className="px-3 pt-3 pb-4">
+        <div className="h-4 w-3/4 bg-gray-700 rounded mb-2" />
+        <div className="h-3 w-1/2 bg-gray-700 rounded" />
+      </div>
     </div>
   )
 }
