@@ -11,6 +11,15 @@ export const metadata: Metadata = {
   title: 'Teachers',
   description: 'Listen to many great bible teachers on Reach Radio Tucson.',
   alternates: { canonical: '/teachers' },
+  openGraph: {
+    title: 'Teachers | Reach Radio',
+    description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+    url: '/teachers',
+  },
+  twitter: {
+    title: 'Teachers | Reach Radio',
+    description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+  },
 }
 
 interface Props {

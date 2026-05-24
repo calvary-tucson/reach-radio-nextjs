@@ -13,6 +13,15 @@ export const metadata: Metadata = {
   title: 'About',
   description: 'About Reach Radio — 106.7FM / 690AM in Tucson, AZ',
   alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About Reach Radio',
+    description: 'About Reach Radio — 106.7FM / 690AM in Tucson, AZ',
+    url: '/about',
+  },
+  twitter: {
+    title: 'About Reach Radio',
+    description: 'About Reach Radio — 106.7FM / 690AM in Tucson, AZ',
+  },
 }
 
 export default async function AboutPage() {
