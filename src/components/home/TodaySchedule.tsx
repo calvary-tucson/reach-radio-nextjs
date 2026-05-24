@@ -156,7 +156,8 @@ export async function TodaySchedule() {
           return (
             <div
               key={`music-${item.startTime}-${item.endTime}`}
-              className="flex gap-5 bg-gray-700 p-2 rounded"
+              className="schedule-row flex gap-5 bg-gray-700 p-2 rounded"
+              style={{ '--stagger-i': idx } as React.CSSProperties}
             >
               {content}
             </div>
@@ -167,7 +168,8 @@ export async function TodaySchedule() {
           <Link
             key={`${item.slug}-${item.startTime}`}
             href={`/teachers/${item.slug}`}
-            className="flex items-center justify-between flex-wrap bg-gray-700 p-2 rounded hover:bg-gray-700/80 transition-colors"
+            className="schedule-row flex items-center justify-between flex-wrap bg-gray-700 p-2 rounded hover:bg-gray-700/80 transition-colors"
+            style={{ '--stagger-i': idx } as React.CSSProperties}
           >
             <div className="flex gap-5">{content}</div>
           </Link>
