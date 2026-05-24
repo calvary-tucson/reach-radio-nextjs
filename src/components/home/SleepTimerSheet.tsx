@@ -105,6 +105,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                   Radio stops in {minutes}m {secs}s
                 </p>
                 <button
+                  type="button"
                   ref={firstBtnRef}
                   onClick={cancel}
                   className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold text-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
@@ -116,6 +117,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
               <div className="grid grid-cols-3 gap-3">
                 {TIMER_OPTIONS.map((mins, i) => (
                   <button
+                    type="button"
                     key={mins}
                     ref={i === 0 ? firstBtnRef : undefined}
                     onClick={() => start(mins)}
