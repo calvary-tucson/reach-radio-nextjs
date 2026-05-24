@@ -8,6 +8,7 @@ import { teacherDetailQuery, teacherSlugsQuery } from '@/lib/sanity/queries'
 import type { TeacherDetail } from '@/lib/sanity/types'
 import { PersonSchema } from '@/components/seo/PersonSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
+import { ArrowLeftIcon } from '@/components/icons/ArrowLeftIcon'
 
 export const revalidate = 3600
 
@@ -69,9 +70,10 @@ export default async function TeacherDetailPage({ params }: Props) {
         <Link
           href="/teachers"
           transitionTypes={['nav-back']}
-          className="text-white/60 text-sm hover:text-white inline-flex items-center gap-1"
+          className="text-white/60 text-sm hover:text-white inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
         >
-          <span aria-hidden="true">←</span> Teachers
+          <ArrowLeftIcon className="w-4 h-4" />
+          Teachers
         </Link>
       </div>
 
