@@ -73,4 +73,14 @@ describe('SleepTimerSheet', () => {
     expect(onClose).toHaveBeenCalledOnce()
     vi.useRealTimers()
   })
+
+  it('closes on Escape key', () => {
+    vi.useFakeTimers()
+    const onClose = vi.fn()
+    render(<SleepTimerSheet open={true} onClose={onClose} />)
+    fireEvent.keyDown(document, { key: 'Escape' })
+    vi.advanceTimersByTime(300)
+    expect(onClose).toHaveBeenCalledOnce()
+    vi.useRealTimers()
+  })
 })
