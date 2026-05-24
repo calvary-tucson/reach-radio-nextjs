@@ -180,4 +180,10 @@ body[data-app] [data-media-bar] {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
+
+  .teacher-card,
+  .schedule-row,
+  .page-enter {
+    animation: none;
+  }
 }
