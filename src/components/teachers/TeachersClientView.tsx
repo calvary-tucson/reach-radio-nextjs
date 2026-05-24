@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDebounce } from '@/hooks/useDebounce'
 import { SearchInput } from '@/components/global/SearchInput'
@@ -17,19 +17,27 @@ export function TeachersClientView({ teachers, initialQuery = '' }: TeachersClie
   const router = useRouter()
   const [query, setQuery] = useState(initialQuery)
   const debouncedQuery = useDebounce(query, 200)
+  const hasMounted = useRef(false)
 
   const filtered = useMemo(
     () => filterTeachers(teachers, debouncedQuery),
     [teachers, debouncedQuery]
   )
 
-  function handleChange(value: string) {
-    setQuery(value)
-    const trimmed = value.trim()
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
+    const trimmed = debouncedQuery.trim()
     router.replace(
       trimmed ? `/teachers?q=${encodeURIComponent(trimmed)}` : '/teachers',
       { scroll: false }
     )
+  }, [debouncedQuery, router])
+
+  function handleChange(value: string) {
+    setQuery(value)
   }
 
   const isFiltered = debouncedQuery.trim().length > 0
@@ -66,9 +74,16 @@ export function TeachersClientView({ teachers, initialQuery = '' }: TeachersClie
           ))}
         </div>
       ) : isFiltered ? (
-        <p className="text-white/60 mt-4">
-          No teachers found for &ldquo;{debouncedQuery}&rdquo;.
-        </p>
+        <div className="text-white/60 mt-4">
+          <p>No teachers found for &ldquo;{debouncedQuery}&rdquo;.</p>
+          <button
+            type="button"
+            onClick={() => handleChange('')}
+            className="mt-2 text-sm text-white/80 underline hover:text-white"
+          >
+            Clear search
+          </button>
+        </div>
       ) : null}
     </>
   )
