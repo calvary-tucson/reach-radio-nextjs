@@ -24,7 +24,7 @@ export function TeacherCard({ teacher, index = 0 }: TeacherCardProps) {
   return (
     <Link
       href={`/teachers/${teacher.slug}`}
-      aria-label={`${teacher.name} — ${teacher.title}`}
+      aria-label={teacher.title ? `${teacher.name} — ${teacher.title}` : teacher.name}
       transitionTypes={['nav-forward']}
       className="teacher-card block rounded overflow-hidden border border-white/10 hover:border-white/25 motion-safe:hover:scale-[1.03] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
       style={{ '--stagger-i': index } as React.CSSProperties}
@@ -34,12 +34,12 @@ export function TeacherCard({ teacher, index = 0 }: TeacherCardProps) {
           <div className="relative aspect-square">
             <Image
               src={teacher.photo}
-              alt=""
+              alt={teacher.name}
               fill
               className="object-cover"
               placeholder={teacher.lqip ? 'blur' : 'empty'}
               blurDataURL={teacher.lqip}
-              sizes="(max-width: 640px) 50vw, 25vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           </div>
         </ViewTransition>
@@ -48,7 +48,7 @@ export function TeacherCard({ teacher, index = 0 }: TeacherCardProps) {
       )}
       <div className="px-3 pt-3 pb-4">
         <p className="text-white font-semibold text-sm" aria-hidden="true">{teacher.name}</p>
-        <p className="text-white/60 text-xs mt-1.5" aria-hidden="true">{teacher.title}</p>
+        {teacher.title && <p className="text-white/60 text-xs mt-1.5" aria-hidden="true">{teacher.title}</p>}
       </div>
     </Link>
   )

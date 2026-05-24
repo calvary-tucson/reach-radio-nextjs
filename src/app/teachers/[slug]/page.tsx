@@ -70,7 +70,7 @@ export default async function TeacherDetailPage({ params }: Props) {
         <Link
           href="/teachers"
           transitionTypes={['nav-back']}
-          className="text-white/60 text-sm hover:text-white inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+          className="text-white/60 text-sm hover:text-white inline-flex items-center gap-1.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
         >
           <ArrowLeftIcon className="w-4 h-4" />
           Teachers
@@ -126,22 +126,24 @@ export default async function TeacherDetailPage({ params }: Props) {
             </div>
           )}
 
-          {sortedSchedule.length > 0 && (
+          {sortedSchedule.length > 0 ? (
             <div className="mt-6">
               <h2 className="text-2xl mb-3">Schedule</h2>
               {sortedSchedule.map((day) => (
                 <div key={day.day} className="mb-5">
                   <h3 className="font-bold text-lg mb-2">{day.day}</h3>
-                  <div className="flex flex-col gap-2">
-                    {day.times.map((t, i) => (
-                      <div key={i} className="bg-gray-700 p-3 rounded text-sm">
+                  <ul className="flex flex-col gap-2">
+                    {day.times.map((t) => (
+                      <li key={`${t.startTime}-${t.endTime}`} className="bg-gray-700 p-3 rounded text-sm">
                         {t.startTime} – {t.endTime}
-                      </div>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               ))}
             </div>
+          ) : (
+            <p className="mt-6 text-white/50 text-sm">No schedule available.</p>
           )}
         </div>
       </div>

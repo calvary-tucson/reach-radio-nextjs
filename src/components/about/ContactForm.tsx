@@ -8,11 +8,16 @@ const initial: ContactState = { success: false }
 export function ContactForm() {
   const [state, action, isPending] = useActionState(submitContact, initial)
   const formRef = useRef<HTMLFormElement>(null)
+  const errorRef = useRef<HTMLParagraphElement>(null)
   const timestampRef = useRef(Date.now().toString())
 
   useEffect(() => {
     if (state.success) formRef.current?.reset()
   }, [state.success])
+
+  useEffect(() => {
+    if (state.error) errorRef.current?.focus()
+  }, [state.error])
 
   return (
     <form ref={formRef} action={action} className="space-y-4 max-w-lg">
@@ -29,21 +34,21 @@ export function ContactForm() {
         <label htmlFor="name" className="text-white/80 text-sm block mb-1">Name *</label>
         <input
           id="name" name="name" type="text" required minLength={2} maxLength={100}
-          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20"
+          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white"
         />
       </div>
       <div>
         <label htmlFor="email" className="text-white/80 text-sm block mb-1">Email *</label>
         <input
           id="email" name="email" type="email" required
-          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20"
+          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white"
         />
       </div>
       <div>
         <label htmlFor="message" className="text-white/80 text-sm block mb-1">Message *</label>
         <textarea
           id="message" name="message" required rows={5} minLength={10} maxLength={2000}
-          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20 resize-none"
+          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white resize-none"
         />
       </div>
 
@@ -54,7 +59,7 @@ export function ContactForm() {
         </span>
       </label>
 
-      {state.error && <p role="alert" className="text-red-400 text-sm">{state.error}</p>}
+      {state.error && <p ref={errorRef} tabIndex={-1} role="alert" className="text-red-400 text-sm outline-none">{state.error}</p>}
       {state.success && <p role="status" className="text-green-400 text-sm">Message sent! We&apos;ll be in touch.</p>}
 
       <button
