@@ -20,6 +20,96 @@
   --color-brand-green: #84B84F;
   --color-brand-purple: oklch(24% 0.05 280);
   --color-brand-gray: oklch(30% 0.02 280);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* === Webview / Mobile Shell === */
+
+body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+main {
+  overscroll-behavior-y: contain;
+}
+
+button, a, [role="button"], input, label {
+  touch-action: manipulation;
+}
+
+/* === MediaBar slide-up animation === */
+
+[data-media-bar] {
+  transition: transform 250ms ease-out, opacity 200ms ease-out;
+}
+
+[data-media-bar][data-hidden] {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* App mode: MediaBar sits at safe-bottom (no MobileNav) */
+body[data-app] [data-media-bar] {
+  bottom: var(--safe-bottom, 0px);
+  padding-bottom: var(--safe-bottom, 0px);
+}
+
+/* === Card stagger entrance animation === */
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.teacher-card {
+  animation: card-enter 240ms ease-out backwards;
+  animation-delay: calc(var(--stagger-i, 0) * 35ms);
+}
+
+/* === Schedule row stagger entrance animation === */
+
+@keyframes schedule-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.schedule-row {
+  animation: schedule-row-enter 220ms ease-out backwards;
+  animation-delay: calc(var(--stagger-i, 0) * 25ms);
+}
+
+/* === Page content entrance (about, donate) === */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 280ms ease-out 50ms backwards;
 }
 
 /* View Transitions */
