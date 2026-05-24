@@ -1,6 +1,6 @@
 interface Props {
   name: string
-  jobTitle: string
+  jobTitle: string | null
   imageUrl?: string
   url: string
 }
@@ -10,7 +10,7 @@ export function PersonSchema({ name, jobTitle, imageUrl, url }: Props) {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name,
-    jobTitle,
+    ...(jobTitle ? { jobTitle } : {}),
     ...(imageUrl ? { image: imageUrl } : {}),
     url,
     worksFor: {

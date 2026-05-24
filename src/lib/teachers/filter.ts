@@ -6,6 +6,6 @@ export function filterTeachers(teachers: TeacherSummary[], query: string): Teach
   return teachers.filter(
     (t) =>
       t.name.toLowerCase().includes(q) ||
-      t.title.toLowerCase().includes(q)
+      (t.title?.toLowerCase().includes(q) ?? false)
   )
 }

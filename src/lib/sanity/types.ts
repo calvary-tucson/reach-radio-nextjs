@@ -1,7 +1,7 @@
 export interface TeacherSummary {
   name: string
   slug: string
-  title: string
+  title: string | null
   photo: string | null
   lqip?: string
 }
