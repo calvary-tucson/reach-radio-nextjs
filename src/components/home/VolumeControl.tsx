@@ -14,7 +14,7 @@ export function VolumeControl() {
       <button
         onClick={toggleMute}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
-        className="md:hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white rounded-full cursor-pointer"
+        className="hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white rounded-full cursor-pointer"
       >
         <VolumeIcon muted={isMuted} volume={volume} />
       </button>

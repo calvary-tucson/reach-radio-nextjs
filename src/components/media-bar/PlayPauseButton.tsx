@@ -18,7 +18,7 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
     postMessageToNative(JSON.stringify({ isPlaying: next }))
   }
 
-  const btnSize = size === 'lg' ? 'md:w-16 md:h-16 w-10 h-10' : 'w-11 h-11'
+  const btnSize = size === 'lg' ? 'md:w-16 md:h-16 w-14 h-14' : 'w-11 h-11'
   const iconSize = size === 'lg' ? 'w-7' : 'w-5'
   const spinnerSize = size === 'lg' ? 'w-7 h-7' : 'w-5 h-5'
 
