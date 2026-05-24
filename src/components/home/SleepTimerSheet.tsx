@@ -87,6 +87,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
             onTouchStart={drag.onTouchStart}
             onTouchMove={drag.onTouchMove}
             onTouchEnd={drag.onTouchEnd}
+            onMouseDown={drag.onMouseDown}
           >
             <div className="flex justify-center pt-3 pb-2">
               <div className="h-1 w-10 rounded-full bg-white/30" />
