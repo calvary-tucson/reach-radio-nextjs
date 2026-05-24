@@ -1,8 +1,9 @@
-// src/lib/hooks/useSheetDrag.ts
-import { type RefObject, useCallback, useRef } from 'react'
+import { type RefObject, useCallback, useEffect, useRef } from 'react'
 
 const DISMISS_THRESHOLD = 120
 const VELOCITY_THRESHOLD = 0.5
+const OPACITY_SCALE_DISTANCE = 400
+const OPACITY_MIN = 0.5
 
 interface UseSheetDragOptions {
   onDismiss: () => void
@@ -13,6 +14,11 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
   const startY = useRef(0)
   const startTime = useRef(0)
   const currentY = useRef(0)
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => {
+    if (dismissTimer.current) clearTimeout(dismissTimer.current)
+  }, [])
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     startY.current = e.touches[0].clientY
@@ -29,13 +35,13 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
     if (contentRef.current) {
       contentRef.current.style.transform = `translateY(${currentY.current}px)`
       contentRef.current.style.opacity = String(
-        Math.max(0.5, 1 - currentY.current / 400)
+        Math.max(OPACITY_MIN, 1 - currentY.current / OPACITY_SCALE_DISTANCE)
       )
     }
   }, [contentRef])
 
   const onTouchEnd = useCallback(() => {
-    const elapsed = Date.now() - startTime.current
+    const elapsed = Math.max(1, Date.now() - startTime.current)
     const velocity = currentY.current / elapsed
 
     if (currentY.current > DISMISS_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
@@ -44,7 +50,7 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
         contentRef.current.style.transform = 'translateY(100%)'
         contentRef.current.style.opacity = '0'
       }
-      setTimeout(onDismiss, 150)
+      dismissTimer.current = setTimeout(onDismiss, 150)
     } else {
       if (contentRef.current) {
         contentRef.current.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out'
