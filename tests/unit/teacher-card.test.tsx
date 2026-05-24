@@ -37,12 +37,9 @@ describe('TeacherCard', () => {
     expect(screen.getByText('John MacArthur')).toBeInTheDocument()
   })
 
-  it('renders image with decorative alt and link aria-label when photo exists', () => {
+  it('renders link with aria-label containing name and title', () => {
     render(<TeacherCard teacher={teacher} />)
-    expect(screen.getByRole('link', { name: 'John MacArthur' })).toBeInTheDocument()
-    // alt="" makes image presentational — verify via DOM query
-    const img = document.querySelector('img')
-    expect(img).toHaveAttribute('alt', '')
+    expect(screen.getByRole('link', { name: 'John MacArthur — Grace to You' })).toBeInTheDocument()
   })
 
   it('renders no image when photo is absent', () => {
@@ -53,5 +50,9 @@ describe('TeacherCard', () => {
   it('links to teacher detail page', () => {
     render(<TeacherCard teacher={teacher} />)
     expect(screen.getByRole('link')).toHaveAttribute('href', '/teachers/john-macarthur')
+  })
+
+  it('accepts optional index prop without error', () => {
+    expect(() => render(<TeacherCard teacher={teacher} index={3} />)).not.toThrow()
   })
 })
