@@ -55,7 +55,7 @@ export function RadioPlayer() {
         <button
           onClick={togglePlay}
           aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
-          className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded"
+          className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded cursor-pointer"
         >
           <Image
             src={image}

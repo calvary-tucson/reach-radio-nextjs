@@ -64,7 +64,7 @@ export function SearchInput({
           type="button"
           onClick={() => { onChange(''); onClear?.() }}
           aria-label="Clear search"
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded border border-white/20 bg-white/5 text-white/60 hover:text-white/80 hover:border-white/40"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded border border-white/20 bg-white/5 text-white/60 hover:text-white/80 hover:border-white/40 cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

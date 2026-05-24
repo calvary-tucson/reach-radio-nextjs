@@ -53,7 +53,7 @@ export function SleepTimerOverlay() {
         ref={cancelBtnRef}
         onClick={cancel}
         aria-label="Cancel sleep timer"
-        className="bg-white/20 text-white px-4 py-2 rounded text-sm hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+        className="bg-white/20 text-white px-4 py-2 rounded text-sm hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
       >
         Cancel
       </button>

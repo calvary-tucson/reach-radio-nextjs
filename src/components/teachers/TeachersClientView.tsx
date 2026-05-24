@@ -79,7 +79,7 @@ export function TeachersClientView({ teachers, initialQuery = '' }: TeachersClie
           <button
             type="button"
             onClick={() => handleChange('')}
-            className="mt-2 text-sm text-white/80 underline hover:text-white"
+            className="mt-2 text-sm text-white/80 underline hover:text-white cursor-pointer"
           >
             Clear search
           </button>

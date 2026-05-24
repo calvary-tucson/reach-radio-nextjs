@@ -39,7 +39,7 @@ export default function SleepTimerPage() {
           <p className="text-white/60 text-sm mb-6">Radio will stop in {minutes}m {seconds}s</p>
           <button
             onClick={cancel}
-            className="bg-red-600 text-white px-6 py-2 rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className="bg-red-600 text-white px-6 py-2 rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
           >
             Cancel Timer
           </button>
@@ -50,7 +50,7 @@ export default function SleepTimerPage() {
             <button
               key={mins}
               onClick={() => start(mins)}
-              className="bg-gray-700/50 text-white py-4 rounded font-medium hover:bg-gray-700/70 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="bg-gray-700/50 text-white py-4 rounded font-medium hover:bg-gray-700/70 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
             >
               {mins}m
             </button>

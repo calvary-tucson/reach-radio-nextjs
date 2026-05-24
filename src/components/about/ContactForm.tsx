@@ -64,7 +64,7 @@ export function ContactForm() {
 
       <button
         type="submit" disabled={isPending}
-        className="bg-[var(--color-brand-green)] text-white px-6 py-2 rounded font-medium text-sm disabled:opacity-50"
+        className="bg-[var(--color-brand-green)] text-white px-6 py-2 rounded font-medium text-sm disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
       >
         {isPending ? 'Sending...' : 'Send Message'}
       </button>

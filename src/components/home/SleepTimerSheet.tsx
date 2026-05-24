@@ -92,7 +92,20 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
             <div className="flex justify-center pt-3 pb-2">
               <div className="h-1 w-10 rounded-full bg-white/30" />
             </div>
-            <h2 id="sleep-timer-heading" className="text-white text-xl font-bold text-center mb-4 px-6 select-none">Sleep Timer</h2>
+          </div>
+          <div className="flex items-center justify-between px-6 pb-4">
+            <h2 id="sleep-timer-heading" className="text-white text-xl font-bold select-none">Sleep Timer</h2>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              aria-label="Close sleep timer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
           <div className="px-6 pb-10">
             {active ? (
@@ -111,7 +124,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                   type="button"
                   ref={firstBtnRef}
                   onClick={cancel}
-                  className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold text-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                  className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold text-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
                 >
                   Cancel Timer
                 </button>
@@ -124,7 +137,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                     key={mins}
                     ref={i === 0 ? firstBtnRef : undefined}
                     onClick={() => start(mins)}
-                    className="bg-gray-700 text-white py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                    className="bg-gray-700 text-white py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
                   >
                     {mins}m
                   </button>
