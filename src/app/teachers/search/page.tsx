@@ -55,7 +55,7 @@ export default function TeacherSearchPage({ searchParams }: Props) {
   return (
     <div className="px-4 py-6">
       <ShowMediaBar />
-      <Link href="/teachers" aria-label="All Teachers" className="text-white/60 text-sm mb-4 block hover:text-white">
+<Link href="/teachers" aria-label="All Teachers" className="text-white/60 text-sm mb-4 block hover:text-white">
         <span aria-hidden="true">←</span> All Teachers
       </Link>
       <SearchBar />
