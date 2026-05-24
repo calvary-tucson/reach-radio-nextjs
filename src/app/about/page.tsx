@@ -34,7 +34,7 @@ export default async function AboutPage() {
   }))
 
   return (
-    <div className="px-4 py-6 max-w-2xl mx-auto space-y-6">
+    <div className="page-enter px-4 py-6 max-w-2xl mx-auto space-y-6">
       <ShowMediaBar />
       <OrganizationSchema
         name={siteSettings.siteTitle}

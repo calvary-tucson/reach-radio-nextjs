@@ -59,7 +59,7 @@ export default function DonatePage() {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div className="page-enter px-4 py-6">
       <h1 className="text-white text-2xl font-bold mb-4">Support Reach Radio</h1>
       <p className="text-white/70 mb-6">Your generous support keeps Reach Radio on the air.</p>
 
