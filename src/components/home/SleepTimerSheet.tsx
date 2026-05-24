@@ -73,25 +73,27 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
     <>
       <div
         data-testid="sheet-backdrop"
-        className={`fixed inset-0 z-50 bg-black/60 transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed inset-0 z-[70] bg-black/60 transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}
         onClick={handleClose}
         aria-hidden="true"
       />
       <div role="dialog" aria-modal="true" aria-labelledby="sleep-timer-heading">
         <div
           ref={sheetRef}
-          className={`fixed inset-x-0 bottom-0 z-50 bg-gray-800 rounded-t-2xl transition-transform duration-[280ms] ease-out ${visible ? 'translate-y-0' : 'translate-y-full'}`}
+          className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 rounded-t-2xl transition-transform duration-[280ms] ease-out ${visible ? 'translate-y-0' : 'translate-y-full'}`}
         >
           <div
-            className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
+            className="touch-none cursor-grab active:cursor-grabbing"
             onTouchStart={drag.onTouchStart}
             onTouchMove={drag.onTouchMove}
             onTouchEnd={drag.onTouchEnd}
           >
-            <div className="h-1 w-10 rounded-full bg-white/30" />
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="h-1 w-10 rounded-full bg-white/30" />
+            </div>
+            <h2 id="sleep-timer-heading" className="text-white text-xl font-bold text-center mb-4 px-6 select-none">Sleep Timer</h2>
           </div>
-          <div className="px-6 pb-10 pt-2">
-            <h2 id="sleep-timer-heading" className="text-white text-xl font-bold text-center mb-6">Sleep Timer</h2>
+          <div className="px-6 pb-10">
             {active ? (
               <div className="text-center">
                 <p
