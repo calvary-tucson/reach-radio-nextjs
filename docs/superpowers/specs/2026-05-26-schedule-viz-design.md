@@ -117,7 +117,7 @@ Slugs derived from the Sanity schema's `slugify` function (`name.first + " " + n
 ### GROQ query
 
 ```groq
-*[_type == "teacher" && slug.current in $slugs] | order(name.last asc) {
+*[_type == "teacher" && slug.current in $slugs] {
   "name": name.first + " " + name.last,
   "slug": slug.current,
   title,
@@ -128,7 +128,7 @@ Slugs derived from the Sanity schema's `slugify` function (`name.first + " " + n
 
 Add as `highlightedTeachersQuery` in `queries.ts`. Param `$slugs` passed from `HIGHLIGHTED_TEACHER_SLUGS`. Return type: `TeacherSummary[]` (already defined).
 
-Display order follows the `| order(name.last asc)` sort, not the array order.
+Display order follows the `HIGHLIGHTED_TEACHER_SLUGS` array order — Robert Furrow first. The GROQ query fetches by slug; results re-sorted client-side to match array order after fetch.
 
 ### Home page section
 
