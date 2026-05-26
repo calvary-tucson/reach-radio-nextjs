@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { Clock } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SleepTimerSheet } from './SleepTimerSheet'
 
 export function SleepTimerButton() {
@@ -8,19 +10,21 @@ export function SleepTimerButton() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Sleep Timer"
-        aria-expanded={open}
-        aria-haspopup="dialog"
-        className="bg-gray-500 rounded-full p-1 w-9 h-9 flex items-center justify-center cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
-      >
-        <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Sleep Timer"
+            aria-expanded={open}
+            aria-haspopup="dialog"
+            className="bg-gray-500 rounded-full p-1 w-9 h-9 flex items-center justify-center cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+          >
+            <Clock className="w-5 h-5 text-white" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Sleep Timer</TooltipContent>
+      </Tooltip>
       <SleepTimerSheet open={open} onClose={() => setOpen(false)} />
     </>
   )
