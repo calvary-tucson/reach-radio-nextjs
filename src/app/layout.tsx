@@ -9,6 +9,8 @@ import { MobileNav } from '@/components/layout/MobileNav'
 import { AudioProvider } from '@/components/AudioProvider'
 import { SleepTimerProvider } from '@/components/SleepTimerProvider'
 import { sanityFetch } from '@/lib/sanity/client'
+import { Toaster } from 'sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -57,22 +59,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
-          Skip to main content
-        </a>
-        <BridgeInit />
-        {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
-        {!isMobileApp && <SleepTimerProvider />}
-        {!isMobileApp && <Header />}
-        {!isMobileApp && <MobileHeader />}
-        <main
-          id="main-content"
-          className={!isMobileApp ? 'pt-16' : ''}
-          style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
-        >{children}</main>
-        {!isMobileApp && <Footer />}
-        {!isMobileApp && <MobileNav />}
-        <MediaBar />
+        <TooltipProvider delayDuration={500}>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
+            Skip to main content
+          </a>
+          <BridgeInit />
+          {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
+          {!isMobileApp && <SleepTimerProvider />}
+          {!isMobileApp && <Header />}
+          {!isMobileApp && <MobileHeader />}
+          <main
+            id="main-content"
+            className={!isMobileApp ? 'pt-16' : ''}
+            style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
+          >{children}</main>
+          {!isMobileApp && <Footer />}
+          {!isMobileApp && <MobileNav />}
+          <MediaBar />
+          <Toaster richColors position="top-center" />
+        </TooltipProvider>
       </body>
     </html>
   )
