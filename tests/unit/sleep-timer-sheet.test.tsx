@@ -68,7 +68,7 @@ describe('SleepTimerSheet', () => {
     vi.useFakeTimers()
     const onClose = vi.fn()
     render(<SleepTimerSheet open={true} onClose={onClose} />)
-    fireEvent.click(screen.getByTestId('sheet-backdrop'))
+    fireEvent.click(screen.getByTestId('bottom-sheet-backdrop'))
     vi.advanceTimersByTime(300)
     expect(onClose).toHaveBeenCalledOnce()
     vi.useRealTimers()
