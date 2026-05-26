@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { X } from 'lucide-react'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 
@@ -101,10 +102,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
               className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
               aria-label="Close sleep timer"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
           <div className="px-6 pb-10">
