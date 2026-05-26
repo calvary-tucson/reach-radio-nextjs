@@ -71,3 +71,13 @@ export const siteSettingsQuery = `
     facebookPage
   }
 `
+
+export const highlightedTeachersQuery = `
+  *[_type == "teacher" && slug.current in $slugs] {
+    "name": name.first + " " + name.last,
+    "slug": slug.current,
+    title,
+    "photo": photo.asset->url,
+    "lqip": photo.asset->metadata.lqip
+  }
+`
