@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 import { submitContact, type ContactState } from '@/actions/contact'
 
 const initial: ContactState = { success: false }
@@ -8,15 +9,17 @@ const initial: ContactState = { success: false }
 export function ContactForm() {
   const [state, action, isPending] = useActionState(submitContact, initial)
   const formRef = useRef<HTMLFormElement>(null)
-  const errorRef = useRef<HTMLParagraphElement>(null)
   const timestampRef = useRef(Date.now().toString())
 
   useEffect(() => {
-    if (state.success) formRef.current?.reset()
+    if (state.success) {
+      formRef.current?.reset()
+      toast.success("Message sent! We'll be in touch.")
+    }
   }, [state.success])
 
   useEffect(() => {
-    if (state.error) errorRef.current?.focus()
+    if (state.error) toast.error(state.error)
   }, [state.error])
 
   return (
@@ -58,9 +61,6 @@ export function ContactForm() {
           I consent to having my submitted information stored for the purpose of responding to my inquiry. *
         </span>
       </label>
-
-      {state.error && <p ref={errorRef} tabIndex={-1} role="alert" className="text-red-400 text-sm outline-none">{state.error}</p>}
-      {state.success && <p role="status" className="text-green-400 text-sm">Message sent! We&apos;ll be in touch.</p>}
 
       <button
         type="submit" disabled={isPending}
