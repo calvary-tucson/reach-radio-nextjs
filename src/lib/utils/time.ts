@@ -18,7 +18,10 @@ export function to24h(time: string): string {
 }
 
 export function toMinutes(time24: string): number {
-  const [h, m] = time24.split(':').map(Number)
+  const parts = time24.split(':').map(Number)
+  const h = parts[0]
+  const m = parts[1]
+  if (isNaN(h) || isNaN(m)) return 0
   return h * 60 + m
 }
 
