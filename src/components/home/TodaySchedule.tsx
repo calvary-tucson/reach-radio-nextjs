@@ -1,5 +1,6 @@
 import { sanityFetch } from '@/lib/sanity/client'
 import { scheduleQuery } from '@/lib/sanity/queries'
+import { to24h, toMinutes } from '@/lib/utils/time'
 import Image from 'next/image'
 import Link from 'next/link'
 import dayjs from 'dayjs'
@@ -21,20 +22,6 @@ interface SlotItem {
   startTime: string
   endTime: string
   isMusic?: boolean
-}
-
-function to24h(time: string): string {
-  const [timeStr, period] = time.split(' ')
-  const [h, m] = timeStr.split(':')
-  let hours = parseInt(h, 10)
-  if (period === 'PM' && hours !== 12) hours += 12
-  if (period === 'AM' && hours === 12) hours = 0
-  return `${hours.toString().padStart(2, '0')}:${m}`
-}
-
-function toMinutes(time24: string): number {
-  const [h, m] = time24.split(':').map(Number)
-  return h * 60 + m
 }
 
 function isInFuture(endTime: string): boolean {
