@@ -5,6 +5,7 @@ import type { TeacherWithSchedule } from '@/lib/sanity/types'
 import { EventSchema } from '@/components/seo/EventSchema'
 import Image from 'next/image'
 import Link from 'next/link'
+import Breadcrumbs from '@/components/global/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: 'Full Schedule',
@@ -52,8 +53,16 @@ export default async function ScheduledListPage() {
   )
 
   return (
-    <div className="px-4 py-6">
+    <div>
+      <Breadcrumbs
+        variant="standalone"
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Full Schedule', url: '/scheduled-list' },
+        ]}
+      />
       <EventSchema events={allEvents} />
+      <div className="px-4 pb-6">
       <h1 className="text-white text-2xl font-bold mb-6">Full Schedule</h1>
       {byDay.length === 0 ? (
         <p className="text-white/60">No schedule available.</p>
@@ -94,6 +103,7 @@ export default async function ScheduledListPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

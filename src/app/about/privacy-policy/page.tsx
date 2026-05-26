@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
+import Breadcrumbs from '@/components/global/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -10,11 +11,17 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="px-4 py-6 max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto">
       <ShowMediaBar />
-      <Link href="/about" className="text-white/60 text-sm mb-6 block hover:text-white">
-        ← About
-      </Link>
+      <Breadcrumbs
+        variant="standalone"
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'About', url: '/about' },
+          { name: 'Privacy Policy', url: '/about/privacy-policy' },
+        ]}
+      />
+      <div className="px-4 pb-6">
       <div className="prose prose-invert max-w-none">
         <h1>Privacy Policy</h1>
         <p><strong>Last updated:</strong> March 17, 2026</p>
@@ -140,6 +147,7 @@ export default function PrivacyPolicyPage() {
           <li><strong>Website:</strong> <a href="https://calvarytucson.com" target="_blank" rel="noopener noreferrer">calvarytucson.com</a></li>
           <li><strong>Organization:</strong> Calvary Chapel of Tucson, Inc. — Tucson, AZ</li>
         </ul>
+      </div>
       </div>
     </div>
   )

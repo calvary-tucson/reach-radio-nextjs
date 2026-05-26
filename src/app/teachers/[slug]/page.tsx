@@ -8,7 +8,7 @@ import { teacherDetailQuery, teacherSlugsQuery } from '@/lib/sanity/queries'
 import type { TeacherDetail } from '@/lib/sanity/types'
 import { PersonSchema } from '@/components/seo/PersonSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
-import { ArrowLeftIcon } from '@/components/icons/ArrowLeftIcon'
+import Breadcrumbs from '@/components/global/Breadcrumbs'
 
 export const revalidate = 3600
 
@@ -66,16 +66,14 @@ export default async function TeacherDetailPage({ params }: Props) {
   return (
     <div>
       <ShowMediaBar />
-      <div className="px-4 py-4">
-        <Link
-          href="/teachers"
-          transitionTypes={['nav-back']}
-          className="text-white/60 text-sm hover:text-white inline-flex items-center gap-1.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
-        >
-          <ArrowLeftIcon className="w-4 h-4" />
-          Teachers
-        </Link>
-      </div>
+      <Breadcrumbs
+        variant="standalone"
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Teachers', url: '/teachers' },
+          { name: teacher.name, url: `/teachers/${teacher.slug}` },
+        ]}
+      />
 
       <PersonSchema
         name={teacher.name}
