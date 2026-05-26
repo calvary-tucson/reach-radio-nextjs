@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-
+import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface SearchInputProps {
@@ -14,10 +14,6 @@ export interface SearchInputProps {
   'aria-label'?: string
 }
 
-/**
- * Controlled search input with clear button. Owns no internal state.
- * Pair with useDebounce for deferred fetch.
- */
 export function SearchInput({
   value,
   onChange,
@@ -36,20 +32,10 @@ export function SearchInput({
 
   return (
     <div className={cn('relative', className)}>
-      <svg
+      <Search
         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60 pointer-events-none"
         aria-hidden="true"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
+      />
       <input
         ref={inputRef}
         type="search"
@@ -66,21 +52,7 @@ export function SearchInput({
           aria-label="Clear search"
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded border border-white/20 bg-white/5 text-white/60 hover:text-white/80 hover:border-white/40 cursor-pointer"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          <X size={16} aria-hidden="true" />
         </button>
       )}
     </div>
