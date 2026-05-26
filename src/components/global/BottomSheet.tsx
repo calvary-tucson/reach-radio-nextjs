@@ -14,15 +14,19 @@ interface BottomSheetProps {
 
 export function BottomSheet({ open, onClose, children, ariaLabel, className }: BottomSheetProps) {
   const [visible, setVisible] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleClose = useCallback(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
     setVisible(false)
     closeTimerRef.current = setTimeout(onClose, 280)
   }, [onClose])
 
   const drag = useSheetDrag({ onDismiss: handleClose, contentRef: sheetRef })
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
@@ -30,7 +34,10 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
 
   useEffect(() => {
     if (!open) return
-    const id = requestAnimationFrame(() => setVisible(true))
+    const id = requestAnimationFrame(() => {
+      setVisible(true)
+      sheetRef.current?.focus()
+    })
     return () => cancelAnimationFrame(id)
   }, [open])
 
@@ -45,13 +52,12 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
 
   useEffect(() => {
     if (!open) return
+    const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = prev }
   }, [open])
 
-  if (!open) return null
+  if (!open || !mounted) return null
 
   return createPortal(
     <>
@@ -66,6 +72,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
       <div role="dialog" aria-modal="true" aria-label={ariaLabel}>
         <div
           ref={sheetRef}
+          tabIndex={-1}
           className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 rounded-t-2xl transition-transform duration-[280ms] ease-out ${
             visible ? 'translate-y-0' : 'translate-y-full'
           } ${className ?? ''}`}
