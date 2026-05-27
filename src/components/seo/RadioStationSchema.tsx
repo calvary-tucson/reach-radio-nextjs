@@ -7,7 +7,7 @@ export function RadioStationSchema() {
     '@context': 'https://schema.org',
     '@type': 'RadioStation',
     name: 'Reach Radio',
-    url: 'https://reach-radio.com',
+    url: 'https://reach.radio',
     broadcastFrequency: [
       { '@type': 'BroadcastFrequencySpecification', broadcastFrequency: '106.7', broadcastSignalModulation: 'FM' },
       { '@type': 'BroadcastFrequencySpecification', broadcastFrequency: '690', broadcastSignalModulation: 'AM' },

@@ -79,7 +79,7 @@ export default async function TeacherDetailPage({ params }: Props) {
         name={teacher.name}
         jobTitle={teacher.title}
         imageUrl={teacher.photo ?? undefined}
-        url={`https://reach-radio.com/teachers/${teacher.slug}`}
+        url={`https://reach.radio/teachers/${teacher.slug}`}
       />
 
       <div className="grid md:grid-cols-2 grid-cols-1 gap-x-16 gap-y-5 text-white">

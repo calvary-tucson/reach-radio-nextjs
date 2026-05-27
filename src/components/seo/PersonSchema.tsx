@@ -16,7 +16,7 @@ export function PersonSchema({ name, jobTitle, imageUrl, url }: Props) {
     worksFor: {
       '@type': 'Organization',
       name: 'Reach Radio',
-      url: 'https://reach-radio.com',
+      url: 'https://reach.radio',
     },
   }
 

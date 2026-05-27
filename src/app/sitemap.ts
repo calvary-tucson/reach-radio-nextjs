@@ -4,7 +4,7 @@ import { teacherSlugsQuery } from '@/lib/sanity/queries'
 
 export const dynamic = 'force-dynamic'
 
-const BASE_URL = 'https://reach-radio.com'
+const BASE_URL = 'https://reach.radio'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const slugs = await sanityFetch<{ slug: string }[]>(

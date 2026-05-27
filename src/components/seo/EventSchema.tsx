@@ -23,7 +23,7 @@ export function EventSchema({ events }: Props) {
         organizer: {
           '@type': 'Organization',
           name: 'Reach Radio',
-          url: 'https://reach-radio.com',
+          url: 'https://reach.radio',
         },
       },
     })),
