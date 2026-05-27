@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Content-Type', value: 'application/javascript' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
       {
@@ -36,7 +37,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://forms.ministryforms.net",
+              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' cdn.sanity.io data: blob: https://www.google.com",
               "media-src 'self' https://*.radiojar.com https://reach.radio",

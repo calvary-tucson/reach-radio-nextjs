@@ -6,7 +6,7 @@ import { useMediaStore } from '@/lib/store/media-store'
 
 declare global {
   interface Window {
-    iFrameResize?: (options: object, selector: string) => void
+    iFrameResize?: (options: Record<string, unknown>, selector: string) => void
   }
 }
 
@@ -69,7 +69,8 @@ export default function DonatePage() {
   }
 
   return (
-    <div className="page-enter px-4 pt-5">
+    <div className="page-enter px-4 pt-5 pb-8">
+      <h1 className="text-white text-2xl font-bold mb-4">Donate</h1>
       {failed ? (
         <div role="alert" className="text-white/70 text-sm py-8 text-center">
           <p>Unable to load the donation form.</p>
@@ -102,12 +103,12 @@ export default function DonatePage() {
             title="Donation Form"
             onLoad={handleLoad}
             onError={handleError}
-            sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+            sandbox="allow-scripts allow-forms allow-popups"
             className={`w-full min-h-[900px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
           />
         </>
       )}
-      <Script src="/js/iFrameResizer.min.js" strategy="lazyOnload" />
+      <Script src="/js/iFrameResizer.min.js" strategy="afterInteractive" />
     </div>
   )
 }
