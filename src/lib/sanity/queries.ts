@@ -66,7 +66,9 @@ export const siteSettingsQuery = `
   *[_type == "siteSettings"][0] {
     siteTitle,
     siteDescription,
+    siteKeywords,
     "siteIconURL": siteIconLight.asset->url,
+    "siteIconURLDark": siteIconDark.asset->url,
     twitterHandle,
     facebookPage
   }
@@ -80,4 +82,10 @@ export const highlightedTeachersQuery = `
     "photo": photo.asset->url,
     "lqip": photo.asset->metadata.lqip
   }
+`
+
+export const APP_SETTINGS_ID = 'a2939b52-e844-45f4-ba97-c335991cea4b'
+
+export const appSettingsQuery = `
+  *[_type == "appSettings" && _id == $id][0] { radioAudioURL }
 `
