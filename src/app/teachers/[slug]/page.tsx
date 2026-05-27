@@ -41,12 +41,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const teacher = await getTeacher(slug)
   if (!teacher) return { title: 'Teacher Not Found' }
+  const description = `Listen to ${teacher.name}${teacher.title ? ` — ${teacher.title}` : ''} on Reach Radio Tucson 106.7FM / 690AM`
   return {
     title: teacher.name,
-    description: `${teacher.title} on Reach Radio Tucson`,
+    description,
     alternates: { canonical: `/teachers/${slug}` },
     openGraph: {
-      images: teacher.photo ? [{ url: teacher.photo }] : [],
+      type: 'profile',
+      title: teacher.name,
+      description,
+      url: `/teachers/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: teacher.name,
+      description,
     },
   }
 }
