@@ -26,7 +26,7 @@ export async function RecommendedTeachers() {
           <Link
             key={teacher.slug}
             href={`/teachers/${teacher.slug}`}
-            className="flex flex-col items-center gap-[5px] flex-shrink-0 w-[54px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
+            className="flex flex-col items-center gap-[5px] flex-shrink-0 w-[54px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
             aria-label={teacher.name}
             style={{ '--stagger-i': index } as React.CSSProperties}
           >
