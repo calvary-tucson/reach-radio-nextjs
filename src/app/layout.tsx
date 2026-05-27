@@ -9,6 +9,7 @@ import { MobileNav } from '@/components/layout/MobileNav'
 import { AudioProvider } from '@/components/AudioProvider'
 import { SleepTimerProvider } from '@/components/SleepTimerProvider'
 import { sanityFetch } from '@/lib/sanity/client'
+import { siteSettingsQuery, appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
 import { Toaster } from 'sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
@@ -17,36 +18,72 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
-export const metadata: Metadata = {
-  title: { default: 'Reach Radio', template: '%s | Reach Radio' },
-  description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
-  metadataBase: new URL('https://reach.radio'),
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    type: 'website',
-    siteName: 'Reach Radio',
-    title: 'Reach Radio',
-    description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
-    url: 'https://reach.radio',
-  },
-  twitter: {
-    card: 'summary',
-    title: 'Reach Radio',
-    description: 'Reach Radio 106.7FM / 690AM — Tucson, AZ',
-  },
-}
-
 const FALLBACK_STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
-const APP_SETTINGS_ID = 'a2939b52-e844-45f4-ba97-c335991cea4b'
+const FALLBACK_DESCRIPTION = "Listen to Reach Radio, Tucson's Christian radio station featuring Bible teachings and gospel music on 106.7FM and 690AM."
+const FALLBACK_KEYWORDS = 'Christian radio, Tucson, Bible teaching, gospel music, Reach Radio, 106.7FM, 690AM'
+const FALLBACK_OG_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSettings = await sanityFetch<{
+    siteTitle: string
+    siteDescription?: string
+    siteKeywords?: string[]
+    siteIconURL?: string
+    siteIconURLDark?: string
+    twitterHandle?: string
+  }>(siteSettingsQuery, {}, { tags: ['siteSettings'] }).catch(() => null)
+
+  const siteTitle = siteSettings?.siteTitle ?? 'Reach Radio'
+  const description = siteSettings?.siteDescription ?? FALLBACK_DESCRIPTION
+  const keywords = siteSettings?.siteKeywords?.join(', ') ?? FALLBACK_KEYWORDS
+  const lightIconURL = siteSettings?.siteIconURL
+  const darkIconURL = siteSettings?.siteIconURLDark
+  const twitterHandle = siteSettings?.twitterHandle
+
+  const icons: Metadata['icons'] = lightIconURL || darkIconURL
+    ? {
+        icon: [
+          ...(lightIconURL ? [{ url: lightIconURL, media: '(prefers-color-scheme: light)' }] : []),
+          ...(darkIconURL ? [{ url: darkIconURL, media: '(prefers-color-scheme: dark)' }] : []),
+        ],
+        apple: lightIconURL
+          ? [{ url: `${lightIconURL}?w=180&h=180&fit=crop&auto=format`, sizes: '180x180' }]
+          : undefined,
+      }
+    : undefined
+
+  return {
+    title: { default: siteTitle, template: `%s | ${siteTitle}` },
+    description,
+    keywords,
+    metadataBase: new URL('https://reach.radio'),
+    alternates: { canonical: '/' },
+    robots: { index: true, follow: true },
+    icons,
+    openGraph: {
+      type: 'website',
+      siteName: siteTitle,
+      title: siteTitle,
+      description,
+      url: 'https://reach.radio',
+      locale: 'en_US',
+      images: [{ url: FALLBACK_OG_IMAGE, width: 1024, height: 1024, alt: siteTitle }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteTitle,
+      description,
+      ...(twitterHandle ? { site: twitterHandle, creator: twitterHandle } : {}),
+    },
+  }
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers()
   const isMobileApp = headersList.get('mobile-app') === 'true'
 
   const { radioAudioURL } = await sanityFetch<{ radioAudioURL: string }>(
-    `*[_type == "appSettings" && _id == $id][0]{ radioAudioURL }`,
+    appSettingsQuery,
     { id: APP_SETTINGS_ID },
     { tags: ['appSettings'] }
   ).catch((err) => {
@@ -58,6 +95,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://formspree.io" />
+      </head>
       <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
         <TooltipProvider delayDuration={500}>
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
