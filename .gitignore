@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Playwright MCP artifacts
 .playwright-mcp/
+
+# Screenshot artifacts
+review-*.png
+visual-*.png
