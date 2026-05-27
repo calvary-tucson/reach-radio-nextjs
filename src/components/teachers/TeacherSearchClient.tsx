@@ -39,7 +39,10 @@ export function TeacherSearchClient({
   const [sort, setSort] = useState<SortOption | undefined>(undefined)
   const [activeDays, setActiveDays] = useState<string[]>([])
 
-  useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => {
+    inputRef.current?.focus()
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
 
   const scheduleMap = useMemo(
     () => new Map<string, ScheduleDay[]>(scheduleTeachers.map((t) => [t.slug, t.schedule])),
