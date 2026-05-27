@@ -114,9 +114,9 @@ export default async function TeacherDetailPage({ params }: Props) {
         <div className="md:mt-5 md:px-0 md:pr-3 px-3">
           <h1 className="text-4xl">{teacher.name}</h1>
           {teacher.title && (
-            <h2 className="uppercase font-bold mt-1 text-white/80">
+            <p className="uppercase font-bold mt-1 text-white/80">
               {teacher.title}{teacher.subtitle ? `: ${teacher.subtitle}` : ''}
-            </h2>
+            </p>
           )}
 
           {teacher.links && teacher.links.length > 0 && (

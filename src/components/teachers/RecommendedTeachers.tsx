@@ -19,11 +19,11 @@ export async function RecommendedTeachers() {
     <section className="mb-6">
       <div className="mb-3">
         <h2 className="text-white font-bold text-lg uppercase">Recommended</h2>
-        <p className="text-white/50 text-sm">Our editorial picks</p>
+        <p className="text-white/70 text-sm">Our editorial picks</p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {teachers.map((teacher, index) => (
-          <TeacherCard key={teacher.slug} teacher={teacher} index={index} />
+          <TeacherCard key={teacher.slug} teacher={teacher} index={index} viewTransitionDisabled />
         ))}
       </div>
     </section>

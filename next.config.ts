@@ -57,7 +57,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: '/speakers/:slug*', destination: '/teachers/:slug*', permanent: true },
-      { source: '/teachers/search', destination: '/teachers', permanent: false },
     ]
   },
 }

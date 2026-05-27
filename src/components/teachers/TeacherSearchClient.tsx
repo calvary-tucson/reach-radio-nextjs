@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { X } from 'lucide-react'
+import { X, ChevronRight } from 'lucide-react'
 import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import type { SortOption } from '@/lib/teachers/filter'
@@ -43,6 +43,8 @@ export function TeacherSearchClient({
   initialQuery = '',
 }: TeacherSearchClientProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const [displayValue, setDisplayValue] = useState(initialQuery)
   const [query, setQuery] = useState(initialQuery)
   const [sort, setSort] = useState<SortOption | undefined>(undefined)
   const [activeDays, setActiveDays] = useState<string[]>([])
@@ -66,7 +68,19 @@ export function TeacherSearchClient({
     [teachers, query, sort, activeDays, scheduleMap, hoursMap]
   )
 
-  const hasFilter = query.trim().length > 0 || !!sort || activeDays.length > 0
+  const hasFilter = displayValue.trim().length > 0 || !!sort || activeDays.length > 0
+
+  function handleQueryChange(value: string) {
+    setDisplayValue(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => setQuery(value), 300)
+  }
+
+  function clearQuery() {
+    setDisplayValue('')
+    setQuery('')
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+  }
 
   function toggleDay(day: string) {
     setActiveDays((prev) =>
@@ -75,7 +89,7 @@ export function TeacherSearchClient({
   }
 
   function clearAll() {
-    setQuery('')
+    clearQuery()
     setSort(undefined)
     setActiveDays([])
   }
@@ -87,16 +101,18 @@ export function TeacherSearchClient({
           ref={inputRef}
           type="text"
           placeholder="Search teachers..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Escape') setQuery('') }}
+          value={displayValue}
+          onChange={(e) => handleQueryChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') clearQuery()
+          }}
           className="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-10 py-3 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
           aria-label="Search teachers"
         />
-        {query && (
+        {displayValue && (
           <button
             type="button"
-            onClick={() => { setQuery(''); inputRef.current?.focus() }}
+            onClick={() => { clearQuery(); inputRef.current?.focus() }}
             className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center text-white/40 hover:text-white cursor-pointer"
             aria-label="Clear search"
           >
@@ -110,11 +126,12 @@ export function TeacherSearchClient({
           <button
             key={day}
             type="button"
+            aria-pressed={activeDays.includes(day)}
             onClick={() => toggleDay(day)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               activeDays.includes(day)
                 ? 'bg-[var(--color-brand-green)] text-white'
-                : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
             }`}
           >
             {DAY_LABELS[day]}
@@ -123,16 +140,17 @@ export function TeacherSearchClient({
       </div>
 
       <div className="flex items-center flex-wrap gap-2">
-        <span className="text-white/40 text-xs">Sort:</span>
+        <span className="text-white/70 text-xs">Sort:</span>
         {SORT_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
+            aria-pressed={sort === option.value}
             onClick={() => setSort(sort === option.value ? undefined : option.value)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               sort === option.value
                 ? 'bg-[var(--color-brand-green)] text-white'
-                : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
             }`}
           >
             {option.label}
@@ -142,14 +160,14 @@ export function TeacherSearchClient({
           <button
             type="button"
             onClick={clearAll}
-            className="ml-auto text-xs text-white/40 hover:text-white cursor-pointer"
+            className="ml-auto text-xs text-white/70 hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"
           >
             Clear all
           </button>
         )}
       </div>
 
-      <p className="text-white/40 text-sm" aria-live="polite" aria-atomic="true">
+      <p className="text-white/70 text-sm" aria-live="polite" aria-atomic="true">
         {results.length} {results.length === 1 ? 'teacher' : 'teachers'} found
       </p>
 
@@ -168,6 +186,8 @@ export function TeacherSearchClient({
                       alt={teacher.name}
                       fill
                       className="object-cover"
+                      placeholder={teacher.lqip ? 'blur' : 'empty'}
+                      blurDataURL={teacher.lqip}
                       sizes="44px"
                     />
                   </div>
@@ -177,24 +197,10 @@ export function TeacherSearchClient({
                 <div className="min-w-0 flex-1">
                   <p className="text-white text-sm font-medium truncate">{teacher.name}</p>
                   {teacher.title && (
-                    <p className="text-white/50 text-xs truncate">{teacher.title}</p>
+                    <p className="text-white/70 text-xs truncate">{teacher.title}</p>
                   )}
                 </div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-white/20 shrink-0"
-                  aria-hidden="true"
-                >
-                  <path d="m9 18 6-6-6-6" />
-                </svg>
+                <ChevronRight className="h-4 w-4 text-white/20 shrink-0" aria-hidden="true" />
               </Link>
             </li>
           ))}

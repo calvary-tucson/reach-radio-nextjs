@@ -42,6 +42,7 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
       >
         {/* Drag handle — mobile only */}
         <div
+          aria-hidden="true"
           className="flex justify-center pt-3 pb-2 sm:hidden cursor-grab active:cursor-grabbing touch-none shrink-0"
           onTouchStart={drag.onTouchStart}
           onTouchMove={drag.onTouchMove}

@@ -115,7 +115,14 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         />
         <DialogPrimitive.Content
           className="fixed inset-0 z-50 outline-none"
-          onEscapeKeyDown={handleDismiss}
+          onEscapeKeyDown={(e) => {
+            const active = document.activeElement as HTMLInputElement | null
+            if (active?.tagName === 'INPUT' && active.value.length > 0) {
+              e.preventDefault()
+              return
+            }
+            handleDismiss()
+          }}
         >
           <DialogPrimitive.Title className="sr-only">
             {title ?? 'Modal'}

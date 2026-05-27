@@ -18,20 +18,22 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-white text-2xl font-bold">All Teachers</h2>
-        <span className="text-white/50 text-sm">{teachers.length} teachers</span>
+        <h3 className="text-white text-2xl font-bold">All Teachers</h3>
+        <span className="text-white/70 text-sm">{teachers.length} teachers</span>
       </div>
 
-      <div className="flex gap-1 mb-5 border-b border-white/10">
+      <div role="tablist" className="flex gap-1 mb-5 border-b border-white/10">
         {(['teachers', 'schedule'] as Tab[]).map((tab) => (
           <button
             key={tab}
+            role="tab"
+            aria-selected={activeTab === tab}
             type="button"
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium capitalize transition-colors cursor-pointer border-b-2 -mb-px ${
               activeTab === tab
                 ? 'text-white border-[var(--color-brand-green)]'
-                : 'text-white/50 border-transparent hover:text-white/80'
+                : 'text-white/70 border-transparent hover:text-white/80'
             }`}
           >
             {tab}
