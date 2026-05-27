@@ -5,7 +5,7 @@ import type { TeacherSummary } from '@/lib/sanity/types'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export async function FeaturedTeachers() {
+export async function FeaturedTeachers({ showSeeAll = true }: { showSeeAll?: boolean } = {}) {
   const raw = await sanityFetch<TeacherSummary[]>(
     highlightedTeachersQuery,
     { slugs: [...HIGHLIGHTED_TEACHER_SLUGS] },
@@ -20,12 +20,14 @@ export async function FeaturedTeachers() {
     <section>
       <div className="flex items-center justify-between px-3 mb-3">
         <h2 className="text-white font-bold text-lg uppercase">Our Teachers</h2>
-        <Link
-          href="/teachers"
-          className="text-white/60 text-sm hover:text-white transition-colors cursor-pointer"
-        >
-          See all →
-        </Link>
+        {showSeeAll && (
+          <Link
+            href="/teachers"
+            className="text-white/60 text-sm hover:text-white transition-colors cursor-pointer"
+          >
+            See all →
+          </Link>
+        )}
       </div>
       <div className="flex gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {teachers.map((teacher) => (

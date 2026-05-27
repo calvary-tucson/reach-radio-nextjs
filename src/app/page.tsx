@@ -2,10 +2,8 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { RadioPlayer } from '@/components/home/RadioPlayer'
 import { TodaySchedule } from '@/components/home/TodaySchedule'
-import { FeaturedTeachers } from '@/components/home/FeaturedTeachers'
 import { RadioPlayerSkeleton } from '@/components/skeletons/RadioPlayerSkeleton'
 import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
-import { FeaturedTeachersSkeleton } from '@/components/skeletons/FeaturedTeachersSkeleton'
 import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 
 export const metadata: Metadata = {
@@ -31,9 +29,6 @@ export default function HomePage() {
         </Suspense>
       </section>
 
-      <Suspense fallback={<FeaturedTeachersSkeleton />}>
-        <FeaturedTeachers />
-      </Suspense>
     </div>
   )
 }

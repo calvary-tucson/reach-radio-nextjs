@@ -4,6 +4,7 @@ import { teacherListQuery, fullScheduleQuery } from '@/lib/sanity/queries'
 import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 import { TeachersClientView } from '@/components/teachers/TeachersClientView'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
+import { FeaturedTeachers } from '@/components/home/FeaturedTeachers'
 import type { SortOption } from '@/lib/teachers/filter'
 
 export const revalidate = 3600
@@ -44,6 +45,7 @@ export default async function TeachersPage({ searchParams }: Props) {
   return (
     <div className="px-4 py-6">
       <ShowMediaBar />
+      <FeaturedTeachers showSeeAll={false} />
       <TeachersClientView
         teachers={teachers}
         scheduleTeachers={scheduleTeachers}
