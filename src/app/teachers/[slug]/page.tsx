@@ -78,7 +78,6 @@ export default async function TeacherDetailPage({ params }: Props) {
       <Breadcrumbs
         variant="standalone"
         items={[
-          { name: 'Home', url: '/' },
           { name: 'Teachers', url: '/teachers' },
           { name: teacher.name, url: `/teachers/${teacher.slug}` },
         ]}

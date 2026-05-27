@@ -16,7 +16,6 @@ export default function PrivacyPolicyPage() {
       <Breadcrumbs
         variant="standalone"
         items={[
-          { name: 'Home', url: '/' },
           { name: 'About', url: '/about' },
           { name: 'Privacy Policy', url: '/about/privacy-policy' },
         ]}
