@@ -79,7 +79,13 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+  modal,
+}: {
+  children: React.ReactNode
+  modal: React.ReactNode
+}) {
   const headersList = await headers()
   const isMobileApp = headersList.get('mobile-app') === 'true'
 
@@ -117,6 +123,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             className={!isMobileApp ? 'pt-16' : ''}
             style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
           >{children}</main>
+          {modal ? <div key="modal">{modal}</div> : null}
           {!isMobileApp && <Footer />}
           {!isMobileApp && <MobileNav />}
           <MediaBar />
