@@ -6,7 +6,6 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery } from '@/lib/sanity/queries'
 import { OrganizationSchema } from '@/components/seo/OrganizationSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
-import Breadcrumbs from '@/components/global/Breadcrumbs'
 
 export const revalidate = 3600
 
@@ -46,13 +45,6 @@ export default async function AboutPage() {
   return (
     <div className="page-enter px-4 py-6 max-w-2xl mx-auto space-y-6">
       <ShowMediaBar />
-      <Breadcrumbs
-        variant="standalone"
-        items={[
-          { name: 'Home', url: '/' },
-          { name: 'About', url: '/about' },
-        ]}
-      />
       <OrganizationSchema
         name={siteSettings.siteTitle}
         alternateName="Reach Radio Tucson"
