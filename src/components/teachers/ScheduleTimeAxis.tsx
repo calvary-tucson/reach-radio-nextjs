@@ -1,7 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import { timeStringToMinutes } from '@/lib/utils/time'
+import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 interface ParsedSlot {
@@ -109,13 +109,13 @@ export function ScheduleTimeAxis({ teachers, selectedDay, onSelect }: Props) {
                 <div
                   key={i}
                   data-testid="music-gap"
-                  className="absolute inset-x-0 bg-white/5 rounded flex items-center px-2"
+                  className="absolute inset-x-0 bg-white/3 rounded-[6px] flex items-center px-2"
                   style={{
                     top: (gap.startMin - AXIS_START) * PX_PER_MIN,
                     height: Math.max(MIN_HEIGHT_PX, (gap.endMin - gap.startMin) * PX_PER_MIN),
                   }}
                 >
-                  <span className="text-white/30 text-xs">Music</span>
+                  <span className="text-white/25 text-xs italic">♪ Music</span>
                 </div>
               ))}
 
@@ -131,19 +131,18 @@ export function ScheduleTimeAxis({ teachers, selectedDay, onSelect }: Props) {
                       key={`${slot.teacher.slug}-${slot.startMinutes}`}
                       type="button"
                       onClick={() => onSelect(slot.teacher)}
-                      className="absolute flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 active:bg-gray-600 rounded px-1.5 overflow-hidden transition-colors cursor-pointer"
+                      className="absolute flex items-center gap-1.5 bg-[rgba(132,184,79,0.12)] border-l-[3px] border-[#84b84f] hover:bg-[rgba(132,184,79,0.2)] active:bg-[rgba(132,184,79,0.2)] rounded-[8px] px-1.5 overflow-hidden transition-colors cursor-pointer"
                       style={{ top: topPx, height: heightPx, left: `${leftPct}%`, width: `${widthPct}%` }}
                     >
-                      {slot.teacher.photo && (
-                        <Image
-                          src={slot.teacher.photo}
-                          alt={slot.teacher.name}
-                          width={24}
-                          height={24}
-                          className="rounded-full flex-shrink-0 object-cover w-6 h-6"
-                        />
-                      )}
-                      <span className="text-white text-xs font-medium truncate leading-tight">
+                      <TeacherAvatar
+                        name={slot.teacher.name}
+                        photo={slot.teacher.photo}
+                        lqip={slot.teacher.lqip ?? null}
+                        size="xs"
+                        shape="circle"
+                        sizes="24px"
+                      />
+                      <span className="text-white/80 text-xs font-medium truncate leading-tight">
                         {slot.teacher.name}
                       </span>
                     </button>
