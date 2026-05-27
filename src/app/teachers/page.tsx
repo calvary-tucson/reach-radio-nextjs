@@ -7,6 +7,7 @@ import { TeachersClientView } from '@/components/teachers/TeachersClientView'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { PassiveSearchBar } from '@/components/global/PassiveSearchBar'
 import { RecommendedTeachers } from '@/components/teachers/RecommendedTeachers'
+import { RecommendedTeachersSkeleton } from '@/components/skeletons/RecommendedTeachersSkeleton'
 
 export const revalidate = 3600
 
@@ -33,7 +34,10 @@ export default async function TeachersPage() {
 
   return (
     <div className="px-4 py-6">
-      <h1 className="sr-only">Teachers</h1>
+      <div className="flex items-center justify-between mb-3">
+        <h1 className="text-[22px] font-extrabold text-white tracking-tight">Teachers</h1>
+        <span className="text-[11px] text-white/35 font-medium">{teachers.length} teachers</span>
+      </div>
       <ShowMediaBar />
       <PassiveSearchBar
         href="/teachers/search"
@@ -41,7 +45,7 @@ export default async function TeachersPage() {
         modalTitle="Search Teachers"
         className="mb-4"
       />
-      <Suspense fallback={null}>
+      <Suspense fallback={<RecommendedTeachersSkeleton />}>
         <RecommendedTeachers />
       </Suspense>
       <TeachersClientView
