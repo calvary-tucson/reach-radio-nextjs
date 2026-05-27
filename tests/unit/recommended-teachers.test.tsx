@@ -25,16 +25,16 @@ vi.mock('next/link', () => ({
 }))
 
 describe('RecommendedTeachers', () => {
-  it('renders the Recommended heading', async () => {
+  it('renders the Recommended label', async () => {
     const Component = await RecommendedTeachers()
     render(Component)
-    expect(screen.getByRole('heading', { name: /recommended/i })).toBeInTheDocument()
+    expect(screen.getByText(/^Recommended$/i)).toBeInTheDocument()
   })
 
-  it('renders editorial picks subtitle', async () => {
+  it('renders the section landmark', async () => {
     const Component = await RecommendedTeachers()
     render(Component)
-    expect(screen.getByText(/editorial picks/i)).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /recommended teachers/i })).toBeInTheDocument()
   })
 
   it('renders a card for each teacher', async () => {

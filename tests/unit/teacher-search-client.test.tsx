@@ -90,7 +90,8 @@ describe('TeacherSearchClient', () => {
     )
     await user.click(screen.getByRole('button', { name: 'A–Z' }))
     const links = screen.getAllByRole('link')
-    const names = links.map((l) => l.textContent?.trim()).filter(Boolean)
+    const teacherLinks = links.filter((l) => /^\/teachers\/\w/.test(l.getAttribute('href') ?? ''))
+    const names = teacherLinks.map((l) => l.textContent?.trim()).filter(Boolean)
     expect(names[0]).toContain('Alistair Begg')
   })
 
