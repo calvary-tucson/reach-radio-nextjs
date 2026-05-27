@@ -1,8 +1,8 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { BottomSheet } from '@/components/global/BottomSheet'
+import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 interface Props {
@@ -39,34 +39,29 @@ export function TeacherDetailSheet({ teacher, open, onClose }: Props) {
 
       <div className="px-6 pb-10 space-y-5 overflow-y-auto max-h-[60vh]">
         <div className="flex items-center gap-4">
-          {teacher.photo ? (
-            <div className="relative w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
-              <Image
-                src={teacher.photo}
-                alt={teacher.name}
-                fill
-                className="object-cover"
-                placeholder={teacher.lqip ? 'blur' : 'empty'}
-                blurDataURL={teacher.lqip ?? undefined}
-                sizes="80px"
-              />
-            </div>
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-gray-700 flex-shrink-0" />
-          )}
-          <div>
+          <TeacherAvatar
+            name={teacher.name}
+            photo={teacher.photo}
+            lqip={teacher.lqip ?? null}
+            size="xl"
+            shape="circle"
+            sizes="80px"
+          />
+          {teacher.title && (
             <p className="text-white/70 text-sm">{teacher.title}</p>
-          </div>
+          )}
         </div>
 
         {sortedSchedule.length > 0 && (
           <div>
-            <h3 className="text-white/50 text-xs uppercase font-semibold mb-2">This Week</h3>
-            <ul className="space-y-1.5">
+            <h3 className="text-[10px] uppercase font-bold tracking-[0.1em] text-white/35 mb-3">
+              This Week
+            </h3>
+            <ul className="space-y-2">
               {sortedSchedule.map((day) => (
                 <li key={day.day} className="flex gap-3">
                   <span className="text-white text-sm font-medium w-24 shrink-0">{day.day}</span>
-                  <span className="text-white/60 text-sm">
+                  <span className="text-white/55 text-sm">
                     {day.times.map((t) => `${t.startTime} – ${t.endTime}`).join(', ')}
                   </span>
                 </li>
@@ -78,7 +73,7 @@ export function TeacherDetailSheet({ teacher, open, onClose }: Props) {
         <Link
           href={`/teachers/${teacher.slug}`}
           onClick={onClose}
-          className="flex items-center justify-center w-full bg-gray-700 hover:bg-gray-600 text-white rounded-xl py-4 text-sm font-semibold transition-colors cursor-pointer"
+          className="flex items-center justify-center w-full bg-[#1d2228] hover:bg-[#262d34] text-white rounded-xl py-4 text-sm font-semibold transition-colors cursor-pointer"
           aria-label={`View full profile for ${teacher.name}`}
         >
           View full profile →
