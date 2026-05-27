@@ -13,7 +13,7 @@ interface TeacherAvatarProps {
   /** When true: positions absolute inset-0 to fill a relative parent. */
   fill?: boolean
   shape: AvatarShape
-  /** Green ring + dark separator — used on detail page banner overlap. */
+  /** Green ring + dark separator — used on detail page banner overlap. Ignored when fill=true. */
   ring?: boolean
   /** next/image sizes hint. Defaults to "{px}px". */
   sizes?: string
