@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Breadcrumbs from '@/components/global/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: 'Donate',
@@ -7,5 +8,16 @@ export const metadata: Metadata = {
 }
 
 export default function DonateLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return (
+    <>
+      <Breadcrumbs
+        variant="standalone"
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Donate', url: '/donate' },
+        ]}
+      />
+      {children}
+    </>
+  )
 }
