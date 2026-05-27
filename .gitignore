@@ -50,3 +50,4 @@ next-env.d.ts
 # Screenshot artifacts
 review-*.png
 visual-*.png
+.superpowers/
