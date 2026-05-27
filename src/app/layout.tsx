@@ -12,6 +12,7 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery, appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
 import { Toaster } from 'sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { WebSiteSchema } from '@/components/seo/WebSiteSchema'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -102,6 +103,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
         <TooltipProvider delayDuration={500}>
+          <WebSiteSchema />
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
             Skip to main content
           </a>
