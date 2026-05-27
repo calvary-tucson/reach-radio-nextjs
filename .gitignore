@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .worktrees/
+
+# Claude Code
+.claude/
+
+# Playwright MCP artifacts
+.playwright-mcp/
