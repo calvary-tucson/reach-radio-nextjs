@@ -69,10 +69,7 @@ export default function DonatePage() {
   }
 
   return (
-    <div className="page-enter px-4 py-6">
-      <h1 className="text-white text-2xl font-bold mb-4">Support Reach Radio</h1>
-      <p className="text-white/70 mb-6">Your generous support keeps Reach Radio on the air.</p>
-
+    <div className="page-enter px-4 pt-5">
       {failed ? (
         <div role="alert" className="text-white/70 text-sm py-8 text-center">
           <p>Unable to load the donation form.</p>
@@ -88,7 +85,7 @@ export default function DonatePage() {
       ) : (
         <>
           {!loaded && (
-            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[1000px] bg-black rounded p-4">
+            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[900px] bg-black rounded p-4">
               <div className="h-[60px] bg-gray-700 rounded" />
               <div className="h-[1.2em] w-[90%] bg-gray-700 rounded" />
               <div className="h-[1.2em] w-[60%] bg-gray-700 rounded" />
@@ -106,7 +103,7 @@ export default function DonatePage() {
             onLoad={handleLoad}
             onError={handleError}
             sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-            className={`w-full min-h-[1000px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
+            className={`w-full min-h-[900px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
           />
         </>
       )}

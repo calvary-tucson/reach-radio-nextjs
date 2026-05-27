@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: '/js/iFrameResizer.contentWindow.min.js',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Content-Type', value: 'application/javascript' },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
@@ -29,7 +36,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://forms.ministryforms.net",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' cdn.sanity.io data: blob: https://www.google.com",
               "media-src 'self' https://*.radiojar.com https://reach.radio",
