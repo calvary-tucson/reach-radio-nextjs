@@ -40,7 +40,7 @@ export async function RecommendedTeachers() {
                 sizes="72px"
               />
             </div>
-            <span className="text-[8px] md:text-xs text-white/55 text-center leading-tight line-clamp-2">
+            <span className="text-xs md:text-[13px] text-white/55 text-center leading-tight line-clamp-2">
               {teacher.name}
             </span>
           </Link>

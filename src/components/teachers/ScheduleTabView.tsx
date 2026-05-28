@@ -54,7 +54,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
             shape="circle"
             sizes="24px"
           />
-          <span className="text-[10px] text-white/55">
+          <span className="text-xs text-white/55">
             Most on air:{' '}
             <span className="text-white font-semibold">{mostOnAir.teacher.name}</span>
             {' · '}
@@ -71,7 +71,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
               key={day}
               type="button"
               onClick={() => setSelectedDay(day)}
-              className={`flex-shrink-0 px-4 py-[5px] rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
+              className={`flex-shrink-0 px-4 py-[5px] rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                 selectedDay === day
                   ? 'bg-[#84b84f] text-[#0a1505]'
                   : 'bg-[#1e2328] text-white/50 hover:bg-[#262d34] hover:text-white/70'
