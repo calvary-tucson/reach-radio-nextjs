@@ -8,6 +8,7 @@ import { ScheduleTimeAxis } from './ScheduleTimeAxis'
 import { TeacherDetailSheet } from './TeacherDetailSheet'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
+import { ScheduleWeekView } from './ScheduleWeekView'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 dayjs.extend(utc)
@@ -62,34 +63,42 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
         </div>
       )}
 
-      <div className="flex gap-[5px] overflow-x-auto pb-1 mb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {DAYS.map((day) => (
-          <button
-            key={day}
-            type="button"
-            onClick={() => setSelectedDay(day)}
-            className={`flex-shrink-0 px-4 py-[5px] rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
-              selectedDay === day
-                ? 'bg-[#84b84f] text-[#0a1505]'
-                : 'bg-[#1e2328] text-white/50 hover:bg-[#262d34] hover:text-white/70'
-            }`}
-          >
-            {DAY_LABELS[day]}
-          </button>
-        ))}
+      {/* Mobile: day-picker + time axis */}
+      <div className="md:hidden">
+        <div className="flex gap-[5px] overflow-x-auto pb-1 mb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {DAYS.map((day) => (
+            <button
+              key={day}
+              type="button"
+              onClick={() => setSelectedDay(day)}
+              className={`flex-shrink-0 px-4 py-[5px] rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
+                selectedDay === day
+                  ? 'bg-[#84b84f] text-[#0a1505]'
+                  : 'bg-[#1e2328] text-white/50 hover:bg-[#262d34] hover:text-white/70'
+              }`}
+            >
+              {DAY_LABELS[day]}
+            </button>
+          ))}
+        </div>
+
+        <ScheduleTimeAxis
+          teachers={scheduleTeachers}
+          selectedDay={selectedDay}
+          onSelect={setSelectedTeacher}
+        />
+
+        <TeacherDetailSheet
+          teacher={selectedTeacher}
+          open={selectedTeacher !== null}
+          onClose={() => setSelectedTeacher(null)}
+        />
       </div>
 
-      <ScheduleTimeAxis
-        teachers={scheduleTeachers}
-        selectedDay={selectedDay}
-        onSelect={setSelectedTeacher}
-      />
-
-      <TeacherDetailSheet
-        teacher={selectedTeacher}
-        open={selectedTeacher !== null}
-        onClose={() => setSelectedTeacher(null)}
-      />
+      {/* Desktop: weekly calendar (has its own internal TeacherDetailSheet) */}
+      <div className="hidden md:block">
+        <ScheduleWeekView scheduleTeachers={scheduleTeachers} />
+      </div>
     </>
   )
 }
