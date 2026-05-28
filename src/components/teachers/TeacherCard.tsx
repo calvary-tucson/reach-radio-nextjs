@@ -53,8 +53,8 @@ export function TeacherCard({
         )}
         {scheduleDays && (
           <div className="flex items-center gap-[3px] mt-[5px]">
-            <CalendarDays className="h-[9px] w-[9px] md:h-[11px] md:w-[11px] text-[#a3d46a] shrink-0" aria-hidden="true" />
-            <span className="text-[8px] md:text-[10px] text-[#a3d46a] font-medium leading-none">
+            <CalendarDays className="h-[11px] w-[11px] md:h-[13px] md:w-[13px] text-[#a3d46a] shrink-0" aria-hidden="true" />
+            <span className="text-[8px] md:text-[10px] text-[#a3d46a] font-medium leading-none uppercase tracking-wide">
               {scheduleDays}
             </span>
           </div>
