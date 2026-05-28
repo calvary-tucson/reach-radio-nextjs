@@ -6,7 +6,7 @@ import { ScheduleCardList } from './ScheduleCardList'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
-const DAY_LABELS: Record<string, string> = {
+const DAY_LABELS: Record<(typeof DAYS)[number], string> = {
   Sunday: 'SUN', Monday: 'MON', Tuesday: 'TUE', Wednesday: 'WED',
   Thursday: 'THU', Friday: 'FRI', Saturday: 'SAT',
 }
