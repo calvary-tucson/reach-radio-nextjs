@@ -1,21 +1,21 @@
 import { ViewTransition } from 'react'
 import Link from 'next/link'
+import { CalendarDays } from 'lucide-react'
 import type { TeacherSummary } from '@/lib/sanity/types'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
-import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
 
 interface TeacherCardProps {
   teacher: TeacherSummary
   index?: number
   viewTransitionDisabled?: boolean
-  weeklyMinutes?: number
+  scheduleDays?: string
 }
 
 export function TeacherCard({
   teacher,
   index = 0,
   viewTransitionDisabled = false,
-  weeklyMinutes,
+  scheduleDays,
 }: TeacherCardProps) {
   const avatarEl = (
     <div className="relative aspect-square bg-gradient-to-br from-[#253520] to-[#131b0d]">
@@ -30,8 +30,6 @@ export function TeacherCard({
       />
     </div>
   )
-
-  const hoursPerWeek = weeklyMinutes ? Math.round(weeklyMinutes / 60) : 0
 
   return (
     <Link
@@ -53,9 +51,12 @@ export function TeacherCard({
             {teacher.title}
           </p>
         )}
-        {hoursPerWeek > 0 && (
-          <div className="mt-[5px]">
-            <TeacherInfoChip label={`${hoursPerWeek} hrs/wk`} variant="accent" />
+        {scheduleDays && (
+          <div className="flex items-center gap-[3px] mt-[5px]">
+            <CalendarDays className="h-[9px] w-[9px] md:h-[11px] md:w-[11px] text-[#84b84f] shrink-0" aria-hidden="true" />
+            <span className="text-[8px] md:text-[10px] text-[#84b84f] font-medium leading-none">
+              {scheduleDays}
+            </span>
           </div>
         )}
       </div>

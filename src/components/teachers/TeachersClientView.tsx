@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { TeacherCard } from '@/components/teachers/TeacherCard'
 import { ScheduleTabView } from '@/components/teachers/ScheduleTabView'
-import { computeWeeklyMinutes } from '@/lib/utils/time'
+import { formatScheduleDays } from '@/lib/utils/time'
 import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 
 interface TeachersClientViewProps {
@@ -16,10 +16,10 @@ type Tab = 'teachers' | 'schedule'
 export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClientViewProps) {
   const [activeTab, setActiveTab] = useState<Tab>('teachers')
 
-  const weeklyMinutesMap = useMemo(
+  const scheduleDaysMap = useMemo(
     () =>
-      new Map<string, number>(
-        scheduleTeachers.map((t) => [t.slug, computeWeeklyMinutes(t.schedule)])
+      new Map<string, string>(
+        scheduleTeachers.map((t) => [t.slug, formatScheduleDays(t.schedule.map((d) => d.day))])
       ),
     [scheduleTeachers]
   )
@@ -59,7 +59,7 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
                 key={teacher.slug}
                 teacher={teacher}
                 index={index}
-                weeklyMinutes={weeklyMinutesMap.get(teacher.slug)}
+                scheduleDays={scheduleDaysMap.get(teacher.slug)}
               />
             ))}
           </div>
