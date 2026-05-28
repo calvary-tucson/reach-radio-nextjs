@@ -11,13 +11,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-interface Props {
-  searchParams: Promise<{ q?: string }>
-}
-
-export default async function TeachersSearchPage({ searchParams }: Props) {
-  const { q = '' } = await searchParams
-
+export default async function TeachersSearchPage() {
   const [teachers, scheduleTeachers] = await Promise.all([
     sanityFetch<TeacherSummary[]>(teacherListQuery, {}, { tags: ['teachers'] }),
     sanityFetch<TeacherWithSchedule[]>(fullScheduleQuery, {}, { tags: ['teachers'] }),
@@ -27,7 +21,6 @@ export default async function TeachersSearchPage({ searchParams }: Props) {
     <TeacherSearchClient
       teachers={teachers}
       scheduleTeachers={scheduleTeachers}
-      initialQuery={q}
     />
   )
 }
