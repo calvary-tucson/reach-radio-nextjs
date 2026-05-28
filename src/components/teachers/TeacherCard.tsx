@@ -44,12 +44,12 @@ export function TeacherCard({
       {teacher.photo && !viewTransitionDisabled ? (
         <ViewTransition name={`teacher-${teacher.slug}`}>{avatarEl}</ViewTransition>
       ) : avatarEl}
-      <div className="px-[11px] pt-[9px] pb-[11px]">
-        <p className="text-white font-bold text-[11px] leading-snug" aria-hidden="true">
+      <div className="px-[11px] md:px-3 pt-[9px] md:pt-3 pb-[11px] md:pb-3">
+        <p className="text-white font-bold text-[11px] md:text-sm leading-snug" aria-hidden="true">
           {teacher.name}
         </p>
         {teacher.title && (
-          <p className="text-white/45 text-[9px] mt-[3px]" aria-hidden="true">
+          <p className="text-white/45 text-[9px] md:text-xs mt-[3px]" aria-hidden="true">
             {teacher.title}
           </p>
         )}

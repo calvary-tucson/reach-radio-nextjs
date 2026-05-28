@@ -53,7 +53,7 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             </p>
             <span className="text-[10px] text-white/25">{teachers.length}</span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[9px]">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (
               <TeacherCard
                 key={teacher.slug}
