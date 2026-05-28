@@ -106,7 +106,7 @@ export default async function TeacherDetailPage({ params }: Props) {
       <div className="px-4 md:px-8 pt-[14px]">
         <Link
           href="/teachers"
-          className="flex items-center gap-[5px] text-[#84b84f] text-[13px] md:text-base font-medium w-fit cursor-pointer"
+          className="flex items-center gap-[5px] text-[#84b84f] text-sm md:text-base font-medium w-fit cursor-pointer"
         >
           <span className="text-[17px] md:text-xl leading-none">&#8249;</span>
           <span>Teachers</span>
@@ -165,23 +165,20 @@ export default async function TeacherDetailPage({ params }: Props) {
           <div className="px-4 md:px-0 mb-[10px]">
             <h1 className="text-[19px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
             {(teacher.title || teacher.subtitle) && (
-              <p className="text-[11px] md:text-sm text-white/50 mt-[3px] font-medium">
+              <p className="text-sm text-white/50 mt-[3px] font-medium">
                 {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
               </p>
             )}
           </div>
 
           {/* Info chips */}
-          {(hoursPerWeek > 0 || daysOnAir > 0 || teacher.links.length > 0) && (
+          {(hoursPerWeek > 0 || daysOnAir > 0) && (
             <div className="flex flex-wrap gap-[7px] px-4 md:px-0 mb-3">
               {hoursPerWeek > 0 && (
                 <TeacherInfoChip icon="📻" label={`${hoursPerWeek} hrs/wk`} variant="accent" />
               )}
               {daysOnAir > 0 && (
                 <TeacherInfoChip label={`${daysOnAir} day${daysOnAir !== 1 ? 's' : ''}`} variant="accent" />
-              )}
-              {teacher.links.length > 0 && (
-                <TeacherInfoChip label={`${teacher.links.length} link${teacher.links.length !== 1 ? 's' : ''}`} variant="dim" />
               )}
             </div>
           )}
@@ -224,17 +221,17 @@ export default async function TeacherDetailPage({ params }: Props) {
             <>
               <div className="h-px bg-white/6 mx-4 md:hidden mb-3" />
               <div className="px-4 md:px-0 mb-4">
-                <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/35 mb-[10px]">
+                <p className="text-xs md:text-sm font-bold uppercase tracking-[0.1em] text-white/35 mb-[10px]">
                   On Air This Week
                 </p>
                 <div className="space-y-[8px] md:space-y-3">
                   {sortedSchedule.map((day) => (
                     <div key={day.day}>
-                      <p className="text-[11px] md:text-sm font-bold text-white/60 mb-[5px]">{day.day}</p>
+                      <p className="text-sm font-bold text-white/60 mb-[5px]">{day.day}</p>
                       {day.times.map((t) => (
                         <div
                           key={`${t.startTime}-${t.endTime}`}
-                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[10px] md:text-sm text-white/55 mb-[3px]"
+                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-xs md:text-sm text-white/55 mb-[3px]"
                         >
                           {t.startTime} &ndash; {t.endTime}
                         </div>
@@ -253,7 +250,7 @@ export default async function TeacherDetailPage({ params }: Props) {
         <>
           <div className="h-px bg-white/6 mx-4 md:mx-8 mb-3" />
           <div className="pb-6 md:pb-10">
-            <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/35 px-4 md:px-8 mb-3">
+            <p className="text-xs md:text-sm font-bold uppercase tracking-[0.1em] text-white/35 px-4 md:px-8 mb-3">
               Also on Reach Radio
             </p>
             <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -261,7 +258,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                 <Link
                   key={t.slug}
                   href={`/teachers/${t.slug}`}
-                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[46px] md:w-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
+                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[56px] md:w-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
                   aria-label={t.name}
                 >
                   <TeacherAvatar
@@ -272,7 +269,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                     shape="circle"
                     sizes="38px"
                   />
-                  <span className="text-[7px] md:text-[10px] text-white/40 text-center line-clamp-2 leading-tight">
+                  <span className="text-[10px] text-white/40 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
                 </Link>
