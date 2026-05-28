@@ -33,10 +33,10 @@ export default async function TeachersPage() {
   ])
 
   return (
-    <div className="px-4 py-6">
+    <div className="px-4 md:px-8 py-6 max-w-screen-xl mx-auto">
       <div className="flex items-center justify-between mb-3">
-        <h1 className="text-[22px] font-extrabold text-white tracking-tight">Teachers</h1>
-        <span className="text-[11px] text-white/35 font-medium">{teachers.length} teachers</span>
+        <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight">Teachers</h1>
+        <span className="text-[11px] md:text-sm text-white/35 font-medium">{teachers.length} teachers</span>
       </div>
       <ShowMediaBar />
       <PassiveSearchBar
