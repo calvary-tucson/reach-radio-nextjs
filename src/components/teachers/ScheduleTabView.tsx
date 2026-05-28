@@ -11,6 +11,7 @@ import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { buildDaySlots } from '@/lib/teachers/schedule'
 import { ScheduleCardList } from './ScheduleCardList'
 import { ScheduleWeekCards } from './ScheduleWeekCards'
+import { useIsMinMd } from '@/hooks/useIsMinMd'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 dayjs.extend(utc)
@@ -32,6 +33,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
   const today = now.format('dddd')
   const currentTime = now.hour() * 60 + now.minute()
 
+  const isMinMd = useIsMinMd()
   const [selectedDay, setSelectedDay] = useState(today)
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherWithSchedule | null>(null)
 
@@ -98,20 +100,20 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
           onSelect={setSelectedTeacher}
         />
 
-        {/* < md: bottom sheet */}
+        {/* < md: bottom sheet — gated with JS because createPortal bypasses CSS hidden */}
         <div className="md:hidden">
           <TeacherDetailSheet
             teacher={selectedTeacher}
-            open={selectedTeacher !== null}
+            open={!isMinMd && selectedTeacher !== null}
             onClose={() => setSelectedTeacher(null)}
           />
         </div>
 
-        {/* md–lg: right overlay panel */}
+        {/* md–lg: right overlay panel — gated with JS because createPortal bypasses CSS hidden */}
         <div className="hidden md:block">
           <TeacherDetailPanel
             teacher={selectedTeacher}
-            open={selectedTeacher !== null}
+            open={isMinMd && selectedTeacher !== null}
             onClose={() => setSelectedTeacher(null)}
           />
         </div>
@@ -127,7 +129,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
         />
         <TeacherDetailPanel
           teacher={selectedTeacher}
-          open={selectedTeacher !== null}
+          open={isMinMd && selectedTeacher !== null}
           onClose={() => setSelectedTeacher(null)}
         />
       </div>
