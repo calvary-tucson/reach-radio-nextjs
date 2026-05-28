@@ -89,7 +89,7 @@ export default async function TeacherDetailPage({ params }: Props) {
   const otherLinks = teacher.links?.slice(1) ?? []
 
   return (
-    <div className="text-white">
+    <div className="text-white max-w-screen-xl mx-auto">
       <ShowMediaBar />
 
       <PersonSchema
@@ -103,18 +103,18 @@ export default async function TeacherDetailPage({ params }: Props) {
       />
 
       {/* Back button */}
-      <div className="px-4 pt-[14px]">
+      <div className="px-4 md:px-8 pt-[14px]">
         <Link
           href="/teachers"
-          className="flex items-center gap-[5px] text-[#84b84f] text-[13px] font-medium w-fit cursor-pointer"
+          className="flex items-center gap-[5px] text-[#84b84f] text-[13px] md:text-base font-medium w-fit cursor-pointer"
         >
-          <span className="text-[17px] leading-none">&#8249;</span>
+          <span className="text-[17px] md:text-xl leading-none">&#8249;</span>
           <span>Teachers</span>
         </Link>
       </div>
 
       {/* Banner */}
-      <div className="relative w-full h-[88px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
+      <div className="relative w-full h-[88px] md:h-[160px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
@@ -131,114 +131,137 @@ export default async function TeacherDetailPage({ params }: Props) {
         />
       </div>
 
-      {/* Avatar overlap row */}
-      <div className="flex items-end justify-between px-4 mt-[-36px] mb-[10px]">
-        <ViewTransition name={`teacher-${teacher.slug}`}>
-          <TeacherAvatar
-            name={teacher.name}
-            photo={teacher.photo}
-            lqip={teacher.lqip}
-            size="xl"
-            shape="circle"
-            ring
-            sizes="80px"
-          />
-        </ViewTransition>
-        {primaryLink && (
-          <a
-            href={primaryLink.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px] text-[10px] font-semibold text-[#84b84f] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] transition-colors"
-          >
-            {primaryLink.title} &#8599;
-          </a>
-        )}
-      </div>
+      {/* Two-column layout at md */}
+      <div className="md:flex md:gap-8 md:px-8 md:items-start">
 
-      {/* Name + title */}
-      <div className="px-4 mb-[10px]">
-        <h1 className="text-[19px] font-extrabold tracking-tight">{teacher.name}</h1>
-        {(teacher.title || teacher.subtitle) && (
-          <p className="text-[11px] text-white/50 mt-[3px] font-medium">
-            {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
-          </p>
-        )}
-      </div>
+        {/* LEFT SIDEBAR */}
+        <div className="md:w-72 md:flex-shrink-0">
+          {/* Avatar overlap row */}
+          <div className="flex items-end justify-between px-4 md:px-0 mt-[-36px] md:mt-[-50px] mb-[10px]">
+            <ViewTransition name={`teacher-${teacher.slug}`}>
+              <TeacherAvatar
+                name={teacher.name}
+                photo={teacher.photo}
+                lqip={teacher.lqip}
+                size="xl"
+                shape="circle"
+                ring
+                sizes="80px"
+              />
+            </ViewTransition>
+            {primaryLink && (
+              <a
+                href={primaryLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="md:hidden bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px] text-[10px] font-semibold text-[#84b84f] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] transition-colors"
+              >
+                {primaryLink.title} &#8599;
+              </a>
+            )}
+          </div>
 
-      {/* Info chips */}
-      {(hoursPerWeek > 0 || daysOnAir > 0 || teacher.links.length > 0) && (
-        <div className="flex flex-wrap gap-[7px] px-4 mb-3">
-          {hoursPerWeek > 0 && (
-            <TeacherInfoChip icon="📻" label={`${hoursPerWeek} hrs/wk`} variant="accent" />
+          {/* Name + title */}
+          <div className="px-4 md:px-0 mb-[10px]">
+            <h1 className="text-[19px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
+            {(teacher.title || teacher.subtitle) && (
+              <p className="text-[11px] md:text-sm text-white/50 mt-[3px] font-medium">
+                {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
+              </p>
+            )}
+          </div>
+
+          {/* Info chips */}
+          {(hoursPerWeek > 0 || daysOnAir > 0 || teacher.links.length > 0) && (
+            <div className="flex flex-wrap gap-[7px] px-4 md:px-0 mb-3">
+              {hoursPerWeek > 0 && (
+                <TeacherInfoChip icon="📻" label={`${hoursPerWeek} hrs/wk`} variant="accent" />
+              )}
+              {daysOnAir > 0 && (
+                <TeacherInfoChip label={`${daysOnAir} day${daysOnAir !== 1 ? 's' : ''}`} variant="accent" />
+              )}
+              {teacher.links.length > 0 && (
+                <TeacherInfoChip label={`${teacher.links.length} link${teacher.links.length !== 1 ? 's' : ''}`} variant="dim" />
+              )}
+            </div>
           )}
-          {daysOnAir > 0 && (
-            <TeacherInfoChip label={`${daysOnAir} day${daysOnAir !== 1 ? 's' : ''}`} variant="accent" />
+
+          {/* Primary link — desktop only (mobile version is in avatar row above) */}
+          {primaryLink && (
+            <div className="hidden md:block px-0 mb-3">
+              <a
+                href={primaryLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px] text-[10px] font-semibold text-[#84b84f] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] transition-colors"
+              >
+                {primaryLink.title} &#8599;
+              </a>
+            </div>
           )}
-          {teacher.links.length > 0 && (
-            <TeacherInfoChip label={`${teacher.links.length} link${teacher.links.length !== 1 ? 's' : ''}`} variant="dim" />
+
+          {/* Other external links */}
+          {otherLinks.length > 0 && (
+            <div className="flex flex-wrap gap-[6px] px-4 md:px-0 mb-4">
+              {otherLinks.map((link) => (
+                <a
+                  key={link.url}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/6 border border-white/10 rounded-full px-3 py-[5px] text-[10px] font-semibold text-white/70 hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  {link.title}
+                </a>
+              ))}
+            </div>
           )}
         </div>
-      )}
 
-      {/* Other external links */}
-      {otherLinks.length > 0 && (
-        <div className="flex flex-wrap gap-[6px] px-4 mb-4">
-          {otherLinks.map((link) => (
-            <a
-              key={link.url}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white/6 border border-white/10 rounded-full px-3 py-[5px] text-[10px] font-semibold text-white/70 hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              {link.title}
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* Schedule */}
-      {sortedSchedule.length > 0 && (
-        <>
-          <div className="h-px bg-white/6 mx-4 mb-3" />
-          <div className="px-4 mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-white/35 mb-[10px]">
-              On Air This Week
-            </p>
-            <div className="space-y-[8px]">
-              {sortedSchedule.map((day) => (
-                <div key={day.day}>
-                  <p className="text-[11px] font-bold text-white/60 mb-[5px]">{day.day}</p>
-                  {day.times.map((t) => (
-                    <div
-                      key={`${t.startTime}-${t.endTime}`}
-                      className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[10px] text-white/55 mb-[3px]"
-                    >
-                      {t.startTime} &ndash; {t.endTime}
+        {/* RIGHT MAIN */}
+        <div className="md:flex-1 md:min-w-0 md:pt-4">
+          {sortedSchedule.length > 0 && (
+            <>
+              <div className="h-px bg-white/6 mx-4 md:hidden mb-3" />
+              <div className="px-4 md:px-0 mb-4">
+                <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/35 mb-[10px]">
+                  On Air This Week
+                </p>
+                <div className="space-y-[8px] md:space-y-3">
+                  {sortedSchedule.map((day) => (
+                    <div key={day.day}>
+                      <p className="text-[11px] md:text-sm font-bold text-white/60 mb-[5px]">{day.day}</p>
+                      {day.times.map((t) => (
+                        <div
+                          key={`${t.startTime}-${t.endTime}`}
+                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[10px] md:text-sm text-white/55 mb-[3px]"
+                        >
+                          {t.startTime} &ndash; {t.endTime}
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
-      {/* Also on Reach Radio */}
+      {/* Also on Reach Radio — full width, below columns */}
       {relatedTeachers.length > 0 && (
         <>
-          <div className="h-px bg-white/6 mx-4 mb-3" />
-          <div className="pb-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-white/35 px-4 mb-3">
+          <div className="h-px bg-white/6 mx-4 md:mx-8 mb-3" />
+          <div className="pb-6 md:pb-10">
+            <p className="text-[10px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/35 px-4 md:px-8 mb-3">
               Also on Reach Radio
             </p>
-            <div className="flex gap-[10px] overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {relatedTeachers.map((t) => (
                 <Link
                   key={t.slug}
                   href={`/teachers/${t.slug}`}
-                  className="flex flex-col items-center gap-[4px] flex-shrink-0 w-[46px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
+                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[46px] md:w-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
                   aria-label={t.name}
                 >
                   <TeacherAvatar
@@ -249,7 +272,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                     shape="circle"
                     sizes="38px"
                   />
-                  <span className="text-[7px] text-white/40 text-center line-clamp-2 leading-tight">
+                  <span className="text-[7px] md:text-[10px] text-white/40 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
                 </Link>
