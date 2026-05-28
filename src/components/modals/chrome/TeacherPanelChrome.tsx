@@ -60,8 +60,8 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           </button>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Scrollable content; pb-20 clears the fixed bottom nav bar on mobile */}
+        <div className="flex-1 min-h-0 overflow-y-auto pb-20 md:pb-0">
           {children}
         </div>
       </div>
