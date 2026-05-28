@@ -48,7 +48,7 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
         if (slot.type === 'music') {
           return (
             <div
-              key={`music-${i}`}
+              key={`music-${slot.startMinutes}`}
               data-testid="music-gap"
               className="bg-white/[0.025] rounded-lg px-4 py-3 flex items-center gap-2"
             >
