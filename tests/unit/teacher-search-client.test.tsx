@@ -1,11 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
 import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/teachers/search',
 }))
 
 vi.mock('next/image', () => ({
@@ -46,24 +48,34 @@ describe('TeacherSearchClient', () => {
     expect(screen.getByText('John MacArthur')).toBeInTheDocument()
   })
 
-  it('filters teachers by name as user types', async () => {
-    const user = userEvent.setup()
+  it('filters teachers by name as user types', () => {
+    vi.useFakeTimers()
     render(
       <TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />
     )
-    await user.type(screen.getByRole('textbox', { name: /search teachers/i }), 'begg')
+    const input = screen.getByRole('textbox', { name: /search teachers/i })
+    act(() => {
+      fireEvent.change(input, { target: { value: 'begg' } })
+      vi.runAllTimers()
+    })
     expect(screen.getByText('Alistair Begg')).toBeInTheDocument()
     expect(screen.queryByText('Jack Hibbs')).not.toBeInTheDocument()
     expect(screen.queryByText('John MacArthur')).not.toBeInTheDocument()
+    vi.useRealTimers()
   })
 
-  it('shows empty state when no results', async () => {
-    const user = userEvent.setup()
+  it('shows empty state when no results', () => {
+    vi.useFakeTimers()
     render(
       <TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />
     )
-    await user.type(screen.getByRole('textbox', { name: /search teachers/i }), 'zzznomatch')
+    const input = screen.getByRole('textbox', { name: /search teachers/i })
+    act(() => {
+      fireEvent.change(input, { target: { value: 'zzznomatch' } })
+      vi.runAllTimers()
+    })
     expect(screen.getByText(/no teachers found/i)).toBeInTheDocument()
+    vi.useRealTimers()
   })
 
   it('renders day filter chips', () => {
