@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { getInitials } from '@/lib/teachers/initials'
 
-type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 type AvatarShape = 'circle' | 'rounded'
 
 interface TeacherAvatarProps {
@@ -20,16 +20,16 @@ interface TeacherAvatarProps {
 }
 
 const SIZE_PX: Record<AvatarSize, number> = {
-  xs: 24, sm: 38, md: 48, lg: 72, xl: 80,
+  xs: 24, sm: 38, md: 48, lg: 72, xl: 80, '2xl': 128,
 }
 
 const FONT_CLASS: Record<AvatarSize, string> = {
-  xs: 'text-[8px]', sm: 'text-[11px]', md: 'text-[14px]', lg: 'text-[22px]', xl: 'text-[26px]',
+  xs: 'text-[8px]', sm: 'text-[11px]', md: 'text-[14px]', lg: 'text-[22px]', xl: 'text-[26px]', '2xl': 'text-[42px]',
 }
 
 const CIRCLE_RADIUS = 'rounded-full'
 const ROUNDED_RADIUS: Record<AvatarSize, string> = {
-  xs: 'rounded-[4px]', sm: 'rounded-[11px]', md: 'rounded-[12px]', lg: 'rounded-[16px]', xl: 'rounded-[18px]',
+  xs: 'rounded-[4px]', sm: 'rounded-[11px]', md: 'rounded-[12px]', lg: 'rounded-[16px]', xl: 'rounded-[18px]', '2xl': 'rounded-[28px]',
 }
 
 export function TeacherAvatar({

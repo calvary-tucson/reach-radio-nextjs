@@ -114,7 +114,7 @@ export default async function TeacherDetailPage({ params }: Props) {
       </div>
 
       {/* Banner */}
-      <div className="relative w-full h-[88px] md:h-[160px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
+      <div className="relative w-full h-[100px] md:h-[180px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
@@ -137,16 +137,16 @@ export default async function TeacherDetailPage({ params }: Props) {
         {/* LEFT SIDEBAR */}
         <div className="md:w-72 md:flex-shrink-0">
           {/* Avatar overlap row */}
-          <div className="flex items-end justify-between px-4 md:px-0 mt-[-36px] md:mt-[-50px] mb-[10px]">
+          <div className="flex items-end justify-between px-4 md:px-0 mt-[-64px] md:mt-[-72px] mb-3">
             <ViewTransition name={`teacher-${teacher.slug}`}>
               <TeacherAvatar
                 name={teacher.name}
                 photo={teacher.photo}
                 lqip={teacher.lqip}
-                size="xl"
+                size="2xl"
                 shape="circle"
                 ring
-                sizes="80px"
+                sizes="128px"
               />
             </ViewTransition>
             {primaryLink && (
@@ -154,7 +154,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="md:hidden bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px] text-[10px] font-semibold text-[#84b84f] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] transition-colors"
+                className="md:hidden bg-[#84b84f] rounded-full px-4 py-2 text-xs font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
               >
                 {primaryLink.title} &#8599;
               </a>
@@ -193,7 +193,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px] text-[10px] font-semibold text-[#84b84f] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] transition-colors"
+                className="inline-block bg-[#84b84f] rounded-full px-5 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
               >
                 {primaryLink.title} &#8599;
               </a>
@@ -202,14 +202,14 @@ export default async function TeacherDetailPage({ params }: Props) {
 
           {/* Other external links */}
           {otherLinks.length > 0 && (
-            <div className="flex flex-wrap gap-[6px] px-4 md:px-0 mb-4">
+            <div className="flex flex-wrap gap-2 px-4 md:px-0 mb-4">
               {otherLinks.map((link) => (
                 <a
                   key={link.url}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/6 border border-white/10 rounded-full px-3 py-[5px] text-[10px] font-semibold text-white/70 hover:bg-white/10 transition-colors cursor-pointer"
+                  className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-xs font-semibold text-white/80 hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
                 >
                   {link.title}
                 </a>
