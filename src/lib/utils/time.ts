@@ -29,6 +29,38 @@ export function timeStringToMinutes(time: string): number {
   return toMinutes(to24h(time))
 }
 
+const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const DAY_ABBR: Record<string, string> = {
+  Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu',
+  Friday: 'Fri', Saturday: 'Sat', Sunday: 'Sun',
+}
+
+export function formatScheduleDays(days: string[]): string {
+  const indices = days
+    .map((d) => DAY_ORDER.indexOf(d))
+    .filter((i) => i !== -1)
+    .sort((a, b) => a - b)
+  if (!indices.length) return ''
+
+  const parts: string[] = []
+  let runStart = indices[0]!
+  let runEnd = indices[0]!
+
+  for (let i = 1; i <= indices.length; i++) {
+    const cur = indices[i]
+    if (cur === runEnd + 1) {
+      runEnd = cur
+    } else {
+      const startAbbr = DAY_ABBR[DAY_ORDER[runStart]!]!
+      const endAbbr = DAY_ABBR[DAY_ORDER[runEnd]!]!
+      parts.push(runEnd - runStart >= 2 ? `${startAbbr}–${endAbbr}` : runEnd > runStart ? `${startAbbr}, ${endAbbr}` : startAbbr)
+      if (cur !== undefined) { runStart = cur; runEnd = cur }
+    }
+  }
+
+  return parts.join(', ')
+}
+
 export function computeWeeklyMinutes(schedule: ScheduleDay[]): number {
   return schedule.reduce(
     (total, day) =>

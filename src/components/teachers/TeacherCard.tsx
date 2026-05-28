@@ -1,41 +1,34 @@
 import { ViewTransition } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+import { CalendarDays } from 'lucide-react'
 import type { TeacherSummary } from '@/lib/sanity/types'
+import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 
 interface TeacherCardProps {
   teacher: TeacherSummary
   index?: number
   viewTransitionDisabled?: boolean
+  scheduleDays?: string
 }
 
-function TeacherInitials({ name }: { name: string }) {
-  const parts = name.trim().split(/\s+/)
-  const initials = parts.length >= 2
-    ? `${parts[0][0]}${parts[parts.length - 1][0]}`
-    : parts[0]?.[0] ?? '?'
-  return (
-    <div className="w-full aspect-square bg-gradient-to-br from-green-900/60 to-gray-700/60 flex items-center justify-center">
-      <span className="text-white/80 text-3xl font-bold uppercase">{initials}</span>
-    </div>
-  )
-}
-
-export function TeacherCard({ teacher, index = 0, viewTransitionDisabled = false }: TeacherCardProps) {
-  const photo = teacher.photo ? (
-    <div className="relative aspect-square">
-      <Image
-        src={teacher.photo}
-        alt={teacher.name}
+export function TeacherCard({
+  teacher,
+  index = 0,
+  viewTransitionDisabled = false,
+  scheduleDays,
+}: TeacherCardProps) {
+  const avatarEl = (
+    <div className="relative aspect-square bg-gradient-to-br from-[#253520] to-[#131b0d]">
+      <TeacherAvatar
+        name={teacher.name}
+        photo={teacher.photo}
+        lqip={teacher.lqip}
+        size="lg"
         fill
-        className="object-cover"
-        placeholder={teacher.lqip ? 'blur' : 'empty'}
-        blurDataURL={teacher.lqip}
+        shape="rounded"
         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
       />
     </div>
-  ) : (
-    <TeacherInitials name={teacher.name} />
   )
 
   return (
@@ -43,15 +36,29 @@ export function TeacherCard({ teacher, index = 0, viewTransitionDisabled = false
       href={`/teachers/${teacher.slug}`}
       aria-label={teacher.title ? `${teacher.name} — ${teacher.title}` : teacher.name}
       transitionTypes={['nav-forward']}
-      className="teacher-card block rounded overflow-hidden border border-white/10 hover:border-white/25 motion-safe:hover:scale-[1.03] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      className="teacher-card block rounded-[18px] overflow-hidden bg-[#1c2128] border border-white/5 motion-safe:hover:scale-[1.03] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
       style={{ '--stagger-i': index } as React.CSSProperties}
     >
       {teacher.photo && !viewTransitionDisabled ? (
-        <ViewTransition name={`teacher-${teacher.slug}`}>{photo}</ViewTransition>
-      ) : photo}
-      <div className="px-3 pt-3 pb-4">
-        <p className="text-white font-semibold text-sm" aria-hidden="true">{teacher.name}</p>
-        {teacher.title && <p className="text-white/70 text-xs mt-1.5" aria-hidden="true">{teacher.title}</p>}
+        <ViewTransition name={`teacher-${teacher.slug}`}>{avatarEl}</ViewTransition>
+      ) : avatarEl}
+      <div className="px-[11px] md:px-3 pt-[9px] md:pt-3 pb-[11px] md:pb-3">
+        <p className="text-white font-bold text-[11px] md:text-sm leading-snug" aria-hidden="true">
+          {teacher.name}
+        </p>
+        {teacher.title && (
+          <p className="text-white/65 text-[9px] md:text-xs mt-[3px]" aria-hidden="true">
+            {teacher.title}
+          </p>
+        )}
+        {scheduleDays && (
+          <div className="flex items-center gap-[3px] mt-[5px]">
+            <CalendarDays className="h-[11px] w-[11px] md:h-[13px] md:w-[13px] text-[#a3d46a] shrink-0" aria-hidden="true" />
+            <span className="text-[8px] md:text-[10px] text-[#a3d46a] font-medium leading-none uppercase tracking-wide">
+              {scheduleDays}
+            </span>
+          </div>
+        )}
       </div>
     </Link>
   )
