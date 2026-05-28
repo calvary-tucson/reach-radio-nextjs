@@ -1,17 +1,16 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { TeacherDetailSheet } from './TeacherDetailSheet'
-import { TeacherDetailPanel } from './TeacherDetailPanel'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { buildDaySlots } from '@/lib/teachers/schedule'
 import { ScheduleCardList } from './ScheduleCardList'
 import { ScheduleWeekCards } from './ScheduleWeekCards'
-import { useIsMinMd } from '@/hooks/useIsMinMd'
+import { useModalStore } from '@/lib/stores/modal'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 dayjs.extend(utc)
@@ -33,9 +32,9 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
   const today = now.format('dddd')
   const currentTime = now.hour() * 60 + now.minute()
 
-  const isMinMd = useIsMinMd()
+  const router = useRouter()
+  const openModal = useModalStore((s) => s.openModal)
   const [selectedDay, setSelectedDay] = useState(today)
-  const [selectedTeacher, setSelectedTeacher] = useState<TeacherWithSchedule | null>(null)
 
   const mostOnAir = useMemo(() => {
     if (scheduleTeachers.length === 0) return null
@@ -52,6 +51,14 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
   const daySlots = useMemo(
     () => buildDaySlots(scheduleTeachers, selectedDay),
     [scheduleTeachers, selectedDay]
+  )
+
+  const handleSelect = useCallback(
+    (teacher: TeacherWithSchedule) => {
+      openModal(teacher.name)
+      router.push(`/teachers/${teacher.slug}`)
+    },
+    [openModal, router]
   )
 
   return (
@@ -97,26 +104,8 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
         <ScheduleCardList
           slots={daySlots}
           currentTime={selectedDay === today ? currentTime : -1}
-          onSelect={setSelectedTeacher}
+          onSelect={handleSelect}
         />
-
-        {/* < md: bottom sheet — gated with JS because createPortal bypasses CSS hidden */}
-        <div className="md:hidden">
-          <TeacherDetailSheet
-            teacher={selectedTeacher}
-            open={!isMinMd && selectedTeacher !== null}
-            onClose={() => setSelectedTeacher(null)}
-          />
-        </div>
-
-        {/* md–lg: right overlay panel — gated with JS because createPortal bypasses CSS hidden */}
-        <div className="hidden md:block">
-          <TeacherDetailPanel
-            teacher={selectedTeacher}
-            open={isMinMd && selectedTeacher !== null}
-            onClose={() => setSelectedTeacher(null)}
-          />
-        </div>
       </div>
 
       {/* Wide desktop (≥ lg): 7-col week grid */}
@@ -125,12 +114,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
           scheduleTeachers={scheduleTeachers}
           currentTime={currentTime}
           today={today}
-          onSelect={setSelectedTeacher}
-        />
-        <TeacherDetailPanel
-          teacher={selectedTeacher}
-          open={isMinMd && selectedTeacher !== null}
-          onClose={() => setSelectedTeacher(null)}
+          onSelect={handleSelect}
         />
       </div>
     </>
