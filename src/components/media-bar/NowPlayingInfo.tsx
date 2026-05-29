@@ -10,13 +10,14 @@ export function NowPlayingInfo() {
 
   return (
     <div className="flex items-center gap-3 flex-1 min-w-0">
-      <Image
-        src={image}
-        alt="Album art"
-        width={48}
-        height={48}
-        className="rounded-md flex-shrink-0 object-cover"
-      />
+      <div className="w-12 h-12 relative overflow-hidden rounded-md flex-shrink-0">
+        <Image
+          src={image}
+          alt="Album art"
+          fill
+          className="object-cover"
+        />
+      </div>
       <div className="min-w-0">
         <p className="text-white font-semibold text-sm truncate">{title}</p>
         {artist && (
