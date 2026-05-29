@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Exclude git worktrees (isolated development branches):
+    ".worktrees/**",
+    // Exclude third-party minified scripts:
+    "public/**",
   ]),
 ]);
 
