@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import { ChevronDown, Check } from 'lucide-react'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
-import { buildDaySlots, DAYS_ORDER, DAY_LABELS } from '@/lib/teachers/schedule'
+import { buildDaySlots, DAYS_ORDER } from '@/lib/teachers/schedule'
 import { ScheduleCardList } from './ScheduleCardList'
 import { ScheduleWeekCards } from './ScheduleWeekCards'
+import { BottomSheet } from '@/components/global/BottomSheet'
 import { useModalStore } from '@/lib/stores/modal'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
@@ -30,6 +32,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
   const router = useRouter()
   const openModal = useModalStore((s) => s.openModal)
   const [selectedDay, setSelectedDay] = useState(today)
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   const mostOnAir = useMemo(() => {
     if (scheduleTeachers.length === 0) return null
@@ -77,39 +80,56 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
         </div>
       )}
 
-      {/* Mobile + narrow desktop (< lg): day tabs + card list */}
+      {/* Mobile + narrow desktop (< lg): day picker chip + card list */}
       <div className="lg:hidden">
-        <div className="relative mb-4">
-          <div
-            role="tablist"
-            aria-label="Schedule day"
-            className="flex gap-[5px] overflow-x-auto pb-1 pr-12 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {DAYS_ORDER.map((day) => (
-              <button
-                key={day}
-                type="button"
-                role="tab"
-                aria-selected={selectedDay === day}
-                onClick={() => setSelectedDay(day)}
-                className={`flex-shrink-0 px-4 py-[5px] rounded-full text-xs font-semibold transition-colors cursor-pointer ${
-                  selectedDay === day
-                    ? 'bg-[#84b84f] text-[#0a1505]'
-                    : 'bg-[#1e2328] text-white/50 hover:bg-[#262d34] hover:text-white/70'
-                }`}
-              >
-                {DAY_LABELS[day]}
-              </button>
-            ))}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[oklch(24%_0.05_280)] to-transparent" />
-        </div>
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={sheetOpen}
+          onClick={() => setSheetOpen(true)}
+          className="flex items-center gap-2 mb-4 px-4 py-[7px] rounded-full bg-[#262d34] border border-white/20 text-white text-sm font-semibold cursor-pointer"
+        >
+          <span>{selectedDay === today ? `Today — ${selectedDay}` : selectedDay}</span>
+          <ChevronDown className="h-3.5 w-3.5 text-white/50" aria-hidden="true" />
+        </button>
 
         <ScheduleCardList
           slots={daySlots}
           currentTime={selectedDay === today ? currentTime : -1}
           onSelect={handleSelect}
         />
+
+        <BottomSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          ariaLabel="Pick a day"
+        >
+          <div className="px-4 pb-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3">
+              Pick a day
+            </p>
+            <ul role="listbox" aria-label="Day">
+              {DAYS_ORDER.map((day) => (
+                <li key={day} role="option" aria-selected={selectedDay === day}>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedDay(day); setSheetOpen(false) }}
+                    className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-sm font-medium cursor-pointer transition-colors hover:bg-white/5 active:bg-white/10"
+                  >
+                    <Check
+                      className={`h-4 w-4 shrink-0 text-[#84b84f] transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}
+                      aria-hidden="true"
+                    />
+                    <span className={selectedDay === day ? 'text-white' : 'text-white/60'}>
+                      {day}
+                      {day === today && <span className="ml-2 text-[#84b84f] text-xs">Today</span>}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </BottomSheet>
       </div>
 
       {/* Wide desktop (≥ lg): 7-col week grid */}
