@@ -4,8 +4,6 @@ import { RadioPlayer } from '@/components/home/RadioPlayer'
 import { TodaySchedule } from '@/components/home/TodaySchedule'
 import { RadioPlayerSkeleton } from '@/components/skeletons/RadioPlayerSkeleton'
 import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
-import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
-
 export const metadata: Metadata = {
   title: 'Listen Live',
   description: "Stream Reach Radio live — Tucson's Christian radio station. Bible teachings and gospel music on 106.7FM and 690AM.",
@@ -16,7 +14,6 @@ export default function HomePage() {
   return (
     <div className="px-4 md:px-8 pt-4 space-y-6 pb-32">
       <h1 className="sr-only">Reach Radio</h1>
-      <RadioStationSchema />
 
       <Suspense fallback={<RadioPlayerSkeleton />}>
         <RadioPlayer />
