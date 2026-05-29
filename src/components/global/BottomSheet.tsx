@@ -73,7 +73,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
         <div
           ref={sheetRef}
           tabIndex={-1}
-          className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 rounded-t-2xl transition-transform duration-[280ms] ease-out ${
+          className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 light:bg-white rounded-t-2xl transition-transform duration-[280ms] ease-out ${
             visible ? 'translate-y-0' : 'translate-y-full'
           } ${className ?? ''}`}
         >
@@ -85,7 +85,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
             onMouseDown={drag.onMouseDown}
           >
             <div className="flex justify-center pt-3 pb-2">
-              <div className="h-1 w-10 rounded-full bg-white/30" />
+              <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" />
             </div>
           </div>
           {children}

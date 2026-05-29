@@ -25,7 +25,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
       <div
         ref={contentRef}
         className={cn(
-          'w-full flex flex-col bg-[#0f1a0a] border-white/[0.08] overflow-hidden',
+          'w-full flex flex-col bg-[#0f1a0a] light:bg-white border-white/[0.08] light:border-gray-200 overflow-hidden',
           // Mobile: bottom sheet
           'max-h-[92dvh] rounded-t-2xl border',
           isClosing
@@ -53,12 +53,12 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
             onTouchMove={drag.onTouchMove}
             onTouchEnd={drag.onTouchEnd}
           >
-            <div className="h-1 w-10 rounded-full bg-white/30" aria-hidden="true" />
+            <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" aria-hidden="true" />
           </button>
           <button
             type="button"
             onClick={onDismiss}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -70,7 +70,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           <button
             type="button"
             onClick={onDismiss}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
