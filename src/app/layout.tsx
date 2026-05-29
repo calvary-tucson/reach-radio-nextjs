@@ -14,16 +14,16 @@ import { Toaster } from 'sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { WebSiteSchema } from '@/components/seo/WebSiteSchema'
 import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { FALLBACK_STREAM_URL, FALLBACK_OG_IMAGE } from '@/lib/constants'
 import './globals.css'
 
 export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
-const FALLBACK_STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
 const FALLBACK_DESCRIPTION = "Listen to Reach Radio, Tucson's Christian radio station featuring Bible teachings and gospel music on 106.7FM and 690AM."
 const FALLBACK_KEYWORDS = 'Christian radio, Tucson, Bible teaching, gospel music, Reach Radio, 106.7FM, 690AM'
-const FALLBACK_OG_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteSettings = await sanityFetch<{
@@ -58,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: siteTitle, template: `%s | ${siteTitle}` },
     description,
     keywords,
-    metadataBase: new URL('https://reach.radio'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://reach.radio'),
     alternates: { canonical: '/' },
     robots: { index: true, follow: true },
     icons,
@@ -93,6 +93,18 @@ export default async function RootLayout({
     headersList.get('mobile-app') === 'true' ||
     cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
 
+  const themeCookieValue = cookieHeader
+    .split(';')
+    .map(c => c.trim())
+    .find(c => c.startsWith('theme='))
+    ?.replace('theme=', '')
+  const initialThemeClass: string =
+    themeCookieValue === 'dark' || themeCookieValue === 'light'
+      ? themeCookieValue
+      : isMobileApp
+        ? 'dark'
+        : ''
+
   const { radioAudioURL } = await sanityFetch<{ radioAudioURL: string }>(
     appSettingsQuery,
     { id: APP_SETTINGS_ID },
@@ -105,13 +117,14 @@ export default async function RootLayout({
   const streamUrl = radioAudioURL || FALLBACK_STREAM_URL
 
   return (
-    <html lang="en">
+    <html lang="en" className={initialThemeClass || undefined}>
       <head>
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://formspree.io" />
       </head>
-      <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
+      <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen light:bg-white light:text-gray-900${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
+        <ThemeProvider>
         <TooltipProvider delayDuration={500}>
           <WebSiteSchema />
           <RadioStationSchema />
@@ -134,6 +147,7 @@ export default async function RootLayout({
           <MediaBar />
           <Toaster richColors position="top-center" />
         </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
