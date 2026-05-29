@@ -36,10 +36,10 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             aria-selected={activeTab === tab}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-[12px] md:text-sm font-semibold capitalize transition-colors cursor-pointer border-b-2 -mb-px ${
+            className={`px-4 py-2 text-sm md:text-sm font-semibold capitalize transition-colors cursor-pointer border-b-2 -mb-px ${
               activeTab === tab
                 ? 'text-[#84b84f] border-[#84b84f]'
-                : 'text-white/35 border-transparent hover:text-white/55'
+                : 'text-white/55 border-transparent hover:text-white/75'
             }`}
           >
             {tab}
@@ -50,10 +50,10 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
       {activeTab === 'teachers' && (
         <>
           <div className="flex items-center justify-between mb-[10px]">
-            <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/35">
+            <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55">
               All Teachers
             </p>
-            <span className="text-[10px] md:text-sm text-white/25">{teachers.length}</span>
+            <span className="text-[10px] md:text-sm text-white/50">{teachers.length}</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (

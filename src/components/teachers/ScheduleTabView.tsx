@@ -79,27 +79,30 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
 
       {/* Mobile + narrow desktop (< lg): day tabs + card list */}
       <div className="lg:hidden">
-        <div
-          role="tablist"
-          aria-label="Schedule day"
-          className="flex gap-[5px] overflow-x-auto pb-1 mb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {DAYS_ORDER.map((day) => (
-            <button
-              key={day}
-              type="button"
-              role="tab"
-              aria-selected={selectedDay === day}
-              onClick={() => setSelectedDay(day)}
-              className={`flex-shrink-0 px-4 py-[5px] rounded-full text-xs font-semibold transition-colors cursor-pointer ${
-                selectedDay === day
-                  ? 'bg-[#84b84f] text-[#0a1505]'
-                  : 'bg-[#1e2328] text-white/50 hover:bg-[#262d34] hover:text-white/70'
-              }`}
-            >
-              {DAY_LABELS[day]}
-            </button>
-          ))}
+        <div className="relative mb-4">
+          <div
+            role="tablist"
+            aria-label="Schedule day"
+            className="flex gap-[5px] overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {DAYS_ORDER.map((day) => (
+              <button
+                key={day}
+                type="button"
+                role="tab"
+                aria-selected={selectedDay === day}
+                onClick={() => setSelectedDay(day)}
+                className={`flex-shrink-0 px-4 py-[5px] rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+                  selectedDay === day
+                    ? 'bg-[#84b84f] text-[#0a1505]'
+                    : 'bg-[#1e2328] text-white/50 hover:bg-[#262d34] hover:text-white/70'
+                }`}
+              >
+                {DAY_LABELS[day]}
+              </button>
+            ))}
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[oklch(24%_0.05_280)] to-transparent" />
         </div>
 
         <ScheduleCardList

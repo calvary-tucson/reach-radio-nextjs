@@ -43,18 +43,18 @@ export function TeacherCard({
         <ViewTransition name={`teacher-${teacher.slug}`}>{avatarEl}</ViewTransition>
       ) : avatarEl}
       <div className="px-[11px] md:px-3 pt-[9px] md:pt-3 pb-[11px] md:pb-3">
-        <p className="text-white font-bold text-[11px] md:text-sm leading-snug" aria-hidden="true">
+        <p className="text-white font-bold text-[13px] md:text-sm leading-snug" aria-hidden="true">
           {teacher.name}
         </p>
         {teacher.title && (
-          <p className="text-white/65 text-[9px] md:text-xs mt-[3px]" aria-hidden="true">
+          <p className="text-white/80 text-[11px] md:text-xs mt-[3px]" aria-hidden="true">
             {teacher.title}
           </p>
         )}
         {scheduleDays && (
           <div className="flex items-center gap-[3px] mt-[5px]">
-            <CalendarDays className="h-[11px] w-[11px] md:h-[13px] md:w-[13px] text-[#a3d46a] shrink-0" aria-hidden="true" />
-            <span className="text-[8px] md:text-[10px] text-[#a3d46a] font-medium leading-none uppercase tracking-wide">
+            <CalendarDays className="h-[13px] w-[13px] md:h-[13px] md:w-[13px] text-[#a3d46a] shrink-0" aria-hidden="true" />
+            <span className="text-[10px] md:text-[10px] text-[#a3d46a] font-medium leading-none uppercase tracking-wide">
               {scheduleDays}
             </span>
           </div>

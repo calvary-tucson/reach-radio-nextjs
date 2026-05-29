@@ -18,33 +18,36 @@ export async function RecommendedTeachers() {
 
   return (
     <section className="mb-4 md:mb-6" aria-label="Recommended teachers">
-      <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/35 px-0 mb-[10px] md:mb-3">
+      <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55 px-0 mb-[10px] md:mb-3">
         Recommended
       </p>
-      <div className="flex gap-3 md:gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {teachers.map((teacher, index) => (
-          <TeacherModalLink
-            key={teacher.slug}
-            slug={teacher.slug}
-            name={teacher.name}
-            className="flex flex-col items-center gap-[5px] md:gap-2 flex-shrink-0 w-[72px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
-            style={{ '--stagger-i': index } as React.CSSProperties}
-          >
-            <div className="teacher-card">
-              <TeacherAvatar
-                name={teacher.name}
-                photo={teacher.photo}
-                lqip={teacher.lqip}
-                size="lg"
-                shape="circle"
-                sizes="72px"
-              />
-            </div>
-            <span className="text-xs md:text-[13px] text-white/55 text-center leading-tight line-clamp-2">
-              {teacher.name}
-            </span>
-          </TeacherModalLink>
-        ))}
+      <div className="relative">
+        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {teachers.map((teacher, index) => (
+            <TeacherModalLink
+              key={teacher.slug}
+              slug={teacher.slug}
+              name={teacher.name}
+              className="flex flex-col items-center gap-[5px] md:gap-2 flex-shrink-0 w-[72px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
+              style={{ '--stagger-i': index } as React.CSSProperties}
+            >
+              <div className="teacher-card">
+                <TeacherAvatar
+                  name={teacher.name}
+                  photo={teacher.photo}
+                  lqip={teacher.lqip}
+                  size="lg"
+                  shape="circle"
+                  sizes="72px"
+                />
+              </div>
+              <span className="text-xs md:text-[13px] text-white/75 text-center leading-tight line-clamp-2">
+                {teacher.name}
+              </span>
+            </TeacherModalLink>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[oklch(24%_0.05_280)] to-transparent md:hidden" />
       </div>
     </section>
   )
