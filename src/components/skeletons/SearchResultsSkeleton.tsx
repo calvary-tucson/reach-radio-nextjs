@@ -1,5 +1,5 @@
 function Sk({ className }: { className: string }) {
-  return <div className={`bg-[#252b32] animate-pulse rounded ${className}`} />
+  return <div className={`bg-[#252b32] light:bg-gray-200 animate-pulse rounded ${className}`} />
 }
 
 export function SearchResultsSkeleton() {
@@ -36,7 +36,7 @@ export function SearchResultsSkeleton() {
         <Sk className="h-4 w-[80px] mb-3 rounded" />
         <ul className="space-y-2">
           {Array.from({ length: 5 }).map((_, i) => (
-            <li key={i} className="h-[68px] rounded-xl bg-white/5 animate-pulse" />
+            <li key={i} className="h-[68px] rounded-xl bg-white/5 light:bg-gray-100 animate-pulse" />
           ))}
         </ul>
       </div>

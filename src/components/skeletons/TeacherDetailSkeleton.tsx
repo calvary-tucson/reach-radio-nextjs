@@ -1,5 +1,5 @@
 function Sk({ className }: { className: string }) {
-  return <div className={`bg-[#252b32] animate-pulse ${className}`} />
+  return <div className={`bg-[#252b32] light:bg-gray-200 animate-pulse ${className}`} />
 }
 
 export function TeacherDetailSkeleton() {
@@ -46,7 +46,7 @@ export function TeacherDetailSkeleton() {
       </div>
 
       {/* Also strip */}
-      <div className="h-px bg-white/5 mx-4 md:mx-8 mb-3" />
+      <div className="h-px bg-white/5 light:bg-gray-200 mx-4 md:mx-8 mb-3" />
       <Sk className="h-[9px] md:h-4 w-[80px] md:w-36 rounded mx-4 md:mx-8 mb-3" />
       <div className="flex gap-[10px] md:gap-4 px-4 md:px-8 overflow-hidden">
         {[...Array(5)].map((_, i) => (

@@ -34,30 +34,30 @@ export function ContactForm() {
       <input type="hidden" name="timestamp" value={timestampRef.current} />
 
       <div>
-        <label htmlFor="name" className="text-white/80 text-sm block mb-1">Name *</label>
+        <label htmlFor="name" className="text-white/80 light:text-gray-700 text-sm block mb-1">Name *</label>
         <input
           id="name" name="name" type="text" required minLength={2} maxLength={100}
-          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
         />
       </div>
       <div>
-        <label htmlFor="email" className="text-white/80 text-sm block mb-1">Email *</label>
+        <label htmlFor="email" className="text-white/80 light:text-gray-700 text-sm block mb-1">Email *</label>
         <input
           id="email" name="email" type="email" required
-          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
         />
       </div>
       <div>
-        <label htmlFor="message" className="text-white/80 text-sm block mb-1">Message *</label>
+        <label htmlFor="message" className="text-white/80 light:text-gray-700 text-sm block mb-1">Message *</label>
         <textarea
           id="message" name="message" required rows={5} minLength={10} maxLength={2000}
-          className="w-full bg-gray-700/50 text-white rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white resize-none"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400 resize-none"
         />
       </div>
 
       <label className="flex gap-3 cursor-pointer items-start">
         <input type="checkbox" name="gdprConsent" required className="mt-1" />
-        <span className="text-white text-sm leading-relaxed">
+        <span className="text-white light:text-gray-900 text-sm leading-relaxed">
           I consent to having my submitted information stored for the purpose of responding to my inquiry. *
         </span>
       </label>
