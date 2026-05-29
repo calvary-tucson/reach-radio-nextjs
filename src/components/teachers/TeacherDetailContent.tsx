@@ -11,9 +11,11 @@ import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
 interface TeacherDetailContentProps {
   teacher: TeacherDetail
   relatedTeachers: TeacherSummary[]
+  headingLevel?: 'h1' | 'h2'
 }
 
-export function TeacherDetailContent({ teacher, relatedTeachers }: TeacherDetailContentProps) {
+export function TeacherDetailContent({ teacher, relatedTeachers, headingLevel = 'h1' }: TeacherDetailContentProps) {
+  const Heading = headingLevel
   const sortedSchedule = [...(teacher.schedule ?? [])].sort(
     (a, b) => DAYS_ORDER.indexOf(a.day) - DAYS_ORDER.indexOf(b.day)
   )
@@ -77,7 +79,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers }: TeacherDetail
 
           {/* Name + title */}
           <div className="px-4 md:px-0 mb-[10px]">
-            <h1 className="text-[22px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
+            <Heading className="text-[22px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</Heading>
             {(teacher.title || teacher.subtitle) && (
               <p className="text-sm text-white/70 mt-[3px] font-medium">
                 {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
