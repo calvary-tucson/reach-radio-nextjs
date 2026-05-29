@@ -1,8 +1,6 @@
 import { sanityFetch } from '@/lib/sanity/client'
 import { teacherNamesAndPhotosQuery } from '@/lib/sanity/queries'
 
-export const revalidate = 3600
-
 export async function GET(): Promise<Response> {
   try {
     const teachers = await sanityFetch<{ name: string; photo: string }[]>(
