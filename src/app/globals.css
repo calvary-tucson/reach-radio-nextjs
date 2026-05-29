@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Theme variants — .light/.dark on <html> triggers these prefixes */
+@custom-variant light (&:where(.light, .light *));
+@custom-variant dark (&:where(.dark, .dark *));
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
