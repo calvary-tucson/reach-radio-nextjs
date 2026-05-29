@@ -23,7 +23,7 @@ export function TeacherModalContent({ teacher }: Props) {
   return (
     <div className="text-white">
       {/* Banner */}
-      <div className="relative w-full h-[72px] bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
+      <div className="relative w-full h-[72px] md:h-[140px] bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
@@ -41,22 +41,35 @@ export function TeacherModalContent({ teacher }: Props) {
       </div>
 
       {/* Avatar + primary link */}
-      <div className="flex items-end justify-between px-4 mt-[-36px] mb-[10px]">
-        <TeacherAvatar
-          name={teacher.name}
-          photo={teacher.photo}
-          lqip={teacher.lqip}
-          size="xl"
-          shape="circle"
-          ring
-          sizes="80px"
-        />
+      <div className="flex items-end justify-between px-4 md:px-6 mt-[-36px] md:mt-[-88px] mb-[10px]">
+        <div className="md:hidden">
+          <TeacherAvatar
+            name={teacher.name}
+            photo={teacher.photo}
+            lqip={teacher.lqip}
+            size="xl"
+            shape="circle"
+            ring
+            sizes="80px"
+          />
+        </div>
+        <div className="hidden md:block">
+          <TeacherAvatar
+            name={teacher.name}
+            photo={teacher.photo}
+            lqip={teacher.lqip}
+            size="3xl"
+            shape="circle"
+            ring
+            sizes="176px"
+          />
+        </div>
         {primaryLink && (
           <a
             href={primaryLink.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px] text-[10px] font-semibold text-[#84b84f] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] transition-colors"
+            className="bg-[rgba(132,184,79,0.1)] md:bg-[#84b84f] border border-[rgba(132,184,79,0.3)] md:border-transparent rounded-full px-3 md:px-5 py-[6px] md:py-2 text-[10px] md:text-sm font-semibold md:font-bold text-[#84b84f] md:text-[#0a1305] cursor-pointer hover:bg-[rgba(132,184,79,0.18)] md:hover:bg-[#96cc5e] transition-colors"
           >
             {primaryLink.title} &#8599;
           </a>
@@ -64,10 +77,10 @@ export function TeacherModalContent({ teacher }: Props) {
       </div>
 
       {/* Name + title */}
-      <div className="px-4 mb-[10px]">
-        <h2 className="text-[19px] font-extrabold tracking-tight">{teacher.name}</h2>
+      <div className="px-4 md:px-6 mb-[10px]">
+        <h2 className="text-[19px] md:text-[28px] font-extrabold tracking-tight">{teacher.name}</h2>
         {(teacher.title || teacher.subtitle) && (
-          <p className="text-[11px] text-white/50 mt-[3px] font-medium">
+          <p className="text-[11px] md:text-[14px] text-white/50 mt-[3px] font-medium">
             {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
           </p>
         )}
@@ -75,7 +88,7 @@ export function TeacherModalContent({ teacher }: Props) {
 
       {/* Info chips */}
       {(hoursPerWeek > 0 || daysOnAir > 0) && (
-        <div className="flex flex-wrap gap-[7px] px-4 mb-3">
+        <div className="flex flex-wrap gap-[7px] px-4 md:px-6 mb-3">
           {hoursPerWeek > 0 && (
             <TeacherInfoChip icon="📻" label={`${hoursPerWeek} hrs/wk`} variant="accent" />
           )}
@@ -87,14 +100,14 @@ export function TeacherModalContent({ teacher }: Props) {
 
       {/* Other links */}
       {otherLinks.length > 0 && (
-        <div className="flex flex-wrap gap-[6px] px-4 mb-4">
+        <div className="flex flex-wrap gap-[6px] px-4 md:px-6 mb-4">
           {otherLinks.map((link) => (
             <a
               key={link.url}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white/6 border border-white/10 rounded-full px-3 py-[5px] text-[10px] font-semibold text-white/70 hover:bg-white/10 transition-colors cursor-pointer"
+              className="bg-white/6 border border-white/10 rounded-full px-3 py-[5px] text-[10px] md:text-[13px] font-semibold text-white/70 hover:bg-white/10 transition-colors cursor-pointer"
             >
               {link.title}
             </a>
@@ -105,19 +118,19 @@ export function TeacherModalContent({ teacher }: Props) {
       {/* Schedule */}
       {sortedSchedule.length > 0 && (
         <>
-          <div className="h-px bg-white/6 mx-4 mb-3" />
-          <div className="px-4 mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-white/35 mb-[10px]">
+          <div className="h-px bg-white/6 mx-4 md:mx-6 mb-3" />
+          <div className="px-4 md:px-6 mb-4">
+            <p className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-white/35 mb-[10px]">
               On Air This Week
             </p>
             <div className="space-y-[8px]">
               {sortedSchedule.map((day) => (
                 <div key={day.day}>
-                  <p className="text-[11px] font-bold text-white/60 mb-[5px]">{day.day}</p>
+                  <p className="text-[11px] md:text-[14px] font-bold text-white/60 mb-[5px]">{day.day}</p>
                   {day.times.map((t) => (
                     <div
                       key={`${t.startTime}-${t.endTime}`}
-                      className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[10px] text-white/55 mb-[3px]"
+                      className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[10px] md:text-[13px] text-white/55 mb-[3px]"
                     >
                       {t.startTime} &ndash; {t.endTime}
                     </div>
