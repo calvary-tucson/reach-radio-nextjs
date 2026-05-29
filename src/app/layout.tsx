@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
+import { Suspense } from 'react'
 import { MediaBar } from '@/components/media-bar/MediaBar'
 import { BridgeInit } from '@/components/bridge/BridgeInit'
 import { Header } from '@/components/layout/Header'
@@ -79,7 +80,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function RootLayout({
+async function LayoutChrome({
   children,
   modal,
 }: {
@@ -101,31 +102,47 @@ export default async function RootLayout({
   const streamUrl = radioAudioURL || FALLBACK_STREAM_URL
 
   return (
+    <>
+      <BridgeInit />
+      {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
+      {!isMobileApp && <SleepTimerProvider />}
+      {!isMobileApp && <Header />}
+      {!isMobileApp && <MobileHeader />}
+      <main
+        id="main-content"
+        className={!isMobileApp ? 'pt-16' : ''}
+        style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
+      >{children}</main>
+      {modal ? <div key="modal">{modal}</div> : null}
+      {!isMobileApp && <Footer />}
+      {!isMobileApp && <MobileNav />}
+    </>
+  )
+}
+
+export default function RootLayout({
+  children,
+  modal,
+}: {
+  children: React.ReactNode
+  modal: React.ReactNode
+}) {
+  return (
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://formspree.io" />
       </head>
-      <body className={`bg-[var(--color-brand-purple)] text-white min-h-screen${!isMobileApp ? ' pb-[152px]' : ''}`} data-app={isMobileApp ? 'true' : undefined}>
+      <body className="bg-[var(--color-brand-purple)] text-white min-h-screen pb-[152px]">
         <TooltipProvider delayDuration={500}>
           <WebSiteSchema />
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
             Skip to main content
           </a>
-          <BridgeInit />
-          {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
-          {!isMobileApp && <SleepTimerProvider />}
-          {!isMobileApp && <Header />}
-          {!isMobileApp && <MobileHeader />}
-          <main
-            id="main-content"
-            className={!isMobileApp ? 'pt-16' : ''}
-            style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
-          >{children}</main>
-          {modal ? <div key="modal">{modal}</div> : null}
-          {!isMobileApp && <Footer />}
-          {!isMobileApp && <MobileNav />}
+          <Suspense fallback={<main id="main-content" className="pt-16">{children}</main>}>
+            <LayoutChrome modal={modal}>{children}</LayoutChrome>
+          </Suspense>
           <MediaBar />
           <Toaster richColors position="top-center" />
         </TooltipProvider>
