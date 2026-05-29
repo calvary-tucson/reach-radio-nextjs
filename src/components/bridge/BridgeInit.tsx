@@ -11,6 +11,22 @@ interface BridgeInitProps {
   streamUrl?: string
 }
 
+function isNativeBridgePresent(): boolean {
+  return !!(
+    window.Android?.postMessage ||
+    window.webkit?.messageHandlers?.messageHandler?.postMessage ||
+    window.inNativeApp
+  )
+}
+
+function setMobileAppCookie() {
+  document.cookie = 'mobile-app=true; path=/; max-age=315360000'
+}
+
+function clearMobileAppCookie() {
+  document.cookie = 'mobile-app=; path=/; max-age=0'
+}
+
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -61,14 +77,31 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
   }, [pathname])
 
-  // Native app detection fallback: set cookie when any native message arrives
+  // Native app detection: check injected bridge objects first (most reliable),
+  // then fall back to verified postMessage. Clear stale cookie if not in native app.
   useEffect(() => {
+    if (isNativeBridgePresent()) {
+      setMobileAppCookie()
+      return
+    }
+
+    // If cookie is set but bridge objects are absent, clear it — stale from prior session
+    if (document.cookie.includes('mobile-app=true')) {
+      clearMobileAppCookie()
+    }
+
+    // Fallback: native app may post a message before bridge objects are detectable
     function handleMessage(e: MessageEvent) {
       if (e.origin !== '' && e.origin !== window.location.origin) return
-      if (!document.cookie.includes('mobile-app=true')) {
-        document.cookie = 'mobile-app=true; path=/; max-age=315360000'
+      try {
+        const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
+        if (!data || typeof data !== 'object' || !('protocolVersion' in data)) return
+      } catch {
+        return
       }
+      setMobileAppCookie()
     }
+
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
   }, [])
