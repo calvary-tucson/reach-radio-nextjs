@@ -4,8 +4,6 @@ import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
 import { SheetChrome } from '@/components/modals/chrome/SheetChrome'
 
-export const revalidate = 3600
-
 export default async function TeachersSearchSheetPage() {
   const [teachers, scheduleTeachers] = await Promise.all([
     sanityFetch<TeacherSummary[]>(teacherListQuery, {}, { tags: ['teachers'] }),

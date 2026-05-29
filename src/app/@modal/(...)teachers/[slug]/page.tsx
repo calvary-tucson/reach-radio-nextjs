@@ -6,8 +6,6 @@ import { HIGHLIGHTED_TEACHER_SLUGS, sortByHighlightedOrder } from '@/lib/teacher
 import { TeacherPanelChrome } from '@/components/modals/chrome/TeacherPanelChrome'
 import { TeacherDetailContent } from '@/components/teachers/TeacherDetailContent'
 
-export const revalidate = 3600
-
 interface Props {
   params: Promise<{ slug: string }>
 }

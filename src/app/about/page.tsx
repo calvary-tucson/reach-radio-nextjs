@@ -7,8 +7,6 @@ import { siteSettingsQuery } from '@/lib/sanity/queries'
 import { OrganizationSchema } from '@/components/seo/OrganizationSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 
-export const revalidate = 3600
-
 export const metadata: Metadata = {
   title: 'About',
   description: 'About Reach Radio — 106.7FM / 690AM in Tucson, AZ',

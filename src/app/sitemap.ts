@@ -2,8 +2,6 @@ import type { MetadataRoute } from 'next'
 import { sanityFetch } from '@/lib/sanity/client'
 import { teacherSlugsWithDatesQuery } from '@/lib/sanity/queries'
 
-export const revalidate = 86400
-
 const BASE_URL = 'https://reach.radio'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
