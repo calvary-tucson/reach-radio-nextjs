@@ -20,12 +20,16 @@ export default function DonatePage() {
   const [failed, setFailed] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const retryRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
 
   useEffect(() => {
     setShowMediaBar(true)
     timeoutRef.current = setTimeout(() => setFailed(true), 10000)
-    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) }
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      if (retryRef.current) clearTimeout(retryRef.current)
+    }
   }, [setShowMediaBar])
 
   useEffect(() => {
@@ -58,7 +62,9 @@ export default function DonatePage() {
       } catch (err) {
         console.warn('postMessage to donation form failed:', err)
       }
-      if (--remaining > 0) setTimeout(trySend, 500)
+      if (--remaining > 0) {
+        retryRef.current = setTimeout(trySend, 500)
+      }
     }
     trySend()
   }
@@ -66,10 +72,11 @@ export default function DonatePage() {
   function handleError() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
     setFailed(true)
+    setShowMediaBar(true)
   }
 
   return (
-    <div className="page-enter px-4 pt-5 pb-8">
+    <div className="page-enter px-4 py-6 pb-8">
       <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight mb-6">Donate</h1>
       {failed ? (
         <div role="alert" className="text-white/70 text-sm py-8 text-center">
@@ -101,6 +108,7 @@ export default function DonatePage() {
             ref={iframeRef}
             src={DONATE_URL}
             title="Donation Form"
+            tabIndex={0}
             onLoad={handleLoad}
             onError={handleError}
             sandbox="allow-scripts allow-forms allow-popups"

@@ -10,6 +10,12 @@ import Breadcrumbs from '@/components/global/Breadcrumbs'
 export const metadata: Metadata = {
   title: 'Full Schedule',
   description: 'Full programming schedule for Reach Radio 106.7FM / 690AM',
+  alternates: { canonical: '/scheduled-list' },
+  openGraph: {
+    title: 'Full Schedule — Reach Radio',
+    description: 'Full programming schedule for Reach Radio 106.7FM / 690AM in Tucson, AZ',
+    url: '/scheduled-list',
+  },
 }
 
 export const revalidate = 86400
@@ -62,7 +68,7 @@ export default async function ScheduledListPage() {
         ]}
       />
       <EventSchema events={allEvents} />
-      <div className="px-4 pb-6">
+      <div className="px-4 pt-6 pb-6">
       <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight mb-6">Full Schedule</h1>
       {byDay.length === 0 ? (
         <p className="text-sm text-white/45 py-12">No schedule available.</p>
@@ -70,7 +76,7 @@ export default async function ScheduledListPage() {
         <div className="space-y-8">
           {byDay.map(({ day, slots }) => (
             <section key={day}>
-              <h2 className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/55 mb-3">{day}</h2>
+              <h2 className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/80 mb-3">{day}</h2>
               <ul className="space-y-2">
                 {slots.map((slot) => (
                   <li key={`${slot.slug}-${slot.startTime}`}>

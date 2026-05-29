@@ -76,7 +76,7 @@ export default async function AboutPage() {
       {/* App download links — hidden in mobile app */}
       {!isMobileApp && (
         <div className="bg-[#1c2128] border border-white/5 rounded-[18px] p-5">
-          <h2 className="text-[10px] font-semibold uppercase tracking-widest text-white/60 mb-4">Download App</h2>
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 mb-4">Download App</h2>
           <div className="flex gap-3 flex-wrap">
             {/* Apple App Store */}
             <a
@@ -181,7 +181,7 @@ export default async function AboutPage() {
 
       {/* Contact form */}
       <div className="bg-[#1c2128] border border-white/5 rounded-[18px] p-5">
-        <h2 className="text-[10px] font-semibold uppercase tracking-widest text-white/60 mb-2">Got Questions?</h2>
+        <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 mb-2">Got Questions?</h2>
         <p className="text-white/60 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
         <ContactForm />
       </div>
@@ -194,7 +194,7 @@ export default async function AboutPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-white font-semibold text-sm">Privacy Policy</p>
-            <p className="text-white/50 text-xs mt-1">How we collect and protect your information</p>
+            <p className="text-white/70 text-xs mt-1">How we collect and protect your information</p>
           </div>
           <svg
             className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0 ml-4"

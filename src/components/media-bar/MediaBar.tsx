@@ -14,7 +14,7 @@ export function MediaBar() {
   const image = useMediaStore((s) => s.image)
 
   useEffect(() => {
-    postMessageToNative(JSON.stringify({ isPlaying, title, artist, image }))
+    postMessageToNative({ isPlaying, title, artist, image })
   }, [isPlaying, title, artist, image])
 
   return (

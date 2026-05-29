@@ -16,7 +16,7 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
   function toggle() {
     const next = !isPlaying
     setIsPlaying(next)
-    postMessageToNative(JSON.stringify({ isPlaying: next }))
+    postMessageToNative({ isPlaying: next })
   }
 
   const btnSize = size === 'lg' ? 'md:w-16 md:h-16 w-14 h-14' : 'w-11 h-11'
@@ -30,6 +30,8 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
     >
       {isBuffering ? (
         <span
+          role="status"
+          aria-label="Buffering"
           className={`border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin`}
           style={{ width: iconSize, height: iconSize }}
         />

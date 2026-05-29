@@ -9,6 +9,8 @@ import { VolumeControl } from './VolumeControl'
 import { SleepTimerButton } from './SleepTimerButton'
 import { SleepTimerOverlay } from './SleepTimerOverlay'
 
+const FALLBACK_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
+
 export function RadioPlayer() {
   const image = useMediaStore((s) => s.image)
   const title = useMediaStore((s) => s.title)
@@ -43,7 +45,7 @@ export function RadioPlayer() {
   function togglePlay() {
     const next = !isPlaying
     setIsPlaying(next)
-    postMessageToNative(JSON.stringify({ isPlaying: next }))
+    postMessageToNative({ isPlaying: next })
   }
 
   const altText = title ? `Now playing: ${title}${artist ? ` by ${artist}` : ''}` : 'Now playing album art'
@@ -58,10 +60,11 @@ export function RadioPlayer() {
           className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded cursor-pointer"
         >
           <Image
-            src={image}
+            src={image || FALLBACK_IMAGE}
             alt={altText}
             width={420}
             height={420}
+            sizes="(max-width: 640px) 100vw, 420px"
             className="max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 transition-opacity"
             priority
           />

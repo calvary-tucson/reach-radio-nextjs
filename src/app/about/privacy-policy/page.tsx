@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
 
+export const revalidate = 604800
+
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: "Privacy Policy for Reach Radio Tucson's website and mobile applications.",

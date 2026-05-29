@@ -50,7 +50,7 @@ export function initBridgeProxy(router?: { push: (path: string) => void }): void
     setBufferingFalse: () => useMediaStore.getState().setIsBuffering(false),
     toggleMediaBar: (flag) => {
       useMediaStore.getState().setShowMediaBar(flag)
-      postMessageToNative(JSON.stringify({ showMediaBar: flag }))
+      postMessageToNative({ showMediaBar: flag })
     },
   }
 }

@@ -23,7 +23,7 @@ export function ContactForm() {
   }, [state.error])
 
   return (
-    <form ref={formRef} action={action} className="space-y-4 max-w-lg">
+    <form ref={formRef} action={action} className="space-y-4 max-w-lg" aria-describedby={state.error ? 'form-error' : undefined}>
       {/* Honeypot fields */}
       <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
@@ -68,6 +68,9 @@ export function ContactForm() {
       >
         {isPending ? 'Sending...' : 'Send Message'}
       </button>
+      {state.error && (
+        <p id="form-error" role="alert" className="text-red-400 text-sm">{state.error}</p>
+      )}
     </form>
   )
 }

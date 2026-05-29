@@ -17,7 +17,7 @@ interface SlotItem {
   name: string
   slug: string
   title: string
-  photo: string
+  photo: string | null
   time: string
   startTime: string
   endTime: string
@@ -38,16 +38,15 @@ export async function TodaySchedule() {
     name: string
     slug: string
     title: string
-    photo: string
+    photo: string | null
     schedule: { day: string; times: { startTime: string; endTime: string }[] }[]
   }[]>(scheduleQuery, { day }, { tags: ['schedule'] })
 
-  // Expand to individual time slots
-  let slots: SlotItem[] = []
+  const rawSlots: SlotItem[] = []
   for (const t of raw) {
     if (!t.schedule?.[0]?.times) continue
     for (const time of t.schedule[0].times) {
-      slots.push({
+      rawSlots.push({
         name: t.name,
         slug: t.slug,
         title: t.title || t.name,
@@ -59,20 +58,17 @@ export async function TodaySchedule() {
     }
   }
 
-  // Sort by start time
-  slots.sort((a, b) => toMinutes(to24h(a.startTime)) - toMinutes(to24h(b.startTime)))
+  rawSlots.sort((a, b) => toMinutes(to24h(a.startTime)) - toMinutes(to24h(b.startTime)))
 
-  // Deduplicate
   const seen = new Set<string>()
-  slots = slots.filter((s) => {
-    const key = `${s.startTime}|${s.endTime}|${s.slug}`
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
-
-  // Filter past shows (keep only those whose end time is still in the future)
-  slots = slots.filter((s) => isInFuture(s.endTime))
+  const slots = rawSlots
+    .filter((s) => {
+      const key = `${s.startTime}|${s.endTime}|${s.slug}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+    .filter((s) => isInFuture(s.endTime))
 
   if (slots.length === 0) {
     return (
@@ -120,11 +116,12 @@ export async function TodaySchedule() {
   return (
     <div className="flex flex-col gap-y-2 text-white">
       {withBreaks.map((item, idx) => {
+        const photoSrc = (item.photo || MUSIC_IMAGE) + '?w=420&fm=webp'
         const content = (
           <>
             <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
               <Image
-                src={item.photo + '?w=420&fm=webp'}
+                src={photoSrc}
                 alt={item.isMusic ? 'Music' : item.name}
                 fill
                 className="object-cover rounded-lg"
@@ -155,7 +152,7 @@ export async function TodaySchedule() {
           <Link
             key={`${item.slug}-${item.startTime}`}
             href={`/teachers/${item.slug}`}
-            className="schedule-row flex items-center justify-between flex-wrap bg-white/5 border border-white/10 rounded-xl p-2 hover:bg-white/10 hover:border-white/20 transition-colors"
+            className="schedule-row flex items-center justify-between flex-wrap bg-white/5 border border-white/10 rounded-xl p-2 hover:bg-white/10 hover:border-white/20 transition-colors cursor-pointer"
             style={{ '--stagger-i': idx } as React.CSSProperties}
           >
             <div className="flex gap-5">{content}</div>

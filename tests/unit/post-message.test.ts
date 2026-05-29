@@ -10,7 +10,7 @@ describe('postMessageToNative', () => {
   it('calls Android.postMessage when Android interface present', () => {
     const mockPostMessage = vi.fn()
     ;(window as any).Android = { postMessage: mockPostMessage }
-    postMessageToNative('{"isPlaying":true}')
+    postMessageToNative({ isPlaying: true })
     expect(mockPostMessage).toHaveBeenCalledWith('{"isPlaying":true}')
   })
 
@@ -19,11 +19,11 @@ describe('postMessageToNative', () => {
     ;(window as any).webkit = {
       messageHandlers: { messageHandler: { postMessage: mockPostMessage } },
     }
-    postMessageToNative('{"isPlaying":true}')
+    postMessageToNative({ isPlaying: true })
     expect(mockPostMessage).toHaveBeenCalledWith('{"isPlaying":true}')
   })
 
   it('does nothing when no native interface present', () => {
-    expect(() => postMessageToNative('{"isPlaying":true}')).not.toThrow()
+    expect(() => postMessageToNative({ isPlaying: true })).not.toThrow()
   })
 })
