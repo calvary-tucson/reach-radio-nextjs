@@ -8,6 +8,7 @@ import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
+import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
 import type { SortOption } from '@/lib/teachers/filter'
 import type { TeacherSummary, TeacherWithSchedule, ScheduleDay } from '@/lib/sanity/types'
 
@@ -193,22 +194,25 @@ export function TeacherSearchClient({
       {/* Day filter */}
       <div>
         <p className={sectionLabel}>Day</p>
-        <div
-          className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          role="group"
-          aria-label="Filter by day"
-        >
-          {DAYS.map((day) => (
-            <button
-              key={day}
-              type="button"
-              aria-pressed={activeDays.includes(day)}
-              onClick={() => toggleDay(day)}
-              className={`${chipBase} ${activeDays.includes(day) ? chipActive : chipInactive}`}
-            >
-              {DAY_LABELS[day]}
-            </button>
-          ))}
+        <div className="relative">
+          <div
+            className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="Filter by day"
+          >
+            {DAYS.map((day) => (
+              <button
+                key={day}
+                type="button"
+                aria-pressed={activeDays.includes(day)}
+                onClick={() => toggleDay(day)}
+                className={`${chipBase} ${activeDays.includes(day) ? chipActive : chipInactive}`}
+              >
+                {DAY_LABELS[day]}
+              </button>
+            ))}
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[oklch(24%_0.05_280)] to-transparent md:hidden" />
         </div>
       </div>
 
@@ -264,9 +268,10 @@ export function TeacherSearchClient({
               const hoursPerWeek = hrs ? Math.round(hrs / 60) : 0
               return (
                 <li key={teacher.slug}>
-                  <Link
-                    href={`/teachers/${teacher.slug}`}
-                    className="rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3 transition-colors cursor-pointer can-hover:hover:bg-white/10 can-hover:hover:border-white/20"
+                  <TeacherModalLink
+                    slug={teacher.slug}
+                    name={teacher.name}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3 transition-colors cursor-pointer can-hover:hover:bg-white/10 can-hover:hover:border-white/20"
                   >
                     <TeacherAvatar
                       name={teacher.name}
@@ -291,7 +296,7 @@ export function TeacherSearchClient({
                       className="h-4 w-4 text-white/18 shrink-0"
                       aria-hidden="true"
                     />
-                  </Link>
+                  </TeacherModalLink>
                 </li>
               )
             })}
