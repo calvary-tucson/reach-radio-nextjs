@@ -63,20 +63,20 @@ export default async function ScheduledListPage() {
       />
       <EventSchema events={allEvents} />
       <div className="px-4 pb-6">
-      <h1 className="text-white text-2xl font-bold mb-6">Full Schedule</h1>
+      <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight mb-6">Full Schedule</h1>
       {byDay.length === 0 ? (
-        <p className="text-white/60">No schedule available.</p>
+        <p className="text-sm text-white/45 py-12">No schedule available.</p>
       ) : (
         <div className="space-y-8">
           {byDay.map(({ day, slots }) => (
             <section key={day}>
-              <h2 className="text-white font-semibold text-lg mb-3">{day}</h2>
+              <h2 className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/55 mb-3">{day}</h2>
               <ul className="space-y-2">
                 {slots.map((slot) => (
                   <li key={`${slot.slug}-${slot.startTime}`}>
                     <Link
                       href={`/teachers/${slot.slug}`}
-                      className="flex items-center gap-3 p-3 bg-gray-700/30 rounded hover:bg-gray-700/50 transition-colors"
+                      className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-colors cursor-pointer"
                     >
                       {slot.photo && (
                         <Image
