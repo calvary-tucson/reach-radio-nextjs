@@ -14,7 +14,7 @@ const VARIANT_CLASS = {
 
 export function TeacherInfoChip({ icon, label, variant }: TeacherInfoChipProps) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${VARIANT_CLASS[variant]}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-semibold ${VARIANT_CLASS[variant]}`}>
       {icon && <span aria-hidden="true">{icon}</span>}
       {label}
     </span>
