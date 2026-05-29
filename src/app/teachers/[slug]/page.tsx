@@ -75,7 +75,7 @@ export default async function TeacherDetailPage({ params }: Props) {
     .slice(0, 8)
 
   return (
-    <div className="text-white max-w-screen-xl mx-auto">
+    <div className="text-white light:text-gray-900 max-w-screen-xl mx-auto">
       <ShowMediaBar />
 
       <BreadcrumbJsonLd items={[

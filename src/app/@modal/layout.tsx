@@ -27,23 +27,23 @@ function ModalSkeleton({
     >
       <div
         className={cn(
-          'w-full max-h-[90dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl border border-white/10 bg-gray-800 p-0 h-[85dvh] sm:h-auto sm:max-w-2xl sm:w-[95vw]',
+          'w-full max-h-[90dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0 h-[85dvh] sm:h-auto sm:max-w-2xl sm:w-[95vw]',
           isClosing ? MODAL_EXIT_ANIMATION : MODAL_ENTER_ANIMATION
         )}
       >
         <div className="flex justify-center pt-3 pb-2 sm:hidden">
-          <div className="h-1 w-10 rounded-full bg-white/30" />
+          <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" />
         </div>
-        <div className="flex items-center justify-between border-b border-white/10 bg-gray-800 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-white/10 light:border-gray-200 bg-gray-800 light:bg-white px-6 py-4">
           {title ? (
-            <h2 className="text-xl font-bold text-white">{title}</h2>
+            <h2 className="text-xl font-bold text-white light:text-gray-900">{title}</h2>
           ) : (
             <Skeleton className="h-6 w-1/3" />
           )}
           <button
             type="button"
             onClick={onDismiss}
-            className="ml-auto -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+            className="ml-auto -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer"
             aria-label="Close"
           >
             <X className="h-5 w-5" />

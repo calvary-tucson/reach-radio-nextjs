@@ -38,7 +38,7 @@ export default async function TeachersPage() {
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-screen-xl mx-auto">
-      <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight mb-3">Teachers</h1>
+      <h1 className="text-[22px] md:text-4xl font-extrabold text-white light:text-gray-900 tracking-tight mb-3">Teachers</h1>
       <ShowMediaBar />
       <PassiveSearchBar
         href="/teachers/search"
