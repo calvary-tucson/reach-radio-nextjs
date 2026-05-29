@@ -17,7 +17,7 @@ interface Props {
 export function ScheduleCardList({ slots, currentTime, onSelect, compact = false }: Props) {
   if (slots.length === 0) {
     return (
-      <p className="text-white/50 text-sm text-center py-8">No shows scheduled for this day.</p>
+      <p className="text-white/50 light:text-gray-400 text-sm text-center py-8">No shows scheduled for this day.</p>
     )
   }
 
@@ -36,10 +36,10 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
             <div
               key={`music-${slot.startMinutes}`}
               data-testid="music-gap"
-              className="bg-white/[0.025] rounded-lg px-4 py-3 flex items-center gap-2"
+              className="bg-white/[0.025] light:bg-gray-50 rounded-lg px-4 py-3 flex items-center gap-2"
             >
-              <span className="text-white/25 text-xs italic">♪ Music</span>
-              <span className="text-white/20 text-xs">
+              <span className="text-white/25 light:text-gray-400 text-xs italic">♪ Music</span>
+              <span className="text-white/20 light:text-gray-300 text-xs">
                 {formatTimeMinutes(slot.startMinutes)} – {formatTimeMinutes(slot.endMinutes)}
               </span>
             </div>
@@ -61,7 +61,7 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
             } ${
               isActive
                 ? 'bg-[rgba(132,184,79,0.10)] border border-[rgba(132,184,79,0.25)] hover:bg-[rgba(132,184,79,0.14)]'
-                : 'bg-white/[0.04] hover:bg-white/[0.07]'
+                : 'bg-white/[0.04] light:bg-gray-50 hover:bg-white/[0.07] light:hover:bg-gray-100'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -74,10 +74,10 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
                 sizes={avatarPx}
               />
               <div className="flex-1 min-w-0">
-                <p className={`text-white font-semibold truncate ${compact ? 'text-xs' : 'text-sm'}`}>
+                <p className={`text-white light:text-gray-900 font-semibold truncate ${compact ? 'text-xs' : 'text-sm'}`}>
                   {slot.teacher.name}
                 </p>
-                <p className={`${compact ? 'text-[10px]' : 'text-xs'} ${isActive ? 'text-[#84b84f]' : 'text-white/55'}`}>
+                <p className={`${compact ? 'text-[10px]' : 'text-xs'} ${isActive ? 'text-[#84b84f]' : 'text-white/55 light:text-gray-500'}`}>
                   {formatTimeMinutes(slot.startMinutes)} – {formatTimeMinutes(slot.endMinutes)}
                 </p>
               </div>
@@ -85,7 +85,7 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
                 <span className={`text-xs font-medium px-2 py-1 rounded-md flex-shrink-0 ${
                   isActive
                     ? 'text-[#84b84f] bg-[rgba(132,184,79,0.15)]'
-                    : 'text-white/30 bg-white/[0.06]'
+                    : 'text-white/30 light:text-gray-400 bg-white/[0.06] light:bg-gray-100'
                 }`}>
                   {formatDuration(slot.startMinutes, slot.endMinutes)}
                 </span>

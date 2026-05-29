@@ -18,7 +18,7 @@ export async function RecommendedTeachers() {
 
   return (
     <section className="mb-4 md:mb-6" aria-label="Recommended teachers">
-      <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55 px-0 mb-[10px] md:mb-3">
+      <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55 light:text-gray-500 px-0 mb-[10px] md:mb-3">
         Recommended
       </p>
       <div className="relative">
@@ -41,7 +41,7 @@ export async function RecommendedTeachers() {
                   sizes="72px"
                 />
               </div>
-              <span className="text-xs md:text-[13px] text-white/75 text-center leading-tight line-clamp-2">
+              <span className="text-xs md:text-[13px] text-white/75 light:text-gray-700 text-center leading-tight line-clamp-2">
                 {teacher.name}
               </span>
             </TeacherModalLink>
@@ -49,7 +49,7 @@ export async function RecommendedTeachers() {
         </div>
         <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[oklch(24%_0.05_280)] from-30% to-transparent md:hidden" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-6 flex items-center justify-end pr-1 md:hidden">
-          <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+          <svg className="w-4 h-4 text-white/50 light:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </div>

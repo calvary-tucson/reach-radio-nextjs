@@ -36,7 +36,7 @@ export function ScheduleWeekCards({ scheduleTeachers, currentTime, today, onSele
               className={`text-center text-[11px] font-bold pb-2 mb-2 border-b ${
                 isToday
                   ? 'text-[#84b84f] border-[rgba(132,184,79,0.25)]'
-                  : 'text-white/40 border-white/[0.06]'
+                  : 'text-white/40 light:text-gray-400 border-white/[0.06] light:border-gray-200'
               }`}
             >
               {DAY_LABELS[day]}
