@@ -21,7 +21,13 @@ export function ModalLink({ children, modalTitle, ...props }: ModalLinkProps) {
       onNavigate={() => {
         setTriggerRef(document.activeElement instanceof HTMLElement ? document.activeElement : null)
         resetNav()
-        openModal(modalTitle)
+        // Stack on top when a modal is already open, otherwise open fresh
+        const store = useModalStore.getState()
+        if (store.isOpen) {
+          store.pushModal(modalTitle)
+        } else {
+          openModal(modalTitle)
+        }
       }}
     >
       {children}

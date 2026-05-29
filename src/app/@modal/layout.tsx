@@ -65,7 +65,9 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   const close = useModalStore((s) => s.close)
   const startClosing = useModalStore((s) => s.startClosing)
   const expectingRoute = useModalStore((s) => s.expectingRoute)
+  const expectingBack = useModalStore((s) => s.expectingBack)
   const routeArrived = useModalStore((s) => s.routeArrived)
+  const clearBack = useModalStore((s) => s.clearBack)
   const dismissGuardRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
 
@@ -78,6 +80,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!isOpen) return
     if (expectingRoute) { routeArrived(); return }
+    if (expectingBack) { clearBack(); return }
     if (isOpen && !isClosing) {
       close()
       dismissGuardRef.current = false
@@ -90,13 +93,20 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
     dismissGuardRef.current = true
     startClosing()
     dismissTimer.current = setTimeout(() => {
-      const triggerEl = useModalStore.getState().triggerRef
-      close()
-      router.back()
+      const state = useModalStore.getState()
+      const triggerEl = state.triggerRef
+      if (state.stackDepth > 0) {
+        // Stacked modal — back to parent sheet without fully closing
+        state.prepareBack()
+        router.back()
+      } else {
+        state.close()
+        router.back()
+      }
       dismissGuardRef.current = false
       triggerEl?.focus()
     }, EXIT_DURATION)
-  }, [startClosing, close, router])
+  }, [startClosing, router])
 
   const handleBack = useCallback(() => { router.back() }, [router])
 

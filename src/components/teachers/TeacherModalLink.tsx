@@ -27,7 +27,13 @@ export function TeacherModalLink({
     <button
       type="button"
       onClick={() => {
-        openModal(name)
+        // If a modal is already open (e.g. search sheet), stack on top rather than reset
+        const store = useModalStore.getState()
+        if (store.isOpen) {
+          store.pushModal(name)
+        } else {
+          openModal(name)
+        }
         router.push(`/teachers/${slug}`)
       }}
       className={className}
