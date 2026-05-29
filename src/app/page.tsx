@@ -7,8 +7,8 @@ import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
 import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 
 export const metadata: Metadata = {
-  title: 'Listen',
-  description: 'Reach Radio features Bible teachings and Christian music. Listen online or on the air in Tucson at 106.7FM and 690AM.',
+  title: 'Listen Live',
+  description: "Stream Reach Radio live — Tucson's Christian radio station. Bible teachings and gospel music on 106.7FM and 690AM.",
   alternates: { canonical: '/' },
 }
 

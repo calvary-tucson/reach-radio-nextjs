@@ -15,17 +15,17 @@ const OG_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443d
 
 export const metadata: Metadata = {
   title: 'Teachers',
-  description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+  description: "Hear nationally-known Bible teachers on Reach Radio — Tucson's Christian station at 106.7FM and 690AM.",
   alternates: { canonical: '/teachers' },
   openGraph: {
     title: 'Teachers | Reach Radio',
-    description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+    description: "Hear nationally-known Bible teachers on Reach Radio — Tucson's Christian station at 106.7FM and 690AM.",
     url: '/teachers',
     images: [{ url: OG_IMAGE, width: 1024, height: 1024, alt: 'Reach Radio Teachers' }],
   },
   twitter: {
     title: 'Teachers | Reach Radio',
-    description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+    description: "Hear nationally-known Bible teachers on Reach Radio — Tucson's Christian station at 106.7FM and 690AM.",
     images: [OG_IMAGE],
   },
 }

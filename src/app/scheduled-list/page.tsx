@@ -3,6 +3,7 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { fullScheduleQuery } from '@/lib/sanity/queries'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 import { EventSchema } from '@/components/seo/EventSchema'
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 import Image from 'next/image'
 import Link from 'next/link'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
@@ -68,6 +69,10 @@ export default async function ScheduledListPage() {
         ]}
       />
       <EventSchema events={allEvents} />
+      <BreadcrumbJsonLd items={[
+        { name: 'Home', url: '/' },
+        { name: 'Full Schedule', url: '/scheduled-list' },
+      ]} />
       <div className="px-4 pt-6 pb-6">
       <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight mb-6">Full Schedule</h1>
       {byDay.length === 0 ? (

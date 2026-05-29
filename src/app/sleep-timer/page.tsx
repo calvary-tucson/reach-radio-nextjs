@@ -4,6 +4,7 @@ import Breadcrumbs from '@/components/global/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: 'Sleep Timer',
+  robots: { index: false, follow: false },
 }
 
 export default function Page() {
