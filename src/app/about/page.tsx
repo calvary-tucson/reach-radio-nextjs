@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Link from 'next/link'
@@ -6,8 +7,6 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery } from '@/lib/sanity/queries'
 import { OrganizationSchema } from '@/components/seo/OrganizationSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
-
-export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'About',
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function AboutPage() {
+async function AboutContent() {
   const headersList = await headers()
   const isMobileApp = headersList.get('mobile-app') === 'true'
 
@@ -43,7 +42,7 @@ export default async function AboutPage() {
   }))
 
   return (
-    <div className="page-enter px-4 py-6 max-w-2xl mx-auto space-y-6">
+    <>
       <ShowMediaBar />
       <OrganizationSchema
         name={siteSettings.siteTitle}
@@ -53,18 +52,19 @@ export default async function AboutPage() {
         facebookUrl={siteSettings.facebookPage}
         twitterHandle={siteSettings.twitterHandle}
       />
+      <h1 className="sr-only">About Reach Radio</h1>
       {/* Frequency hero */}
-      <div className="grid md:grid-cols-2 rounded overflow-hidden">
-        <div className="text-center p-5 bg-gradient-to-b from-green-600 to-green-700 flex flex-col justify-center items-center">
-          <div className="text-5xl text-white font-bold">690AM</div>
-          <div className="text-5xl text-white font-bold">106.7FM</div>
-          <div className="text-lg text-white uppercase font-bold mt-1">On the air in Tucson, AZ</div>
+      <div className="grid md:grid-cols-2 rounded-[18px] overflow-hidden border border-white/5">
+        <div className="text-center p-6 bg-[#84b84f] flex flex-col justify-center items-center">
+          <div className="text-5xl text-[#0a1305] font-extrabold">690AM</div>
+          <div className="text-5xl text-[#0a1305] font-extrabold">106.7FM</div>
+          <div className="text-sm text-[#0a1305]/80 uppercase font-bold tracking-widest mt-2">On the air in Tucson, AZ</div>
         </div>
-        <div className="p-6 bg-gradient-to-b from-gray-800 to-gray-900">
-          <div className="border-l-4 pl-3 font-bold text-xl mb-3 border-l-green-500 uppercase text-white">
+        <div className="p-6 bg-[#1c2128]">
+          <div className="border-l-4 pl-3 font-bold text-sm mb-3 border-l-[#84b84f] uppercase text-white tracking-wide">
             Providing Solid Bible Teachings and Uplifting Worship 24/7
           </div>
-          <p className="text-white/80">
+          <p className="text-white/70 text-sm leading-relaxed">
             Reach Radio first went online in February 2016, and on the air in February 2017.
             Our goal is simple, to bring the life-saving message and hope of the gospel to
             as many as can hear via the Tucson radio airwaves.
@@ -74,8 +74,8 @@ export default async function AboutPage() {
 
       {/* App download links — hidden in mobile app */}
       {!isMobileApp && (
-        <div className="bg-gray-700/40 p-5 rounded">
-          <h2 className="text-white text-2xl mb-4">Download App</h2>
+        <div className="bg-[#1c2128] border border-white/5 rounded-[18px] p-5">
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 mb-4">Download App</h2>
           <div className="flex gap-3 flex-wrap">
             {/* Apple App Store */}
             <a
@@ -179,22 +179,43 @@ export default async function AboutPage() {
       )}
 
       {/* Contact form */}
-      <div className="bg-gray-700/40 p-5 rounded">
-        <h2 className="text-white text-2xl mb-2">Got Questions?</h2>
+      <div className="bg-[#1c2128] border border-white/5 rounded-[18px] p-5">
+        <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 mb-2">Got Questions?</h2>
         <p className="text-white/60 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
         <ContactForm />
       </div>
 
       {/* Privacy policy */}
-      <div className="bg-gray-700/40 p-5 rounded">
-        <h2 className="text-white text-2xl mb-3">Privacy Policy</h2>
-        <Link
-          href="/about/privacy-policy"
-          className="text-[var(--color-brand-green)] hover:underline text-sm"
-        >
-          Read our privacy policy →
-        </Link>
-      </div>
+      <Link
+        href="/about/privacy-policy"
+        className="block bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 hover:border-white/20 transition-colors cursor-pointer group"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-white font-semibold text-sm">Privacy Policy</p>
+            <p className="text-white/70 text-xs mt-1">How we collect and protect your information</p>
+          </div>
+          <svg
+            className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0 ml-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </Link>
+    </>
+  )
+}
+
+export default function AboutPage() {
+  return (
+    <div className="page-enter px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-6">
+      <Suspense fallback={null}>
+        <AboutContent />
+      </Suspense>
     </div>
   )
 }
