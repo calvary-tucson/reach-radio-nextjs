@@ -1,10 +1,12 @@
 const STREAM_URL = 'http://stream.radiojar.com/g4d600bv6p5tv'
 
 export async function GET(): Promise<Response> {
+  const controller = new AbortController()
+  const connectTimeout = setTimeout(() => controller.abort(), 10_000)
+
   try {
-    const upstream = await fetch(STREAM_URL, {
-      signal: AbortSignal.timeout(10_000),
-    })
+    const upstream = await fetch(STREAM_URL, { signal: controller.signal })
+    clearTimeout(connectTimeout) // connected — don't abort the open stream
 
     if (!upstream.ok || !upstream.body) {
       return new Response('Upstream error', { status: 502 })
