@@ -22,7 +22,7 @@ export async function RecommendedTeachers() {
         Recommended
       </p>
       <div className="relative">
-        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-1 pr-20 md:pr-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {teachers.map((teacher, index) => (
             <TeacherModalLink
               key={teacher.slug}

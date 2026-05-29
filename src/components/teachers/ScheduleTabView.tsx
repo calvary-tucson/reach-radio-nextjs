@@ -83,7 +83,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
           <div
             role="tablist"
             aria-label="Schedule day"
-            className="flex gap-[5px] overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="flex gap-[5px] overflow-x-auto pb-1 pr-12 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             {DAYS_ORDER.map((day) => (
               <button

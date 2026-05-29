@@ -187,7 +187,7 @@ export function TeacherSearchClient({
         <p className={sectionLabel}>Day</p>
         <div className="relative">
           <div
-            className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex gap-2 overflow-x-auto pb-1 pr-12 md:pr-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             role="group"
             aria-label="Filter by day"
           >
