@@ -47,7 +47,7 @@ export function VolumeControl() {
 }
 
 function VolumeIcon({ volume }: { volume: number }) {
-  const props = { size: 18, className: 'text-white' } as const
+  const props = { size: 18, className: 'text-white light:text-gray-900' } as const
   if (volume <= 0) return <VolumeX {...props} />
   if (volume <= 33) return <Volume {...props} />
   if (volume <= 66) return <Volume1 {...props} />

@@ -72,7 +72,7 @@ export async function TodaySchedule() {
 
   if (slots.length === 0) {
     return (
-      <div className="flex items-center gap-5 bg-white/5 border border-white/10 rounded-xl p-2 text-white">
+      <div className="flex items-center gap-5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 text-white light:text-gray-900">
         <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
           <Image
             src={MUSIC_IMAGE + '?w=420&fm=webp'}
@@ -84,7 +84,7 @@ export async function TodaySchedule() {
         </div>
         <div>
           <div className="font-bold text-base">Music</div>
-          <div className="uppercase text-sm text-white/70">Reach Radio</div>
+          <div className="uppercase text-sm text-white/70 light:text-gray-500">Reach Radio</div>
         </div>
       </div>
     )
@@ -114,7 +114,7 @@ export async function TodaySchedule() {
   }
 
   return (
-    <div className="flex flex-col gap-y-2 text-white">
+    <div className="flex flex-col gap-y-2 text-white light:text-gray-900">
       {withBreaks.map((item, idx) => {
         const photoSrc = (item.photo || MUSIC_IMAGE) + '?w=420&fm=webp'
         const content = (
@@ -130,8 +130,8 @@ export async function TodaySchedule() {
             </div>
             <div>
               <div className="font-bold text-base">{item.title}</div>
-              <div className="uppercase text-sm text-white/70">{item.name}</div>
-              <div className="text-sm text-white/60">{item.time}</div>
+              <div className="uppercase text-sm text-white/70 light:text-gray-500">{item.name}</div>
+              <div className="text-sm text-white/60 light:text-gray-500">{item.time}</div>
             </div>
           </>
         )
@@ -140,7 +140,7 @@ export async function TodaySchedule() {
           return (
             <div
               key={`music-${item.startTime}-${item.endTime}`}
-              className="schedule-row flex gap-5 bg-white/5 border border-white/10 rounded-xl p-2"
+              className="schedule-row flex gap-5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2"
               style={{ '--stagger-i': idx } as React.CSSProperties}
             >
               {content}
@@ -152,7 +152,7 @@ export async function TodaySchedule() {
           <Link
             key={`${item.slug}-${item.startTime}`}
             href={`/teachers/${item.slug}`}
-            className="schedule-row flex items-center justify-between flex-wrap bg-white/5 border border-white/10 rounded-xl p-2 hover:bg-white/10 hover:border-white/20 transition-colors cursor-pointer"
+            className="schedule-row flex items-center justify-between flex-wrap bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 transition-colors cursor-pointer"
             style={{ '--stagger-i': idx } as React.CSSProperties}
           >
             <div className="flex gap-5">{content}</div>

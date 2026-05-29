@@ -35,13 +35,13 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabel="Sleep timer">
       <div className="flex items-center justify-between px-6 pb-4">
-        <h2 id="sleep-timer-heading" className="text-white text-xl font-bold select-none">
+        <h2 id="sleep-timer-heading" className="text-white light:text-gray-900 text-xl font-bold select-none">
           Sleep Timer
         </h2>
         <button
           type="button"
           onClick={onClose}
-          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer"
           aria-label="Close sleep timer"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -53,10 +53,10 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
       <div className="px-6 pb-10">
         {active ? (
           <div className="text-center">
-            <p className="text-white text-5xl font-mono mb-2" aria-live="polite" aria-atomic="true">
+            <p className="text-white light:text-gray-900 text-5xl font-mono mb-2" aria-hidden="true">
               {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </p>
-            <p className="text-white/60 text-sm mb-8">
+            <p className="text-white/60 light:text-gray-500 text-sm mb-8">
               Radio stops in {minutes}m {secs}s
             </p>
             <button
@@ -74,7 +74,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                 type="button"
                 key={mins}
                 onClick={() => start(mins)}
-                className="bg-gray-700 text-white py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+                className="bg-gray-700 light:bg-gray-200 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
               >
                 {mins}m
               </button>

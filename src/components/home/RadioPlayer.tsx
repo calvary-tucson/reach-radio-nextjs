@@ -51,7 +51,7 @@ export function RadioPlayer() {
   const altText = title ? `Now playing: ${title}${artist ? ` by ${artist}` : ''}` : 'Now playing album art'
 
   return (
-    <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-[#1c2128] border border-white/5 rounded-[18px]">
+    <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px]">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
         <button
@@ -72,11 +72,11 @@ export function RadioPlayer() {
       </div>
       <div className="flex md:flex-row flex-col items-center justify-between md:gap-0 gap-8 mt-5">
         <div className="flex flex-col md:items-start items-center md:gap-3 gap-1 w-full md:w-[calc(100%_-_276px)] px-2">
-          <p className="md:text-4xl text-2xl font-normal leading-tight text-white truncate w-full md:text-left text-center">
+          <p className="md:text-4xl text-2xl font-normal leading-tight text-white light:text-gray-900 truncate w-full md:text-left text-center">
             {title}
           </p>
           {artist && (
-            <p className="md:font-bold font-medium md:text-lg uppercase text-white/80 truncate w-full md:text-left text-center">
+            <p className="md:font-bold font-medium md:text-lg uppercase text-white/80 light:text-gray-700 truncate w-full md:text-left text-center">
               {artist}
             </p>
           )}
