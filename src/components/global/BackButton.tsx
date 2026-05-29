@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +13,11 @@ interface BackButtonProps {
 
 export function BackButton({ variant, className, fallbackHref }: BackButtonProps) {
   const router = useRouter()
+  const [isApp, setIsApp] = useState(false)
+
+  useEffect(() => {
+    setIsApp(document.body.getAttribute('data-app') === 'true')
+  }, [])
 
   function handleBack() {
     if (fallbackHref && window.history.length <= 1) {
@@ -28,7 +34,8 @@ export function BackButton({ variant, className, fallbackHref }: BackButtonProps
         onClick={handleBack}
         aria-label="Go back"
         className={cn(
-          'fixed top-4 left-3 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-green-700 p-2 pr-2.5 md:hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+          'fixed left-3 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-green-700 p-2 pr-2.5 md:hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+          isApp ? 'top-4' : 'top-[72px]',
           className,
         )}
       >
