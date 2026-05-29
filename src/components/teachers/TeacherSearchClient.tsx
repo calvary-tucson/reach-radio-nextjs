@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo, useEffect, useRef, useTransition } from 'react'
-import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Search, X, Loader2, ChevronRight } from 'lucide-react'
 import { filterTeachers } from '@/lib/teachers/filter'
@@ -142,13 +141,6 @@ export function TeacherSearchClient({
 
       {/* Search input */}
       <div className="flex items-center gap-[10px]">
-        <Link
-          href="/teachers"
-          className="text-[#84b84f] text-xl leading-none cursor-pointer flex-shrink-0"
-          aria-label="Back to teachers"
-        >
-          ‹
-        </Link>
         <div className="relative flex-1">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40"
@@ -271,7 +263,7 @@ export function TeacherSearchClient({
                   <TeacherModalLink
                     slug={teacher.slug}
                     name={teacher.name}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3 transition-colors cursor-pointer can-hover:hover:bg-white/10 can-hover:hover:border-white/20"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3 text-left transition-colors cursor-pointer can-hover:hover:bg-white/10 can-hover:hover:border-white/20"
                   >
                     <TeacherAvatar
                       name={teacher.name}
@@ -302,7 +294,7 @@ export function TeacherSearchClient({
             })}
           </ul>
         ) : (
-          <p className="text-sm text-white/45 text-center py-12">
+          <p className="text-sm text-white/45 py-12">
             No teachers found. Try a different search.
           </p>
         )}
