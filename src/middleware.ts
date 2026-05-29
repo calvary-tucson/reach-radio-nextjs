@@ -7,8 +7,8 @@ export function middleware(request: NextRequest): NextResponse {
     response.cookies.set('mobile-app', 'true', {
       maxAge: 60 * 60 * 24 * 365, // 1 year
       path: '/',
-      httpOnly: true,
       sameSite: 'lax',
+      // Not httpOnly — BridgeInit.tsx needs to clear this when the bridge is absent
     })
   }
 

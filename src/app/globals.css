@@ -47,8 +47,10 @@ button, a, [role="button"], input, label {
 
 /* === MediaBar slide-up animation === */
 
-[data-media-bar] {
-  transition: transform 250ms ease-out, opacity 200ms ease-out;
+@media (prefers-reduced-motion: no-preference) {
+  [data-media-bar] {
+    transition: transform 250ms ease-out, opacity 200ms ease-out;
+  }
 }
 
 [data-media-bar][data-hidden] {
@@ -76,9 +78,21 @@ body[data-app] [data-media-bar] {
   }
 }
 
-.teacher-card {
-  animation: card-enter 240ms ease-out backwards;
-  animation-delay: calc(var(--stagger-i, 0) * 35ms);
+/* Animations opt-in — only run when user has not requested reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .teacher-card {
+    animation: card-enter 240ms ease-out backwards;
+    animation-delay: calc(var(--stagger-i, 0) * 35ms);
+  }
+
+  .schedule-row {
+    animation: schedule-row-enter 220ms ease-out backwards;
+    animation-delay: calc(var(--stagger-i, 0) * 25ms);
+  }
+
+  .page-enter {
+    animation: page-enter 280ms ease-out 50ms backwards;
+  }
 }
 
 /* === Schedule row stagger entrance animation === */
@@ -94,11 +108,6 @@ body[data-app] [data-media-bar] {
   }
 }
 
-.schedule-row {
-  animation: schedule-row-enter 220ms ease-out backwards;
-  animation-delay: calc(var(--stagger-i, 0) * 25ms);
-}
-
 /* === Page content entrance (about, donate) === */
 
 @keyframes page-enter {
@@ -112,39 +121,7 @@ body[data-app] [data-media-bar] {
   }
 }
 
-.page-enter {
-  animation: page-enter 280ms ease-out 50ms backwards;
-}
-
-/* View Transitions */
-
-/* Directional slide — forward (left) */
-::view-transition-old(.nav-forward) {
-  --slide-offset: -60px;
-  animation:
-    150ms ease-in both vt-fade reverse,
-    400ms ease-in-out both vt-slide reverse;
-}
-::view-transition-new(.nav-forward) {
-  --slide-offset: 60px;
-  animation:
-    210ms ease-out 150ms both vt-fade,
-    400ms ease-in-out both vt-slide;
-}
-
-/* Directional slide — back (right) */
-::view-transition-old(.nav-back) {
-  --slide-offset: 60px;
-  animation:
-    150ms ease-in both vt-fade reverse,
-    400ms ease-in-out both vt-slide reverse;
-}
-::view-transition-new(.nav-back) {
-  --slide-offset: -60px;
-  animation:
-    210ms ease-out 150ms both vt-fade,
-    400ms ease-in-out both vt-slide;
-}
+/* View Transitions — opt-in, only when supported and motion allowed */
 
 @keyframes vt-fade {
   from {
@@ -164,30 +141,56 @@ body[data-app] [data-media-bar] {
   }
 }
 
-/* Header anchor — stays fixed, does not slide */
-::view-transition-group(site-header) {
-  animation: none;
-  z-index: 100;
-}
-::view-transition-old(site-header) {
-  display: none;
-}
-::view-transition-new(site-header) {
-  animation: none;
-}
+@supports (view-transition-name: none) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Directional slide — forward (left) */
+    ::view-transition-old(.nav-forward) {
+      --slide-offset: -60px;
+      animation:
+        150ms ease-in both vt-fade reverse,
+        400ms ease-in-out both vt-slide reverse;
+    }
+    ::view-transition-new(.nav-forward) {
+      --slide-offset: 60px;
+      animation:
+        210ms ease-out 150ms both vt-fade,
+        400ms ease-in-out both vt-slide;
+    }
 
-/* Reduced motion — instant swap, no positional animation */
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(*),
-  ::view-transition-new(*),
-  ::view-transition-group(*) {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
+    /* Directional slide — back (right) */
+    ::view-transition-old(.nav-back) {
+      --slide-offset: 60px;
+      animation:
+        150ms ease-in both vt-fade reverse,
+        400ms ease-in-out both vt-slide reverse;
+    }
+    ::view-transition-new(.nav-back) {
+      --slide-offset: -60px;
+      animation:
+        210ms ease-out 150ms both vt-fade,
+        400ms ease-in-out both vt-slide;
+    }
   }
 
-  .teacher-card,
-  .schedule-row,
-  .page-enter {
+  /* Instant swap for reduce-motion users */
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(*),
+    ::view-transition-new(*),
+    ::view-transition-group(*) {
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
+    }
+  }
+
+  /* Header anchor — stays fixed, does not slide */
+  ::view-transition-group(site-header) {
+    animation: none;
+    z-index: 100;
+  }
+  ::view-transition-old(site-header) {
+    display: none;
+  }
+  ::view-transition-new(site-header) {
     animation: none;
   }
 }

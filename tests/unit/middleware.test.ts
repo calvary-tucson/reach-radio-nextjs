@@ -14,7 +14,8 @@ describe('middleware', () => {
     const setCookie = res.headers.get('set-cookie')
     expect(setCookie).toContain('mobile-app=true')
     expect(setCookie).toContain('Max-Age=31536000')
-    expect(setCookie).toContain('HttpOnly')
+    // Not HttpOnly — BridgeInit.tsx needs to clear this when the bridge is absent
+    expect(setCookie).not.toContain('HttpOnly')
   })
 
   it('does not set mobile-app cookie when header is absent', async () => {

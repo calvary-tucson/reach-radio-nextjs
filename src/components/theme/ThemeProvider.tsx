@@ -85,7 +85,7 @@ function ThemeInit({ children }: { children: React.ReactNode }) {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <ThemeInit>{children}</ThemeInit>
     </Suspense>
   )

@@ -97,7 +97,7 @@ export default async function RootLayout({
     .split(';')
     .map(c => c.trim())
     .find(c => c.startsWith('theme='))
-    ?.replace('theme=', '')
+    ?.split('=').slice(1).join('=')
   const initialThemeClass: string =
     themeCookieValue === 'dark' || themeCookieValue === 'light'
       ? themeCookieValue

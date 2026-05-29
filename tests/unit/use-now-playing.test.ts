@@ -61,15 +61,15 @@ describe('useNowPlaying', () => {
     expect(useMediaStore.getState().title).toBe('Reach Radio')
   })
 
-  it('does not close permanently on first error — retries after delay', async () => {
+  it('closes connection on error then retries after delay', async () => {
     renderHook(() => useNowPlaying())
 
     act(() => {
       mockES.simulateError()
     })
 
-    // After first error, close is NOT called immediately — retry is scheduled
-    expect(mockES.close).not.toHaveBeenCalled()
+    // Error handler closes the current connection immediately before scheduling retry
+    expect(mockES.close).toHaveBeenCalledTimes(1)
 
     // Advance past the 1s + up to 500ms jitter retry delay — a new EventSource is created
     act(() => {

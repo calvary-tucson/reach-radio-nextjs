@@ -62,6 +62,7 @@ export function useNowPlaying(): void {
       }
 
       es.onerror = () => {
+        es?.close()
         if (retries >= MAX_RETRIES) return
         const delay = Math.pow(2, retries) * 1000 + Math.random() * 500
         retries++
@@ -75,5 +76,6 @@ export function useNowPlaying(): void {
       if (retryTimer) clearTimeout(retryTimer)
       if (es) es.close()
     }
-  }, [setNowPlaying])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 }

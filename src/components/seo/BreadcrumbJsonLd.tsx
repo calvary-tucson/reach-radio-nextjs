@@ -1,11 +1,11 @@
-const SITE_URL = 'https://reach.radio'
+import { SITE_URL } from '@/lib/constants'
+import { safeJsonLd } from '@/lib/seo'
 
 interface BreadcrumbItem {
   name: string
   url: string
 }
 
-// JSON-LD uses developer-controlled data only — safe from XSS
 export function BreadcrumbJsonLd({ items }: { items: BreadcrumbItem[] }) {
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -21,7 +21,7 @@ export function BreadcrumbJsonLd({ items }: { items: BreadcrumbItem[] }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/<\/script>/gi, '<\\/script>') }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
     />
   )
 }

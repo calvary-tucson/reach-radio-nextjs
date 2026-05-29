@@ -9,9 +9,17 @@ export function SleepTimerOverlay() {
   const setSleepTimerActive = useMediaStore((s) => s.setSleepTimerActive)
   const setRemainingSleepSeconds = useMediaStore((s) => s.setRemainingSleepSeconds)
   const cancelBtnRef = useRef<HTMLButtonElement>(null)
+  const prevFocusRef = useRef<HTMLElement | null>(null)
 
+  // Save previously focused element, move focus in, restore on close
   useEffect(() => {
-    if (active) cancelBtnRef.current?.focus()
+    if (active) {
+      prevFocusRef.current = document.activeElement as HTMLElement
+      cancelBtnRef.current?.focus()
+    } else if (prevFocusRef.current) {
+      prevFocusRef.current.focus()
+      prevFocusRef.current = null
+    }
   }, [active])
 
   useEffect(() => {
@@ -20,6 +28,11 @@ export function SleepTimerOverlay() {
       if (e.key === 'Escape') {
         setSleepTimerActive(false)
         setRemainingSleepSeconds(0)
+      }
+      // Focus trap: only one focusable element, keep Tab inside the dialog
+      if (e.key === 'Tab') {
+        e.preventDefault()
+        cancelBtnRef.current?.focus()
       }
     }
     document.addEventListener('keydown', onKeyDown)
@@ -39,13 +52,13 @@ export function SleepTimerOverlay() {
   return (
     <div
       role="dialog"
+      aria-modal="true"
       aria-label="Sleep timer active"
       className="absolute inset-0 z-10 bg-black/80 rounded flex flex-col items-center justify-center gap-4"
     >
       <p
         className="text-white text-4xl font-mono"
-        aria-live="polite"
-        aria-atomic="true"
+        aria-label={`${minutes} minute${minutes !== 1 ? 's' : ''} ${secs} seconds remaining`}
       >
         {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
       </p>
@@ -53,7 +66,7 @@ export function SleepTimerOverlay() {
         ref={cancelBtnRef}
         onClick={cancel}
         aria-label="Cancel sleep timer"
-        className="bg-white/20 text-white px-4 py-2 rounded text-sm hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+        className="bg-white/20 text-white px-4 py-3 min-h-[44px] min-w-[88px] rounded text-sm hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2 cursor-pointer"
       >
         Cancel
       </button>

@@ -1,5 +1,6 @@
 import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery } from '@/lib/sanity/queries'
+import { safeJsonLd } from '@/lib/seo'
 
 export async function WebSiteSchema() {
   const siteSettings = await sanityFetch<{
@@ -26,7 +27,7 @@ export async function WebSiteSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/<\/script>/gi, '<\\/script>') }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
     />
   )
 }

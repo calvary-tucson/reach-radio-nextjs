@@ -1,9 +1,6 @@
 import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery, appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
-
-function safeJsonLd(obj: unknown): string {
-  return JSON.stringify(obj).replace(/<\/script>/gi, '<\\/script>')
-}
+import { safeJsonLd } from '@/lib/seo'
 
 export async function RadioStationSchema() {
   const [siteSettings, appSettings] = await Promise.all([

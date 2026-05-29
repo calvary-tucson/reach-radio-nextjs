@@ -20,26 +20,21 @@ function isNativeBridgePresent(): boolean {
 }
 
 function setMobileAppCookie() {
-  document.cookie = 'mobile-app=true; path=/; max-age=315360000'
+  document.cookie = 'mobile-app=true; path=/; max-age=31536000; SameSite=Lax'
 }
 
 function clearMobileAppCookie() {
-  document.cookie = 'mobile-app=; path=/; max-age=0'
+  document.cookie = 'mobile-app=; path=/; max-age=0; SameSite=Lax'
 }
 
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // On mount: init bridge, send loaded + streamUrl, wire online/offline
+  // One-time setup: init bridge globals and wire online/offline
   useEffect(() => {
     initUnpolyShim()
     initBridgeProxy(router)
-
-    postMessageToNative({
-      loaded: true,
-      ...(streamUrl ? { streamUrl } : {}),
-    })
 
     const handleOnline = () => postMessageToNative({ offline: false })
     const handleOffline = () => postMessageToNative({ offline: true })
@@ -51,7 +46,15 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [router, streamUrl])
+  }, [router])
+
+  // Send loaded + streamUrl after mount (streamUrl is a static server prop)
+  useEffect(() => {
+    postMessageToNative({
+      loaded: true,
+      ...(streamUrl ? { streamUrl } : {}),
+    })
+  }, [streamUrl])
 
   // On route change: send location + showMediaBar state
   useEffect(() => {
@@ -86,11 +89,13 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
 
     // If cookie is set but bridge objects are absent, clear it — stale from prior session
-    if (document.cookie.includes('mobile-app=true')) {
+    if (document.cookie.split(';').some(c => c.trim() === 'mobile-app=true')) {
       clearMobileAppCookie()
     }
 
-    // Fallback: native app may post a message before bridge objects are detectable
+    // Fallback: future native app versions may send a protocolVersion handshake via postMessage
+    // before bridge objects are injected. Current iOS/Android builds call JS APIs via
+    // evaluateJavaScript only and never postMessage here, so this is forward-compatible only.
     function handleMessage(e: MessageEvent) {
       if (e.origin !== '' && e.origin !== window.location.origin) return
       try {
