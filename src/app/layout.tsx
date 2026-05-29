@@ -87,7 +87,10 @@ export default async function RootLayout({
   modal: React.ReactNode
 }) {
   const headersList = await headers()
-  const isMobileApp = headersList.get('mobile-app') === 'true'
+  const cookieHeader = headersList.get('cookie') ?? ''
+  const isMobileApp =
+    headersList.get('mobile-app') === 'true' ||
+    cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
 
   const { radioAudioURL } = await sanityFetch<{ radioAudioURL: string }>(
     appSettingsQuery,
