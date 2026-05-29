@@ -107,7 +107,7 @@ async function TeacherContentWrapper({ params }: Props) {
 
 export default function TeacherDetailPage({ params }: Props) {
   return (
-    <div className="text-white light:text-gray-900 max-w-screen-xl mx-auto">
+    <div className="text-white max-w-screen-xl mx-auto">
       <ShowMediaBar />
       <Suspense fallback={<TeacherDetailSkeleton />}>
         <TeacherContentWrapper params={params} />
