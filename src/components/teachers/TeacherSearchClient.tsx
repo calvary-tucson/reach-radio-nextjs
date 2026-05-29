@@ -6,7 +6,6 @@ import { Search, X, Loader2, ChevronRight } from 'lucide-react'
 import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
-import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
 import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
 import type { SortOption } from '@/lib/teachers/filter'
 import type { TeacherSummary, TeacherWithSchedule, ScheduleDay } from '@/lib/sanity/types'
@@ -256,8 +255,6 @@ export function TeacherSearchClient({
         ) : results.length > 0 ? (
           <ul className="space-y-2">
             {results.map((teacher) => {
-              const hrs = hoursMap.get(teacher.slug)
-              const hoursPerWeek = hrs ? Math.round(hrs / 60) : 0
               return (
                 <li key={teacher.slug}>
                   <TeacherModalLink
@@ -281,9 +278,6 @@ export function TeacherSearchClient({
                         <p className="text-xs text-white/60 truncate">{teacher.title}</p>
                       )}
                     </div>
-                    {hoursPerWeek > 0 && (
-                      <TeacherInfoChip label={`${hoursPerWeek}h`} variant="accent" />
-                    )}
                     <ChevronRight
                       className="h-4 w-4 text-white/18 shrink-0"
                       aria-hidden="true"
