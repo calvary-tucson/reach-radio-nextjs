@@ -157,7 +157,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="md:hidden bg-[#84b84f] rounded-full px-4 py-2 text-xs font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
+                className="md:hidden bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
               >
                 {primaryLink.title} &#8599;
               </a>
@@ -166,7 +166,7 @@ export default async function TeacherDetailPage({ params }: Props) {
 
           {/* Name + title */}
           <div className="px-4 md:px-0 mb-[10px]">
-            <h1 className="text-[19px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
+            <h1 className="text-[22px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
             {(teacher.title || teacher.subtitle) && (
               <p className="text-sm text-white/70 mt-[3px] font-medium">
                 {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
@@ -224,7 +224,7 @@ export default async function TeacherDetailPage({ params }: Props) {
             <>
               <div className="h-px bg-white/6 mx-4 md:hidden mb-3" />
               <div className="px-4 md:px-0 mb-4">
-                <p className="text-xs md:text-sm font-bold uppercase tracking-[0.1em] text-white/55 mb-[10px]">
+                <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/55 mb-[10px]">
                   On Air This Week
                 </p>
                 <div className="space-y-[8px] md:space-y-3">
@@ -234,7 +234,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                       {day.times.map((t) => (
                         <div
                           key={`${t.startTime}-${t.endTime}`}
-                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-xs md:text-sm text-white/75 mb-[3px]"
+                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[13px] md:text-sm text-white/75 mb-[3px]"
                         >
                           {t.startTime} &ndash; {t.endTime}
                         </div>
@@ -253,7 +253,7 @@ export default async function TeacherDetailPage({ params }: Props) {
         <>
           <div className="h-px bg-white/6 mx-4 md:mx-8 mb-3" />
           <div className="pb-6 md:pb-10">
-            <p className="text-xs md:text-sm font-bold uppercase tracking-[0.1em] text-white/55 px-4 md:px-8 mb-3">
+            <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/55 px-4 md:px-8 mb-3">
               Also on Reach Radio
             </p>
             <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -272,7 +272,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                     shape="circle"
                     sizes="38px"
                   />
-                  <span className="text-[10px] text-white/80 text-center line-clamp-2 leading-tight">
+                  <span className="text-[11px] text-white/80 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
                 </TeacherModalLink>
