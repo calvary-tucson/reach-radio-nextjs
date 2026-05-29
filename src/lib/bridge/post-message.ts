@@ -13,7 +13,7 @@ declare global {
 
 export function postMessageToNative(payload: Record<string, unknown>): void {
   if (typeof window === 'undefined') return
-  const message = JSON.stringify(payload)
+  const message = JSON.stringify({ protocolVersion: 1, ...payload })
   if (window.Android?.postMessage) {
     window.Android.postMessage(message)
   } else if (window.webkit?.messageHandlers?.messageHandler?.postMessage) {
