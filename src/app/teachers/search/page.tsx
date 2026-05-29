@@ -18,9 +18,11 @@ export default async function TeachersSearchPage() {
   ])
 
   return (
-    <TeacherSearchClient
-      teachers={teachers}
-      scheduleTeachers={scheduleTeachers}
-    />
+    <div className="px-4 py-6 sm:px-6">
+      <TeacherSearchClient
+        teachers={teachers}
+        scheduleTeachers={scheduleTeachers}
+      />
+    </div>
   )
 }
