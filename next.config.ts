@@ -1,10 +1,11 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  reactCompiler: true,
+  cacheComponents: true,
   experimental: {
     serverComponentsHmrCache: true,
     viewTransition: true,
-    useCache: true,
   },
   images: {
     remotePatterns: [
