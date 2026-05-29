@@ -131,15 +131,6 @@ export function TeacherModalContent({ teacher }: Props) {
         </>
       )}
 
-      {/* View full profile */}
-      <div className="px-4 pb-6">
-        <Link
-          href={`/teachers/${teacher.slug}`}
-          className="flex items-center justify-center w-full bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 text-white/70 rounded-xl py-3 text-sm font-semibold transition-colors cursor-pointer"
-        >
-          View full profile →
-        </Link>
-      </div>
     </div>
   )
 }

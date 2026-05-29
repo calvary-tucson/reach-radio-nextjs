@@ -1,7 +1,6 @@
 import { cache, ViewTransition } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { sanityFetch } from '@/lib/sanity/client'
 import {
   teacherDetailQuery,
@@ -15,6 +14,8 @@ import { PersonSchema } from '@/components/seo/PersonSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
+import Breadcrumbs from '@/components/global/Breadcrumbs'
+import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
 
 export const revalidate = 3600
 
@@ -102,16 +103,13 @@ export default async function TeacherDetailPage({ params }: Props) {
         sameAs={teacher.links?.map((l) => l.url)}
       />
 
-      {/* Back button */}
-      <div className="px-4 md:px-8 pt-[14px]">
-        <Link
-          href="/teachers"
-          className="flex items-center gap-[5px] text-[#84b84f] text-sm md:text-base font-medium w-fit cursor-pointer"
-        >
-          <span className="text-[17px] md:text-xl leading-none">&#8249;</span>
-          <span>Teachers</span>
-        </Link>
-      </div>
+      <Breadcrumbs
+        variant="standalone"
+        items={[
+          { name: 'Teachers', url: '/teachers' },
+          { name: teacher.name, url: `/teachers/${teacher.slug}` },
+        ]}
+      />
 
       {/* Banner */}
       <div className="relative w-full h-[100px] md:h-[180px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
@@ -255,11 +253,11 @@ export default async function TeacherDetailPage({ params }: Props) {
             </p>
             <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {relatedTeachers.map((t) => (
-                <Link
+                <TeacherModalLink
                   key={t.slug}
-                  href={`/teachers/${t.slug}`}
+                  slug={t.slug}
+                  name={t.name}
                   className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[56px] md:w-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
-                  aria-label={t.name}
                 >
                   <TeacherAvatar
                     name={t.name}
@@ -272,7 +270,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                   <span className="text-[10px] text-white/40 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
-                </Link>
+                </TeacherModalLink>
               ))}
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { TeacherCard } from '@/components/teachers/TeacherCard'
 import { ScheduleTabView } from '@/components/teachers/ScheduleTabView'
 import { formatScheduleDays } from '@/lib/utils/time'
+import { useModalStore } from '@/lib/stores/modal'
 import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 
 interface TeachersClientViewProps {
@@ -15,6 +16,7 @@ type Tab = 'teachers' | 'schedule'
 
 export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClientViewProps) {
   const [activeTab, setActiveTab] = useState<Tab>('teachers')
+  const openModal = useModalStore((s) => s.openModal)
 
   const scheduleDaysMap = useMemo(
     () =>
@@ -55,12 +57,14 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (
-              <TeacherCard
-                key={teacher.slug}
-                teacher={teacher}
-                index={index}
-                scheduleDays={scheduleDaysMap.get(teacher.slug)}
-              />
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+              <div key={teacher.slug} onClick={() => openModal(teacher.name)}>
+                <TeacherCard
+                  teacher={teacher}
+                  index={index}
+                  scheduleDays={scheduleDaysMap.get(teacher.slug)}
+                />
+              </div>
             ))}
           </div>
         </>

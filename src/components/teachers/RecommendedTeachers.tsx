@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import { sanityFetch } from '@/lib/sanity/client'
 import { highlightedTeachersQuery } from '@/lib/sanity/queries'
 import { HIGHLIGHTED_TEACHER_SLUGS, sortByHighlightedOrder } from '@/lib/teachers/highlighted'
 import type { TeacherSummary } from '@/lib/sanity/types'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
+import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
 
 export async function RecommendedTeachers() {
   const raw = await sanityFetch<TeacherSummary[]>(
@@ -23,11 +23,11 @@ export async function RecommendedTeachers() {
       </p>
       <div className="flex gap-3 md:gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {teachers.map((teacher, index) => (
-          <Link
+          <TeacherModalLink
             key={teacher.slug}
-            href={`/teachers/${teacher.slug}`}
+            slug={teacher.slug}
+            name={teacher.name}
             className="flex flex-col items-center gap-[5px] md:gap-2 flex-shrink-0 w-[72px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
-            aria-label={teacher.name}
             style={{ '--stagger-i': index } as React.CSSProperties}
           >
             <div className="teacher-card">
@@ -43,7 +43,7 @@ export async function RecommendedTeachers() {
             <span className="text-xs md:text-[13px] text-white/55 text-center leading-tight line-clamp-2">
               {teacher.name}
             </span>
-          </Link>
+          </TeacherModalLink>
         ))}
       </div>
     </section>

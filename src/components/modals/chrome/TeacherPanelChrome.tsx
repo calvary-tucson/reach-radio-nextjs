@@ -37,15 +37,28 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
             : 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)]',
         )}
       >
-        {/* Drag handle — mobile only */}
+        {/* Drag handle + close — mobile only */}
         <div
-          aria-hidden="true"
-          className="flex justify-center pt-3 pb-2 md:hidden cursor-grab active:cursor-grabbing touch-none shrink-0"
-          onTouchStart={drag.onTouchStart}
-          onTouchMove={drag.onTouchMove}
-          onTouchEnd={drag.onTouchEnd}
+          className="flex items-center justify-between px-3 pt-3 pb-2 md:hidden shrink-0"
         >
-          <div className="h-1 w-10 rounded-full bg-white/30" />
+          <div className="w-9" />
+          <div
+            aria-hidden="true"
+            className="cursor-grab active:cursor-grabbing touch-none"
+            onTouchStart={drag.onTouchStart}
+            onTouchMove={drag.onTouchMove}
+            onTouchEnd={drag.onTouchEnd}
+          >
+            <div className="h-1 w-10 rounded-full bg-white/30" />
+          </div>
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* Close button — desktop only */}
