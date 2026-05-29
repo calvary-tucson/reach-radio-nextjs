@@ -20,6 +20,7 @@ export async function sanityFetch<T>(
   params: Record<string, unknown> = {},
   options: { tags?: string[] } = {}
 ): Promise<T> {
+  'use cache'
   const { tags } = options
   cacheLife('days')
   if (tags?.length) {

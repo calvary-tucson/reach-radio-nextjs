@@ -2,10 +2,10 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  // cacheComponents: true,  // Disabled: incompatible with dynamic pages; requires 'use cache' + Suspense refactor
   experimental: {
     serverComponentsHmrCache: true,
     viewTransition: true,
+    useCache: true,
   },
   images: {
     remotePatterns: [
