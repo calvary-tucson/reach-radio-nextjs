@@ -148,10 +148,10 @@ Tab container: `flex gap-1 mb-5 border-b border-white/7`
 
 ### Primary CTA Button (inside panel)
 
-Mobile — ghost pill:
+Mobile (detail page, `md:hidden`) — solid green with tighter padding than desktop:
 ```
-bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.3)] rounded-full px-3 py-[6px]
-text-[10px] font-semibold text-[#84b84f] hover:bg-[rgba(132,184,79,0.18)] transition-colors cursor-pointer
+bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305]
+hover:bg-[#96cc5e] transition-colors cursor-pointer
 ```
 
 Desktop — solid green:
@@ -181,8 +181,8 @@ hover:bg-[#96cc5e] transition-colors cursor-pointer
 
 ### Detail Panel Content Layout
 
-1. Decorative banner (`h-[72px] md:h-[140px]`, dark green gradient + stripe + radial glow)
-2. Avatar overlapping banner (`mt-[-36px] md:mt-[-88px]`), beside primary CTA
+1. Decorative banner (`h-[100px] md:h-[180px]`, dark green gradient + stripe + radial glow)
+2. Avatar overlapping banner (`mt-[-88px]` on both breakpoints), beside primary CTA
 3. Name (`font-extrabold`) + subtitle (`text-white/50`)
 4. Info chips row
 5. Secondary links row (ghost pills)
