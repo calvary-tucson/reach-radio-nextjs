@@ -17,9 +17,14 @@ export function EventSchema({ events }: Props) {
       '@type': 'ListItem',
       position: index + 1,
       item: {
-        '@type': 'Event',
+        '@type': 'BroadcastEvent',
         name: event.name,
         description: `${event.day} ${event.startTime}–${event.endTime}`,
+        publishedOn: {
+          '@type': 'BroadcastService',
+          name: 'Reach Radio',
+          url: 'https://reach.radio',
+        },
         organizer: {
           '@type': 'Organization',
           name: 'Reach Radio',
@@ -32,7 +37,7 @@ export function EventSchema({ events }: Props) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/<\/script>/gi, '<\\/script>') }}
     />
   )
 }

@@ -22,13 +22,15 @@ describe('EventSchema', () => {
     expect(json.itemListElement).toHaveLength(2)
   })
 
-  it('each ListItem has Event type with name and organizer', () => {
+  it('each ListItem has BroadcastEvent type with name, organizer, and publishedOn', () => {
     const { container } = render(<EventSchema events={events} />)
     const script = container.querySelector('script[type="application/ld+json"]')!
     const json = JSON.parse(script.innerHTML)
     const first = json.itemListElement[0].item
-    expect(first['@type']).toBe('Event')
+    expect(first['@type']).toBe('BroadcastEvent')
     expect(first.name).toBe('Grace to You')
     expect(first.organizer.name).toBe('Reach Radio')
+    expect(first.publishedOn['@type']).toBe('BroadcastService')
+    expect(first.publishedOn.url).toBe('https://reach.radio')
   })
 })
