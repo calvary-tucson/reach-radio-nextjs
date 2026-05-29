@@ -150,6 +150,8 @@ git commit -m "fix: remove legacy revalidate exports — use cache handles cachi
 
 ## Phase 2 — PPR
 
+> **NOTE (2026-05-29):** Phase 2 was investigated during execution and found to require architectural changes beyond this plan's scope. In Next.js 16.2.6, `experimental.ppr` is deprecated and `experimental_ppr` route segment config is removed. PPR is now enabled via `cacheComponents: true` (top-level config), but this requires all data-fetching to happen inside `<Suspense>` boundaries with properly cached server components. This is a separate refactor. Tasks 4 and 5 are documented here for reference but were not implemented.
+
 ### Task 4: Enable PPR globally
 
 **Files:**
