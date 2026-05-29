@@ -10,7 +10,9 @@ import {
 import type { TeacherDetail, TeacherSummary } from '@/lib/sanity/types'
 import { HIGHLIGHTED_TEACHER_SLUGS, sortByHighlightedOrder } from '@/lib/teachers/highlighted'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
+import { DAYS_ORDER } from '@/lib/teachers/schedule'
 import { PersonSchema } from '@/components/seo/PersonSchema'
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
@@ -58,8 +60,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const DAYS_ORDER = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
 export default async function TeacherDetailPage({ params }: Props) {
   const { slug } = await params
 
@@ -93,6 +93,11 @@ export default async function TeacherDetailPage({ params }: Props) {
     <div className="text-white max-w-screen-xl mx-auto">
       <ShowMediaBar />
 
+      <BreadcrumbJsonLd items={[
+        { name: 'Home', url: '/' },
+        { name: 'Teachers', url: '/teachers' },
+        { name: teacher.name, url: `/teachers/${teacher.slug}` },
+      ]} />
       <PersonSchema
         name={teacher.name}
         jobTitle={teacher.title}
@@ -267,7 +272,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                     shape="circle"
                     sizes="38px"
                   />
-                  <span className="text-[10px] text-white/40 text-center line-clamp-2 leading-tight">
+                  <span className="text-[10px] text-white/60 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
                 </TeacherModalLink>

@@ -78,7 +78,6 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!isOpen) return
     if (expectingRoute) { routeArrived(); return }
-    if (useModalStore.getState().keepAlive) return
     if (isOpen && !isClosing) {
       close()
       dismissGuardRef.current = false
@@ -93,8 +92,8 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
     dismissTimer.current = setTimeout(() => {
       const triggerEl = useModalStore.getState().triggerRef
       close()
-      dismissGuardRef.current = false
       router.back()
+      dismissGuardRef.current = false
       triggerEl?.focus()
     }, EXIT_DURATION)
   }, [startClosing, close, router])

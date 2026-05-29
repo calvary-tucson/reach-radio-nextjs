@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import type { ComponentProps } from 'react'
 import { useModalStore } from '@/lib/stores/modal'
 import { useNavigationStore } from '@/lib/stores/navigation-store'
@@ -15,7 +14,6 @@ export function ModalLink({ children, modalTitle, ...props }: ModalLinkProps) {
   const openModal = useModalStore((s) => s.openModal)
   const setTriggerRef = useModalStore((s) => s.setTriggerRef)
   const resetNav = useNavigationStore((s) => s.reset)
-  const pathname = usePathname()
 
   return (
     <Link
@@ -23,7 +21,7 @@ export function ModalLink({ children, modalTitle, ...props }: ModalLinkProps) {
       onNavigate={() => {
         setTriggerRef(document.activeElement instanceof HTMLElement ? document.activeElement : null)
         resetNav()
-        openModal(modalTitle, pathname)
+        openModal(modalTitle)
       }}
     >
       {children}

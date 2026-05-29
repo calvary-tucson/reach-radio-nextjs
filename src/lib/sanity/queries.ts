@@ -48,6 +48,7 @@ export const fullScheduleQuery = `
     "slug": slug.current,
     title,
     "photo": photo.asset->url,
+    "lqip": photo.asset->metadata.lqip,
     schedule[] {
       day,
       times[] { startTime, endTime }

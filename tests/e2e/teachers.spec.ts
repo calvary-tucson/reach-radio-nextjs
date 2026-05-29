@@ -9,33 +9,28 @@ test.describe('Teachers', () => {
     await expect(cards.first()).toBeVisible()
   })
 
-  test('live search filters teachers without page navigation', async ({ page }) => {
-    await page.goto('/teachers')
-    await page.waitForSelector('a[href^="/teachers/"]', { timeout: 10000 })
+  test('search page filters teachers and syncs URL', async ({ page }) => {
+    await page.goto('/teachers/search')
+    await page.waitForSelector('input[aria-label="Search teachers"]', { timeout: 10000 })
 
-    const searchInput = page.locator('input[type="search"]')
+    const searchInput = page.locator('input[aria-label="Search teachers"]')
     await expect(searchInput).toBeVisible()
 
     await searchInput.fill('Jack')
-    // Wait for debounce (200ms) + buffer
-    await page.waitForTimeout(400)
+    // Wait for debounce (300ms) + buffer
+    await page.waitForTimeout(500)
 
-    // URL updates without navigation
-    await expect(page).toHaveURL(/\/teachers\?q=Jack/)
+    // URL updates to reflect the query
+    await expect(page).toHaveURL(/\/teachers\/search\?q=Jack/)
 
-    // Count label updates
+    // Count label announces results
     const countLabel = page.locator('[aria-live="polite"]')
-    await expect(countLabel).toContainText('of')
+    await expect(countLabel).toContainText('teachers found')
 
-    // Clearing search restores all teachers
+    // Clearing search restores full list
     await searchInput.fill('')
-    await page.waitForTimeout(400)
-    await expect(page).toHaveURL('/teachers')
-  })
-
-  test('/teachers/search redirects to /teachers preserving query', async ({ page }) => {
-    await page.goto('/teachers/search?q=john')
-    await expect(page).toHaveURL(/\/teachers\?q=john/)
+    await page.waitForTimeout(500)
+    await expect(page).toHaveURL('/teachers/search')
   })
 
   test('teacher detail page loads', async ({ page }) => {
@@ -44,7 +39,7 @@ test.describe('Teachers', () => {
     const firstCard = page.locator('a[href^="/teachers/"]').first()
     await firstCard.click()
     await expect(page.locator('h1')).toBeVisible()
-    // Back link navigates to /teachers
+    // Breadcrumb link back to teachers list
     await expect(page.locator('a[href="/teachers"]').first()).toBeVisible()
   })
 })

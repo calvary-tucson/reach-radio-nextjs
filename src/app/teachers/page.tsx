@@ -11,6 +11,8 @@ import { RecommendedTeachersSkeleton } from '@/components/skeletons/RecommendedT
 
 export const revalidate = 3600
 
+const OG_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
+
 export const metadata: Metadata = {
   title: 'Teachers',
   description: 'Listen to many great bible teachers on Reach Radio Tucson.',
@@ -19,10 +21,12 @@ export const metadata: Metadata = {
     title: 'Teachers | Reach Radio',
     description: 'Listen to many great bible teachers on Reach Radio Tucson.',
     url: '/teachers',
+    images: [{ url: OG_IMAGE, width: 1024, height: 1024, alt: 'Reach Radio Teachers' }],
   },
   twitter: {
     title: 'Teachers | Reach Radio',
     description: 'Listen to many great bible teachers on Reach Radio Tucson.',
+    images: [OG_IMAGE],
   },
 }
 

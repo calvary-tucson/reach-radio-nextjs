@@ -22,15 +22,6 @@ export interface TeacherDetail extends TeacherSummary {
   schedule: ScheduleDay[]
 }
 
-export interface ScheduleTeacher {
-  name: string
-  slug: string
-  title: string
-  photo: string
-  time: string
-  startTime: string
-  endTime: string
-}
 
 export type TeacherWithSchedule = TeacherSummary & { schedule: ScheduleDay[] }
 

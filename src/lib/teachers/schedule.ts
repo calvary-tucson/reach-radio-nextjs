@@ -1,6 +1,12 @@
 import { timeStringToMinutes } from '@/lib/utils/time'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
+export const DAYS_ORDER: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+export const DAY_LABELS: Record<string, string> = {
+  Sunday: 'Sun', Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed',
+  Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat',
+}
+
 export type ScheduleSlot =
   | { type: 'show'; teacher: TeacherWithSchedule; startMinutes: number; endMinutes: number }
   | { type: 'music'; startMinutes: number; endMinutes: number }

@@ -73,3 +73,18 @@ export function computeWeeklyMinutes(schedule: ScheduleDay[]): number {
     0
   )
 }
+
+export function formatTimeMinutes(mins: number): string {
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  const period = h < 12 ? 'AM' : 'PM'
+  const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h
+  return `${displayH}:${String(m).padStart(2, '0')} ${period}`
+}
+
+export function formatDuration(startMinutes: number, endMinutes: number): string {
+  const mins = endMinutes - startMinutes
+  if (mins < 60) return `${mins}m`
+  const h = mins / 60
+  return h === Math.floor(h) ? `${h}h` : `${h.toFixed(1)}h`
+}

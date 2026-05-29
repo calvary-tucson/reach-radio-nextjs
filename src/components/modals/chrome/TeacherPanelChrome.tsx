@@ -16,10 +16,11 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
   const drag = useSheetDrag({ onDismiss, contentRef })
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
+      role="presentation"
       className="fixed inset-0 flex items-end md:items-stretch md:justify-end"
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
+      onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) onDismiss() }}
     >
       <div
         ref={contentRef}
@@ -42,15 +43,18 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           className="flex items-center justify-between px-3 pt-3 pb-2 md:hidden shrink-0"
         >
           <div className="w-9" />
-          <div
-            aria-hidden="true"
+          {/* Drag handle is also a button for keyboard dismiss */}
+          <button
+            type="button"
+            aria-label="Drag to dismiss"
             className="cursor-grab active:cursor-grabbing touch-none"
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
             onTouchStart={drag.onTouchStart}
             onTouchMove={drag.onTouchMove}
             onTouchEnd={drag.onTouchEnd}
           >
-            <div className="h-1 w-10 rounded-full bg-white/30" />
-          </div>
+            <div className="h-1 w-10 rounded-full bg-white/30" aria-hidden="true" />
+          </button>
           <button
             type="button"
             onClick={onDismiss}

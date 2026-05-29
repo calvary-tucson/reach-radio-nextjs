@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { to24h, toMinutes, timeStringToMinutes, computeWeeklyMinutes } from '@/lib/utils/time'
+import { to24h, toMinutes, timeStringToMinutes, computeWeeklyMinutes, formatTimeMinutes, formatDuration } from '@/lib/utils/time'
 
 describe('to24h', () => {
   it('converts AM times', () => {
@@ -58,5 +58,36 @@ describe('computeWeeklyMinutes', () => {
   it('returns 0 for slots with reversed times', () => {
     const schedule = [{ day: 'Monday', times: [{ startTime: '9:30 AM', endTime: '9:00 AM' }] }]
     expect(computeWeeklyMinutes(schedule)).toBe(0)
+  })
+})
+
+describe('formatTimeMinutes', () => {
+  it('formats midnight as 12:00 AM', () => {
+    expect(formatTimeMinutes(0)).toBe('12:00 AM')
+  })
+  it('formats noon as 12:00 PM', () => {
+    expect(formatTimeMinutes(720)).toBe('12:00 PM')
+  })
+  it('formats 1:00 PM (780 min)', () => {
+    expect(formatTimeMinutes(780)).toBe('1:00 PM')
+  })
+  it('formats 9:30 AM (570 min)', () => {
+    expect(formatTimeMinutes(570)).toBe('9:30 AM')
+  })
+  it('formats 11:59 PM (1439 min)', () => {
+    expect(formatTimeMinutes(1439)).toBe('11:59 PM')
+  })
+})
+
+describe('formatDuration', () => {
+  it('formats sub-hour as minutes', () => {
+    expect(formatDuration(0, 30)).toBe('30m')
+  })
+  it('formats exact hours', () => {
+    expect(formatDuration(0, 60)).toBe('1h')
+    expect(formatDuration(0, 120)).toBe('2h')
+  })
+  it('formats fractional hours', () => {
+    expect(formatDuration(0, 90)).toBe('1.5h')
   })
 })

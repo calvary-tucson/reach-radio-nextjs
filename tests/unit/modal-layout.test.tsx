@@ -23,7 +23,7 @@ async function loadLayout() {
 beforeEach(() => {
   useModalStore.setState({
     expectingRoute: false, isOpen: false, isClosing: false,
-    title: null, originPath: null, keepAlive: false, triggerRef: null,
+    title: null, triggerRef: null,
   })
 })
 
@@ -35,7 +35,7 @@ describe('ModalLayout', () => {
   })
 
   it('renders children when modal is open', async () => {
-    useModalStore.getState().openModal('Test', '/page')
+    useModalStore.getState().openModal('Test')
     const ModalLayout = await loadLayout()
     render(<ModalLayout><p>modal content</p></ModalLayout>)
     expect(screen.getByText('modal content')).toBeInTheDocument()

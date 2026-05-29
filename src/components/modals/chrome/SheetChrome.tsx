@@ -21,10 +21,11 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
   const drag = useSheetDrag({ onDismiss, contentRef })
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
+      role="presentation"
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center"
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
+      onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) onDismiss() }}
     >
       <div
         ref={contentRef}
@@ -40,16 +41,18 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
-        {/* Drag handle — mobile only */}
-        <div
-          aria-hidden="true"
-          className="flex justify-center pt-3 pb-2 sm:hidden cursor-grab active:cursor-grabbing touch-none shrink-0"
+        {/* Drag handle — mobile only; button allows keyboard dismiss */}
+        <button
+          type="button"
+          aria-label="Drag to dismiss"
+          className="flex justify-center pt-3 pb-2 sm:hidden cursor-grab active:cursor-grabbing touch-none shrink-0 w-full"
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
           onTouchStart={drag.onTouchStart}
           onTouchMove={drag.onTouchMove}
           onTouchEnd={drag.onTouchEnd}
         >
-          <div className="h-1 w-10 rounded-full bg-white/30" />
-        </div>
+          <div className="h-1 w-10 rounded-full bg-white/30" aria-hidden="true" />
+        </button>
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between border-b border-white/10 bg-gray-800 px-6 py-4">
           {title ? (

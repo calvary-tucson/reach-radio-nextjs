@@ -1,10 +1,8 @@
-import Link from 'next/link'
 import type { TeacherDetail } from '@/lib/sanity/types'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
+import { DAYS_ORDER } from '@/lib/teachers/schedule'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
-
-const DAYS_ORDER = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 interface Props {
   teacher: TeacherDetail

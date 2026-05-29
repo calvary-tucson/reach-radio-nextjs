@@ -7,7 +7,7 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
-import { buildDaySlots } from '@/lib/teachers/schedule'
+import { buildDaySlots, DAYS_ORDER, DAY_LABELS } from '@/lib/teachers/schedule'
 import { ScheduleCardList } from './ScheduleCardList'
 import { ScheduleWeekCards } from './ScheduleWeekCards'
 import { useModalStore } from '@/lib/stores/modal'
@@ -17,11 +17,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 const TZ = 'America/Phoenix'
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const DAY_LABELS: Record<string, string> = {
-  Sunday: 'Sun', Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed',
-  Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat',
-}
 
 interface Props {
   scheduleTeachers: TeacherWithSchedule[]
@@ -84,11 +79,17 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
 
       {/* Mobile + narrow desktop (< lg): day tabs + card list */}
       <div className="lg:hidden">
-        <div className="flex gap-[5px] overflow-x-auto pb-1 mb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          {DAYS.map((day) => (
+        <div
+          role="tablist"
+          aria-label="Schedule day"
+          className="flex gap-[5px] overflow-x-auto pb-1 mb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {DAYS_ORDER.map((day) => (
             <button
               key={day}
               type="button"
+              role="tab"
+              aria-selected={selectedDay === day}
               onClick={() => setSelectedDay(day)}
               className={`flex-shrink-0 px-4 py-[5px] rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                 selectedDay === day

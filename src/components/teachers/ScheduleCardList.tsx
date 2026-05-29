@@ -1,23 +1,9 @@
 'use client'
 
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
+import { formatTimeMinutes, formatDuration } from '@/lib/utils/time'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 import type { ScheduleSlot } from '@/lib/teachers/schedule'
-
-function formatTimeMinutes(mins: number): string {
-  const h = Math.floor(mins / 60)
-  const m = mins % 60
-  const period = h < 12 ? 'AM' : 'PM'
-  const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h
-  return `${displayH}:${String(m).padStart(2, '0')} ${period}`
-}
-
-function formatDuration(startMinutes: number, endMinutes: number): string {
-  const mins = endMinutes - startMinutes
-  if (mins < 60) return `${mins}m`
-  const h = mins / 60
-  return h === Math.floor(h) ? `${h}h` : `${h.toFixed(1)}h`
-}
 
 interface Props {
   slots: ScheduleSlot[]
