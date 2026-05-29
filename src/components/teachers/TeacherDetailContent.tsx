@@ -27,7 +27,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
   const otherLinks = teacher.links?.slice(1) ?? []
 
   return (
-    <div className="text-white">
+    <div className="text-white light:text-gray-900">
       {/* Banner */}
       <div className="relative w-full h-[100px] md:h-[180px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
         <div
@@ -80,7 +80,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
           <div className="px-4 md:px-0 mb-[10px]">
             <Heading className="text-[26px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</Heading>
             {(teacher.title || teacher.subtitle) && (
-              <p className="text-base text-white/85 mt-[3px] font-medium">
+              <p className="text-base text-white/85 light:text-gray-700 mt-[3px] font-medium">
                 {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
               </p>
             )}
@@ -121,7 +121,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
                 >
                   {link.title}
                 </a>
@@ -134,19 +134,19 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
         <div className="md:flex-1 md:min-w-0 md:pt-4">
           {sortedSchedule.length > 0 && (
             <>
-              <div className="h-px bg-white/6 mx-4 md:hidden mb-3" />
+              <div className="h-px bg-white/6 light:bg-gray-200 mx-4 md:hidden mb-3" />
               <div className="px-4 md:px-0 mb-4">
-                <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 mb-[10px]">
+                <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 light:text-gray-600 mb-[10px]">
                   On Air This Week
                 </p>
                 <div className="space-y-[8px] md:space-y-3">
                   {sortedSchedule.map((day) => (
                     <div key={day.day}>
-                      <p className="text-base font-bold text-white/90 mb-[5px]">{day.day}</p>
+                      <p className="text-base font-bold text-white/90 light:text-gray-900 mb-[5px]">{day.day}</p>
                       {day.times.map((t) => (
                         <div
                           key={`${t.startTime}-${t.endTime}`}
-                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-base md:text-sm text-white/90 mb-[3px]"
+                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] light:bg-green-50 rounded-r-[8px] py-1.5 px-2.5 text-base md:text-sm text-white/90 light:text-gray-900 mb-[3px]"
                         >
                           {t.startTime} &ndash; {t.endTime}
                         </div>
@@ -163,9 +163,9 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
       {/* Also on Reach Radio */}
       {relatedTeachers.length > 0 && (
         <>
-          <div className="h-px bg-white/6 mx-4 md:mx-8 mb-3" />
+          <div className="h-px bg-white/6 light:bg-gray-200 mx-4 md:mx-8 mb-3" />
           <div className="pb-6 md:pb-10">
-            <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 px-4 md:px-8 mb-3">
+            <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 light:text-gray-600 px-4 md:px-8 mb-3">
               Also on Reach Radio
             </p>
             <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -184,7 +184,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                     shape="circle"
                     sizes="48px"
                   />
-                  <span className="text-sm text-white/80 text-center line-clamp-2 leading-tight">
+                  <span className="text-sm text-white/80 light:text-gray-700 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
                 </TeacherModalLink>

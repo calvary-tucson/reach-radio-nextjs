@@ -131,9 +131,9 @@ export function TeacherSearchClient({
   const chipActive =
     'bg-[rgba(132,184,79,0.15)] border-[rgba(132,184,79,0.3)] text-[#84b84f]'
   const chipInactive =
-    'bg-white/5 border-white/10 text-white/60 can-hover:hover:border-white/20 can-hover:hover:text-white/80'
+    'bg-white/5 light:bg-gray-50 border-white/10 light:border-gray-200 text-white/60 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white/80 light:can-hover:hover:border-gray-300'
   const sectionLabel =
-    'text-[10px] font-semibold text-white/60 uppercase tracking-widest mb-1.5'
+    'text-[10px] font-semibold text-white/60 light:text-gray-500 uppercase tracking-widest mb-1.5'
 
   return (
     <div className="max-w-screen-xl mx-auto space-y-4">
@@ -142,7 +142,7 @@ export function TeacherSearchClient({
       <div className="flex items-center gap-[10px]">
         <div className="relative flex-1">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 light:text-gray-400"
             aria-hidden="true"
           />
           <input
@@ -154,14 +154,14 @@ export function TeacherSearchClient({
             onKeyDown={(e) => {
               if (e.key === 'Escape') clearQuery()
             }}
-            className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
             aria-label="Search teachers"
           />
           {displayValue && (
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
               {isPending ? (
                 <Loader2
-                  className="h-4 w-4 text-white/40 animate-spin"
+                  className="h-4 w-4 text-white/40 light:text-gray-400 animate-spin"
                   aria-hidden="true"
                 />
               ) : (
@@ -171,7 +171,7 @@ export function TeacherSearchClient({
                     clearQuery()
                     inputRef.current?.focus()
                   }}
-                  className="flex h-8 w-8 items-center justify-center text-white/40 hover:text-white cursor-pointer"
+                  className="flex h-8 w-8 items-center justify-center text-white/40 light:text-gray-400 hover:text-white light:hover:text-gray-900 cursor-pointer"
                   aria-label="Clear search"
                 >
                   <X className="h-4 w-4" />
@@ -228,7 +228,7 @@ export function TeacherSearchClient({
             <button
               type="button"
               onClick={clearAll}
-              className="ml-auto text-xs text-white/45 can-hover:hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
+              className="ml-auto text-xs text-white/45 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
             >
               Clear all
             </button>
@@ -239,7 +239,7 @@ export function TeacherSearchClient({
       {/* Results */}
       <div>
         <p
-          className="text-sm text-white/60 mb-3"
+          className="text-sm text-white/60 light:text-gray-500 mb-3"
           aria-live="polite"
           aria-atomic="true"
         >
@@ -249,7 +249,7 @@ export function TeacherSearchClient({
         {isPending ? (
           <div className="space-y-2" aria-busy="true">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-[68px] rounded-xl bg-white/5 animate-pulse" />
+              <div key={i} className="h-[68px] rounded-xl bg-white/5 light:bg-gray-50 animate-pulse" />
             ))}
           </div>
         ) : results.length > 0 ? (
@@ -260,7 +260,7 @@ export function TeacherSearchClient({
                   <TeacherModalLink
                     slug={teacher.slug}
                     name={teacher.name}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3 text-left transition-colors cursor-pointer can-hover:hover:bg-white/10 can-hover:hover:border-white/20"
+                    className="w-full rounded-xl border border-white/10 light:border-gray-200 bg-white/5 light:bg-gray-50 p-3 flex items-center gap-3 text-left transition-colors cursor-pointer can-hover:hover:bg-white/10 light:can-hover:hover:bg-gray-100 can-hover:hover:border-white/20 light:can-hover:hover:border-gray-300"
                   >
                     <TeacherAvatar
                       name={teacher.name}
@@ -271,11 +271,11 @@ export function TeacherSearchClient({
                       sizes="38px"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-white truncate">
+                      <p className="text-sm font-semibold text-white light:text-gray-900 truncate">
                         {teacher.name}
                       </p>
                       {teacher.title && (
-                        <p className="text-xs text-white/60 truncate">{teacher.title}</p>
+                        <p className="text-xs text-white/60 light:text-gray-500 truncate">{teacher.title}</p>
                       )}
                     </div>
                     <ChevronRight
@@ -288,7 +288,7 @@ export function TeacherSearchClient({
             })}
           </ul>
         ) : (
-          <p className="text-sm text-white/45 py-12">
+          <p className="text-sm text-white/45 light:text-gray-400 py-12">
             No teachers found. Try a different search.
           </p>
         )}

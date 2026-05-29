@@ -36,18 +36,18 @@ export function TeacherCard({
       href={`/teachers/${teacher.slug}`}
       aria-label={teacher.title ? `${teacher.name} — ${teacher.title}` : teacher.name}
       transitionTypes={['nav-forward']}
-      className="teacher-card block rounded-[18px] overflow-hidden bg-[#1c2128] border border-white/5 motion-safe:hover:scale-[1.03] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
+      className="teacher-card block rounded-[18px] overflow-hidden bg-[#1c2128] light:bg-white border border-white/5 light:border-gray-200 motion-safe:hover:scale-[1.03] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white light:focus-visible:ring-gray-400 cursor-pointer"
       style={{ '--stagger-i': index } as React.CSSProperties}
     >
       {teacher.photo && !viewTransitionDisabled ? (
         <ViewTransition name={`teacher-${teacher.slug}`}>{avatarEl}</ViewTransition>
       ) : avatarEl}
       <div className="px-[11px] md:px-3 pt-[9px] md:pt-3 pb-[11px] md:pb-3">
-        <p className="text-white font-bold text-[13px] md:text-sm leading-snug" aria-hidden="true">
+        <p className="text-white light:text-gray-900 font-bold text-[13px] md:text-sm leading-snug" aria-hidden="true">
           {teacher.name}
         </p>
         {teacher.title && (
-          <p className="text-white/80 text-[11px] md:text-xs mt-[3px]" aria-hidden="true">
+          <p className="text-white/80 light:text-gray-600 text-[11px] md:text-xs mt-[3px]" aria-hidden="true">
             {teacher.title}
           </p>
         )}

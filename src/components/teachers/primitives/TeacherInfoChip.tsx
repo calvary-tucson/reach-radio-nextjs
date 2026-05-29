@@ -9,7 +9,7 @@ interface TeacherInfoChipProps {
 
 const VARIANT_CLASS = {
   accent: 'bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.2)] text-[#84b84f]',
-  dim: 'bg-white/5 border border-white/10 text-white/50',
+  dim: 'bg-white/5 light:bg-gray-100 border border-white/10 light:border-gray-200 text-white/50 light:text-gray-500',
 }
 
 export function TeacherInfoChip({ icon, label, variant }: TeacherInfoChipProps) {

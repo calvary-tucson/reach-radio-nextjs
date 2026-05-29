@@ -28,18 +28,20 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
 
   return (
     <>
-      <div role="tablist" className="flex gap-1 mb-5 border-b border-white/7">
+      <div role="tablist" className="flex gap-1 mb-5 border-b border-white/7 light:border-gray-200">
         {(['teachers', 'schedule'] as Tab[]).map((tab) => (
           <button
             key={tab}
+            id={`tab-${tab}`}
             role="tab"
             aria-selected={activeTab === tab}
+            aria-controls={`panel-${tab}`}
             type="button"
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm md:text-sm font-semibold capitalize transition-colors cursor-pointer border-b-2 -mb-px ${
               activeTab === tab
                 ? 'text-[#84b84f] border-[#84b84f]'
-                : 'text-white/55 border-transparent hover:text-white/75'
+                : 'text-white/55 light:text-gray-500 border-transparent hover:text-white/75'
             }`}
           >
             {tab}
@@ -48,29 +50,37 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
       </div>
 
       {activeTab === 'teachers' && (
-        <>
+        <div id="panel-teachers" role="tabpanel" aria-labelledby="tab-teachers">
           <div className="flex items-center justify-between mb-[10px]">
-            <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55">
+            <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55 light:text-gray-500">
               All Teachers
             </p>
-            <span className="text-[12px] md:text-sm text-white/50">{teachers.length}</span>
+            <span className="text-[12px] md:text-sm text-white/50 light:text-gray-400">{teachers.length}</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-              <div key={teacher.slug} onClick={() => openModal(teacher.name)}>
+              <button
+                key={teacher.slug}
+                type="button"
+                onClick={() => openModal(teacher.name)}
+                className="block w-full text-left cursor-pointer"
+              >
                 <TeacherCard
                   teacher={teacher}
                   index={index}
                   scheduleDays={scheduleDaysMap.get(teacher.slug)}
                 />
-              </div>
+              </button>
             ))}
           </div>
-        </>
+        </div>
       )}
 
-      {activeTab === 'schedule' && <ScheduleTabView scheduleTeachers={scheduleTeachers} />}
+      {activeTab === 'schedule' && (
+        <div id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule">
+          <ScheduleTabView scheduleTeachers={scheduleTeachers} />
+        </div>
+      )}
     </>
   )
 }
