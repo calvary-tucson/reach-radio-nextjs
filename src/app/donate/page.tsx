@@ -70,7 +70,7 @@ export default function DonatePage() {
 
   return (
     <div className="page-enter px-4 pt-5 pb-8">
-      <h1 className="text-white text-2xl font-bold mb-4">Donate</h1>
+      <h1 className="text-[22px] md:text-4xl font-extrabold text-white tracking-tight mb-6">Donate</h1>
       {failed ? (
         <div role="alert" className="text-white/70 text-sm py-8 text-center">
           <p>Unable to load the donation form.</p>
@@ -86,14 +86,14 @@ export default function DonatePage() {
       ) : (
         <>
           {!loaded && (
-            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[900px] bg-black rounded p-4">
-              <div className="h-[60px] bg-gray-700 rounded" />
-              <div className="h-[1.2em] w-[90%] bg-gray-700 rounded" />
-              <div className="h-[1.2em] w-[60%] bg-gray-700 rounded" />
-              <div className="h-[150px] bg-gray-700 rounded" />
-              <div className="h-[1.2em] w-[85%] bg-gray-700 rounded" />
-              <div className="h-[1.2em] w-[75%] bg-gray-700 rounded" />
-              <div className="h-[100px] bg-gray-700 rounded" />
+            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[900px] bg-[#1c2128] border border-white/5 rounded-[18px] p-4">
+              <div className="h-[60px] bg-white/5 rounded-xl" />
+              <div className="h-[1.2em] w-[90%] bg-white/5 rounded-xl" />
+              <div className="h-[1.2em] w-[60%] bg-white/5 rounded-xl" />
+              <div className="h-[150px] bg-white/5 rounded-xl" />
+              <div className="h-[1.2em] w-[85%] bg-white/5 rounded-xl" />
+              <div className="h-[1.2em] w-[75%] bg-white/5 rounded-xl" />
+              <div className="h-[100px] bg-white/5 rounded-xl" />
             </div>
           )}
           <iframe
