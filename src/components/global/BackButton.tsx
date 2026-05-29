@@ -52,7 +52,7 @@ export function BackButton({ variant, className, fallbackHref }: BackButtonProps
       onClick={handleBack}
       aria-label="Go back"
       className={cn(
-        'hidden h-11 w-11 items-center justify-center rounded-full bg-white/25 text-white transition-all duration-300 hover:bg-white/40 md:flex cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+        'hidden h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white light:text-gray-900 transition-all duration-300 hover:bg-white/40 light:hover:bg-gray-300 md:flex cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
         className,
       )}
     >

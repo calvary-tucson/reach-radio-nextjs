@@ -33,14 +33,14 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
       {currentPage > 1 && (
         <Link
           href={href(currentPage - 1)}
-          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 transition-colors hover:bg-white/10"
+          className="rounded-lg border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-2 text-sm text-white/80 light:text-gray-700 transition-colors hover:bg-white/10 light:hover:bg-gray-100"
         >
           Previous
         </Link>
       )}
       {pages.map((item, i) =>
         item === 'ellipsis' ? (
-          <span key={`e${i}`} className="px-2 text-white/60">...</span>
+          <span key={`e${i}`} className="px-2 text-white/60 light:text-gray-400">...</span>
         ) : (
           <Link
             key={item}
@@ -49,7 +49,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
               'flex h-10 w-10 items-center justify-center rounded-lg text-sm transition-colors',
               item === currentPage
                 ? 'bg-blue-600 font-bold text-white'
-                : 'border border-white/10 bg-white/5 text-white/70 hover:bg-white/10',
+                : 'border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 text-white/70 light:text-gray-700 hover:bg-white/10 light:hover:bg-gray-100',
             )}
           >
             {item}
@@ -59,7 +59,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
       {currentPage < totalPages && (
         <Link
           href={href(currentPage + 1)}
-          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 transition-colors hover:bg-white/10"
+          className="rounded-lg border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-2 text-sm text-white/80 light:text-gray-700 transition-colors hover:bg-white/10 light:hover:bg-gray-100"
         >
           Next
         </Link>

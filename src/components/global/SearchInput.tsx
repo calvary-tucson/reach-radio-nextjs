@@ -33,7 +33,7 @@ export function SearchInput({
   return (
     <div className={cn('relative', className)}>
       <Search
-        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60 pointer-events-none"
+        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60 light:text-gray-400 pointer-events-none"
         aria-hidden="true"
       />
       <input
@@ -43,14 +43,14 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel ?? placeholder}
-        className="w-full rounded-lg border border-white/20 bg-white/5 pl-10 pr-10 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full rounded-lg border border-white/20 light:border-gray-300 bg-white/5 light:bg-white pl-10 pr-10 py-2 text-white light:text-gray-900 placeholder:text-white/60 light:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       {value && (
         <button
           type="button"
           onClick={() => { onChange(''); onClear?.() }}
           aria-label="Clear search"
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded border border-white/20 bg-white/5 text-white/60 hover:text-white/80 hover:border-white/40 cursor-pointer"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded border border-white/20 light:border-gray-300 bg-white/5 light:bg-gray-50 text-white/60 light:text-gray-400 hover:text-white/80 light:hover:text-gray-700 hover:border-white/40 light:hover:border-gray-400 cursor-pointer"
         >
           <X size={16} aria-hidden="true" />
         </button>

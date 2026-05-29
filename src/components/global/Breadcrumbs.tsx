@@ -50,22 +50,22 @@ export default function Breadcrumbs({
 
       {/* Desktop breadcrumb trail */}
       <Breadcrumb className="hidden md:block">
-        <BreadcrumbList className="rounded-lg bg-black/30 backdrop-blur-sm px-3 py-1.5 w-fit font-semibold gap-2">
+        <BreadcrumbList className="rounded-lg bg-black/30 light:bg-gray-100 backdrop-blur-sm px-3 py-1.5 w-fit font-semibold gap-2">
           <BreadcrumbItem>
             <BackButton variant="desktop" />
           </BreadcrumbItem>
           {ancestors.map((crumb) => (
             <React.Fragment key={crumb.url}>
               <BreadcrumbItem>
-                <BreadcrumbLink asChild className="text-white/80 underline-offset-4 hover:text-white hover:underline cursor-pointer">
+                <BreadcrumbLink asChild className="text-white/80 light:text-gray-600 underline-offset-4 hover:text-white light:hover:text-gray-900 hover:underline cursor-pointer">
                   <Link href={crumb.url}>{crumb.name}</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white/60" />
+              <BreadcrumbSeparator className="text-white/60 light:text-gray-400" />
             </React.Fragment>
           ))}
           <BreadcrumbItem>
-            <BreadcrumbPage className="text-white">{current.name}</BreadcrumbPage>
+            <BreadcrumbPage className="text-white light:text-gray-900">{current.name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
