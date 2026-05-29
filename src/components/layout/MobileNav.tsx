@@ -36,7 +36,7 @@ export function MobileNav() {
   return (
     <nav
       id="site-nav"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around w-full px-1 text-white bg-black border-t border-t-green-500"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around w-full px-1 text-white light:text-gray-900 bg-black light:bg-white border-t border-t-green-500 light:border-t-green-600"
     >
       {navItems.map((item) => {
         const isActive = item.href === '/'
@@ -53,7 +53,7 @@ export function MobileNav() {
               <div className="absolute top-0 w-full h-[6px] bg-green-500 rounded-b-md" />
             )}
             <div className="flex flex-col items-center gap-0.5">
-              <svg className="w-5 h-5 fill-white" viewBox="0 -960 960 960" aria-hidden="true">
+              <svg className="w-5 h-5 fill-white light:fill-gray-900" viewBox="0 -960 960 960" aria-hidden="true">
                 <path d={isActive ? item.filledPath : item.outlinePath} />
               </svg>
               <span className={`text-sm ${isActive ? 'font-bold' : ''}`}>{item.label}</span>

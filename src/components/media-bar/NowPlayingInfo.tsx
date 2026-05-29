@@ -15,13 +15,14 @@ export function NowPlayingInfo() {
           src={image}
           alt="Album art"
           fill
+          sizes="48px"
           className="object-cover"
         />
       </div>
       <div className="min-w-0">
-        <p className="text-white font-semibold text-sm truncate">{title}</p>
+        <p className="text-white light:text-gray-900 font-semibold text-sm truncate">{title}</p>
         {artist && (
-          <p className="text-white/70 text-xs truncate">{artist}</p>
+          <p className="text-white/70 light:text-gray-500 text-xs truncate">{artist}</p>
         )}
       </div>
     </div>

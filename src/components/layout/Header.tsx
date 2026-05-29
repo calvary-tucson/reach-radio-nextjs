@@ -46,7 +46,7 @@ export function Header() {
       ref={ref}
       id="site-header"
       style={{ viewTransitionName: 'site-header', transition: 'transform 0.5s, opacity 0.5s' }}
-      className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 border-b border-b-green-500/20 px-6"
+      className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6"
     >
       <Link href="/" aria-label="Reach Radio home" className="flex items-center w-[clamp(130px,16vw,186px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded">
         <Image
@@ -77,7 +77,7 @@ export function Header() {
                   <div className="absolute inset-0 -bottom-4 bg-green-500 blur-2xl opacity-60 pointer-events-none" />
                 </>
               )}
-              <span className={`relative z-10 text-white text-[clamp(14px,1.5vw,16px)] ${isActive ? 'font-bold' : ''}`}>
+              <span className={`relative z-10 text-white light:text-gray-900 text-[clamp(14px,1.5vw,16px)] ${isActive ? 'font-bold' : ''}`}>
                 {item.label}
               </span>
             </Link>
@@ -91,7 +91,7 @@ export function Header() {
           target="_blank"
           rel="noopener noreferrer"
           title="Facebook"
-          className="w-7 fill-slate-300 hover:fill-white transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">

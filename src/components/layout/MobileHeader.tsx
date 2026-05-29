@@ -35,7 +35,7 @@ export function MobileHeader() {
   return (
     <header
       ref={ref}
-      className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black border-b border-b-white/10"
+      className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200"
       style={{ transition: 'transform 0.5s, opacity 0.5s' }}
     >
       <Link href="/" className="w-[clamp(180px,40vw,250px)]">
@@ -54,7 +54,7 @@ export function MobileHeader() {
           target="_blank"
           rel="noopener noreferrer"
           title="Facebook"
-          className="w-8 fill-slate-300 hover:fill-white transition-colors duration-500"
+          className="w-8 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">
@@ -63,7 +63,7 @@ export function MobileHeader() {
         </a>
         <Link
           href="/about#aboutGotQuestions"
-          className="flex items-center px-2 py-1 bg-white rounded text-black font-bold text-sm"
+          className="flex items-center px-2 py-1 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
         >
           Contact
         </Link>
