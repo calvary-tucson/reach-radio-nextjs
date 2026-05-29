@@ -186,15 +186,26 @@ export default async function AboutPage() {
       </div>
 
       {/* Privacy policy */}
-      <div className="bg-gray-700/40 p-5 rounded">
-        <h2 className="text-white text-2xl mb-3">Privacy Policy</h2>
-        <Link
-          href="/about/privacy-policy"
-          className="text-[var(--color-brand-green)] hover:underline text-sm"
-        >
-          Read our privacy policy →
-        </Link>
-      </div>
+      <Link
+        href="/about/privacy-policy"
+        className="block bg-gray-700/40 p-5 rounded hover:bg-gray-700/60 transition-colors cursor-pointer group"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-white text-2xl mb-1">Privacy Policy</h2>
+            <p className="text-white/60 text-sm">How we collect and protect your information</p>
+          </div>
+          <svg
+            className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors flex-shrink-0 ml-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </Link>
     </div>
   )
 }
