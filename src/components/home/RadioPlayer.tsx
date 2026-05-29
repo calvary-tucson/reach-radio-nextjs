@@ -49,7 +49,7 @@ export function RadioPlayer() {
   const altText = title ? `Now playing: ${title}${artist ? ` by ${artist}` : ''}` : 'Now playing album art'
 
   return (
-    <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded">
+    <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-[#1c2128] border border-white/5 rounded-[18px]">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
         <button
@@ -62,7 +62,7 @@ export function RadioPlayer() {
             alt={altText}
             width={420}
             height={420}
-            className="max-w-[420px] max-h-64 rounded object-contain hover:opacity-90 transition-opacity"
+            className="max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 transition-opacity"
             priority
           />
         </button>

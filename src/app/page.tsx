@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="px-3 pt-3 space-y-6 pb-32">
+    <div className="px-4 md:px-8 pt-4 space-y-6 pb-32">
       <h1 className="sr-only">Reach Radio</h1>
       <RadioStationSchema />
 
@@ -23,7 +23,7 @@ export default function HomePage() {
       </Suspense>
 
       <section>
-        <h2 className="text-white font-bold text-lg px-3 uppercase mb-3">Playing Next</h2>
+        <h2 className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/55 mb-3 px-1">Playing Next</h2>
         <Suspense fallback={<ScheduleSkeleton />}>
           <TodaySchedule />
         </Suspense>

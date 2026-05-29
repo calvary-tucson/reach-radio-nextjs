@@ -76,13 +76,13 @@ export async function TodaySchedule() {
 
   if (slots.length === 0) {
     return (
-      <div className="flex items-center gap-5 bg-gray-700 p-2 rounded text-white">
+      <div className="flex items-center gap-5 bg-white/5 border border-white/10 rounded-xl p-2 text-white">
         <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
           <Image
             src={MUSIC_IMAGE + '?w=420&fm=webp'}
             alt="Music"
             fill
-            className="object-cover rounded"
+            className="object-cover rounded-lg"
             sizes="(max-width: 768px) 64px, 80px"
           />
         </div>
@@ -127,7 +127,7 @@ export async function TodaySchedule() {
                 src={item.photo + '?w=420&fm=webp'}
                 alt={item.isMusic ? 'Music' : item.name}
                 fill
-                className="object-cover rounded"
+                className="object-cover rounded-lg"
                 sizes="(max-width: 768px) 64px, 80px"
               />
             </div>
@@ -143,7 +143,7 @@ export async function TodaySchedule() {
           return (
             <div
               key={`music-${item.startTime}-${item.endTime}`}
-              className="schedule-row flex gap-5 bg-gray-700 p-2 rounded"
+              className="schedule-row flex gap-5 bg-white/5 border border-white/10 rounded-xl p-2"
               style={{ '--stagger-i': idx } as React.CSSProperties}
             >
               {content}
@@ -155,7 +155,7 @@ export async function TodaySchedule() {
           <Link
             key={`${item.slug}-${item.startTime}`}
             href={`/teachers/${item.slug}`}
-            className="schedule-row flex items-center justify-between flex-wrap bg-gray-700 p-2 rounded hover:bg-gray-700/80 transition-colors"
+            className="schedule-row flex items-center justify-between flex-wrap bg-white/5 border border-white/10 rounded-xl p-2 hover:bg-white/10 hover:border-white/20 transition-colors"
             style={{ '--stagger-i': idx } as React.CSSProperties}
           >
             <div className="flex gap-5">{content}</div>
