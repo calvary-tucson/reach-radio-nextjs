@@ -140,16 +140,16 @@ export default async function TeacherDetailPage({ params }: Props) {
         {/* LEFT SIDEBAR */}
         <div className="md:w-72 md:flex-shrink-0">
           {/* Avatar overlap row */}
-          <div className="flex items-end justify-between px-4 md:px-0 mt-[-64px] md:mt-[-72px] mb-3">
+          <div className="flex items-end justify-between px-4 md:px-0 mt-[-88px] md:mt-[-88px] mb-3">
             <ViewTransition name={`teacher-${teacher.slug}`}>
               <TeacherAvatar
                 name={teacher.name}
                 photo={teacher.photo}
                 lqip={teacher.lqip}
-                size="2xl"
+                size="3xl"
                 shape="circle"
                 ring
-                sizes="128px"
+                sizes="176px"
               />
             </ViewTransition>
             {primaryLink && (
@@ -166,9 +166,9 @@ export default async function TeacherDetailPage({ params }: Props) {
 
           {/* Name + title */}
           <div className="px-4 md:px-0 mb-[10px]">
-            <h1 className="text-[22px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
+            <h1 className="text-[26px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</h1>
             {(teacher.title || teacher.subtitle) && (
-              <p className="text-sm text-white/70 mt-[3px] font-medium">
+              <p className="text-base text-white/85 mt-[3px] font-medium">
                 {teacher.title}{teacher.subtitle ? ` · ${teacher.subtitle}` : ''}
               </p>
             )}
@@ -209,7 +209,7 @@ export default async function TeacherDetailPage({ params }: Props) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-xs font-semibold text-white/80 hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+                  className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
                 >
                   {link.title}
                 </a>
@@ -224,17 +224,17 @@ export default async function TeacherDetailPage({ params }: Props) {
             <>
               <div className="h-px bg-white/6 mx-4 md:hidden mb-3" />
               <div className="px-4 md:px-0 mb-4">
-                <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/55 mb-[10px]">
+                <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 mb-[10px]">
                   On Air This Week
                 </p>
                 <div className="space-y-[8px] md:space-y-3">
                   {sortedSchedule.map((day) => (
                     <div key={day.day}>
-                      <p className="text-sm font-bold text-white/80 mb-[5px]">{day.day}</p>
+                      <p className="text-base font-bold text-white/90 mb-[5px]">{day.day}</p>
                       {day.times.map((t) => (
                         <div
                           key={`${t.startTime}-${t.endTime}`}
-                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-[13px] md:text-sm text-white/75 mb-[3px]"
+                          className="border-l-[3px] border-[#84b84f] bg-[rgba(132,184,79,0.08)] rounded-r-[8px] py-1.5 px-2.5 text-base md:text-sm text-white/90 mb-[3px]"
                         >
                           {t.startTime} &ndash; {t.endTime}
                         </div>
@@ -253,7 +253,7 @@ export default async function TeacherDetailPage({ params }: Props) {
         <>
           <div className="h-px bg-white/6 mx-4 md:mx-8 mb-3" />
           <div className="pb-6 md:pb-10">
-            <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.1em] text-white/55 px-4 md:px-8 mb-3">
+            <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 px-4 md:px-8 mb-3">
               Also on Reach Radio
             </p>
             <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -262,17 +262,17 @@ export default async function TeacherDetailPage({ params }: Props) {
                   key={t.slug}
                   slug={t.slug}
                   name={t.name}
-                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[56px] md:w-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
+                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[72px] md:w-[72px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
                 >
                   <TeacherAvatar
                     name={t.name}
                     photo={t.photo}
                     lqip={t.lqip}
-                    size="sm"
+                    size="md"
                     shape="circle"
-                    sizes="38px"
+                    sizes="48px"
                   />
-                  <span className="text-[11px] text-white/80 text-center line-clamp-2 leading-tight">
+                  <span className="text-sm text-white/80 text-center line-clamp-2 leading-tight">
                     {t.name}
                   </span>
                 </TeacherModalLink>
