@@ -29,6 +29,10 @@ export const teacherSlugsQuery = `
   *[_type == "teacher"] { "slug": slug.current }
 `
 
+export const teacherSlugsWithDatesQuery = `
+  *[_type == "teacher"] { "slug": slug.current, "updatedAt": _updatedAt }
+`
+
 export const scheduleQuery = `
   *[_type == "teacher" && count(schedule[day == $day]) > 0] {
     "name": name.first + " " + name.last,
