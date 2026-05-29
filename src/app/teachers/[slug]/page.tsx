@@ -15,8 +15,6 @@ import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
 import { TeacherDetailContent } from '@/components/teachers/TeacherDetailContent'
 
-export const revalidate = 3600
-
 interface Props {
   params: Promise<{ slug: string }>
 }

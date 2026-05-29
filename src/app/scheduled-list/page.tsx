@@ -21,8 +21,6 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 86400
-
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 const BREADCRUMB_ITEMS = [
