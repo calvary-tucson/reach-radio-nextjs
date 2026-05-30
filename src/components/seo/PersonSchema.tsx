@@ -1,3 +1,5 @@
+import { safeJsonLd } from '@/lib/seo'
+
 interface Props {
   name: string
   jobTitle: string | null
@@ -29,7 +31,7 @@ export function PersonSchema({ name, jobTitle, imageUrl, url, description, knows
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/<\/script>/gi, '<\\/script>') }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
     />
   )
 }

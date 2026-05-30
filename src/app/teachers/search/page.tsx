@@ -6,8 +6,6 @@ import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
 import { SearchResultsSkeleton } from '@/components/skeletons/SearchResultsSkeleton'
 
-export const unstable_instant = { prefetch: 'static' }
-
 export const metadata: Metadata = {
   title: 'Search Teachers',
   robots: { index: false },

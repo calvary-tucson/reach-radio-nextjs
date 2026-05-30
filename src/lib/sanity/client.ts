@@ -28,3 +28,17 @@ export async function sanityFetch<T>(
   }
   return sanityClient.fetch<T>(query, params)
 }
+
+export async function sanityFetchHourly<T>(
+  query: string,
+  params: Record<string, unknown> = {},
+  options: { tags?: string[] } = {}
+): Promise<T> {
+  'use cache'
+  const { tags } = options
+  cacheLife('hours')
+  if (tags?.length) {
+    cacheTag(...tags)
+  }
+  return sanityClient.fetch<T>(query, params)
+}

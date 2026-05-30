@@ -57,6 +57,9 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             </p>
             <span className="text-[12px] md:text-sm text-white/50 light:text-gray-400">{teachers.length}</span>
           </div>
+          {teachers.length === 0 && (
+            <p className="text-white/50 light:text-gray-400 text-sm py-8 text-center">No teachers found.</p>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (
               <button

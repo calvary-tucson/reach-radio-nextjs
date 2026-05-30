@@ -1,5 +1,5 @@
 function Sk({ className }: { className: string }) {
-  return <div className={`bg-[#252b32] light:bg-gray-200 animate-pulse ${className}`} />
+  return <div className={`bg-[#252b32] light:bg-gray-200 motion-safe:animate-pulse ${className}`} />
 }
 
 export function TeacherDetailSkeleton() {

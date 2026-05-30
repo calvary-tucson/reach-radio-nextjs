@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { sanityFetch } from '@/lib/sanity/client'
+import { sanityFetchHourly } from '@/lib/sanity/client'
 import { fullScheduleQuery } from '@/lib/sanity/queries'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 import { EventSchema } from '@/components/seo/EventSchema'
@@ -11,7 +11,6 @@ import Link from 'next/link'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
 import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
 
-export const unstable_instant = { prefetch: 'static' }
 
 export const metadata: Metadata = {
   title: 'Full Schedule',
@@ -39,7 +38,7 @@ function timeToMinutes(t: string): number {
 }
 
 async function ScheduleContent() {
-  const teachers = await sanityFetch<TeacherWithSchedule[]>(
+  const teachers = await sanityFetchHourly<TeacherWithSchedule[]>(
     fullScheduleQuery,
     {},
     { tags: ['schedule'] }

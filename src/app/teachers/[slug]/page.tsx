@@ -16,7 +16,6 @@ import Breadcrumbs from '@/components/global/Breadcrumbs'
 import { TeacherDetailContent } from '@/components/teachers/TeacherDetailContent'
 import { TeacherDetailSkeleton } from '@/components/skeletons/TeacherDetailSkeleton'
 
-export const unstable_instant = { prefetch: 'static' }
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -57,7 +56,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-async function TeacherContent({ slug }: { slug: string }) {
+async function TeacherContent({ params }: Props) {
+  const { slug } = await params
   const [teacher, highlightedRaw] = await Promise.all([
     getTeacher(slug),
     sanityFetch<TeacherSummary[]>(
@@ -101,17 +101,12 @@ async function TeacherContent({ slug }: { slug: string }) {
   )
 }
 
-async function TeacherContentWrapper({ params }: Props) {
-  const { slug } = await params
-  return <TeacherContent slug={slug} />
-}
-
 export default function TeacherDetailPage({ params }: Props) {
   return (
     <div className="text-white light:text-gray-900 max-w-screen-xl mx-auto">
       <ShowMediaBar />
       <Suspense fallback={<TeacherDetailSkeleton />}>
-        <TeacherContentWrapper params={params} />
+        <TeacherContent params={params} />
       </Suspense>
     </div>
   )

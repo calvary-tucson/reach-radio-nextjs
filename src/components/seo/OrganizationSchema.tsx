@@ -1,3 +1,5 @@
+import { safeJsonLd } from '@/lib/seo'
+
 interface OrganizationSchemaProps {
   name: string
   alternateName?: string
@@ -46,7 +48,7 @@ export function OrganizationSchema({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/<\/script>/gi, '<\\/script>') }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
     />
   )
 }
