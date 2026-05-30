@@ -30,7 +30,7 @@ describe('POST /api/revalidate', () => {
     expect(res.status).toBe(401)
   })
 
-  it('calls revalidateTag("teachers") for teacher documents (no second arg)', async () => {
+  it('calls revalidateTag("teachers", "max") for teacher documents', async () => {
     const { revalidateTag } = await import('next/cache')
     const { POST } = await import('@/app/api/revalidate/route')
     const req = new Request('http://localhost/api/revalidate', {
@@ -40,10 +40,10 @@ describe('POST /api/revalidate', () => {
     })
     const res = await POST(req)
     expect(res.status).toBe(200)
-    expect(revalidateTag).toHaveBeenCalledWith('teachers')
+    expect(revalidateTag).toHaveBeenCalledWith('teachers', 'max')
   })
 
-  it('calls revalidateTag("settings") for appSettings documents', async () => {
+  it('calls revalidateTag("appSettings", "max") for appSettings documents', async () => {
     const { revalidateTag } = await import('next/cache')
     const { POST } = await import('@/app/api/revalidate/route')
     const req = new Request('http://localhost/api/revalidate', {
@@ -53,7 +53,7 @@ describe('POST /api/revalidate', () => {
     })
     const res = await POST(req)
     expect(res.status).toBe(200)
-    expect(revalidateTag).toHaveBeenCalledWith('settings')
+    expect(revalidateTag).toHaveBeenCalledWith('appSettings', 'max')
   })
 
   it('returns revalidated: false for unknown document type', async () => {

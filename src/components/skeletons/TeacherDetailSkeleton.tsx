@@ -4,7 +4,7 @@ function Sk({ className }: { className: string }) {
 
 export function TeacherDetailSkeleton() {
   return (
-    <div className="max-w-screen-xl mx-auto">
+    <div className="max-w-screen-xl mx-auto" role="status" aria-busy="true" aria-label="Loading teacher...">
       {/* Back */}
       <Sk className="h-[14px] md:h-5 w-[60px] md:w-24 rounded mx-4 md:mx-8 mt-[14px] mb-0" />
 

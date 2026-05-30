@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 const RADIOJAR_URL = 'https://proxy.radiojar.com/api/stations/g4d600bv6p5tv/now_playing/?callback='
 
 export async function GET(): Promise<Response> {

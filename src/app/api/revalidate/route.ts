@@ -3,8 +3,8 @@ import { revalidateTag } from 'next/cache'
 const TAG_MAP: Record<string, string> = {
   teacher: 'teachers',
   schedule: 'schedule',
-  settings: 'settings',
-  appSettings: 'settings',
+  siteSettings: 'siteSettings',
+  appSettings: 'appSettings',
 }
 
 export async function POST(req: Request): Promise<Response> {
@@ -24,7 +24,7 @@ export async function POST(req: Request): Promise<Response> {
   const tag = body._type ? TAG_MAP[body._type] : undefined
 
   if (tag) {
-    revalidateTag(tag, 'days')
+    revalidateTag(tag, 'max')
     return Response.json({ revalidated: true, tag })
   }
 

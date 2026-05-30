@@ -1,4 +1,4 @@
-import { cache } from 'react'
+import { cache, Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { sanityFetch } from '@/lib/sanity/client'
@@ -14,6 +14,9 @@ import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
 import { TeacherDetailContent } from '@/components/teachers/TeacherDetailContent'
+import { TeacherDetailSkeleton } from '@/components/skeletons/TeacherDetailSkeleton'
+
+export const unstable_instant = { prefetch: 'static' }
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -54,9 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function TeacherDetailPage({ params }: Props) {
-  const { slug } = await params
-
+async function TeacherContent({ slug }: { slug: string }) {
   const [teacher, highlightedRaw] = await Promise.all([
     getTeacher(slug),
     sanityFetch<TeacherSummary[]>(
@@ -73,9 +74,7 @@ export default async function TeacherDetailPage({ params }: Props) {
     .slice(0, 8)
 
   return (
-    <div className="text-white light:text-gray-900 max-w-screen-xl mx-auto">
-      <ShowMediaBar />
-
+    <>
       <BreadcrumbJsonLd items={[
         { name: 'Home', url: '/' },
         { name: 'Teachers', url: '/teachers' },
@@ -90,7 +89,6 @@ export default async function TeacherDetailPage({ params }: Props) {
         knowsAbout={['Bible Teaching', 'Christian Ministry', 'Gospel']}
         sameAs={teacher.links?.map((l) => l.url)}
       />
-
       <Breadcrumbs
         variant="standalone"
         items={[
@@ -98,8 +96,23 @@ export default async function TeacherDetailPage({ params }: Props) {
           { name: teacher.name, url: `/teachers/${teacher.slug}` },
         ]}
       />
-
       <TeacherDetailContent teacher={teacher} relatedTeachers={relatedTeachers} />
+    </>
+  )
+}
+
+async function TeacherContentWrapper({ params }: Props) {
+  const { slug } = await params
+  return <TeacherContent slug={slug} />
+}
+
+export default function TeacherDetailPage({ params }: Props) {
+  return (
+    <div className="text-white light:text-gray-900 max-w-screen-xl mx-auto">
+      <ShowMediaBar />
+      <Suspense fallback={<TeacherDetailSkeleton />}>
+        <TeacherContentWrapper params={params} />
+      </Suspense>
     </div>
   )
 }

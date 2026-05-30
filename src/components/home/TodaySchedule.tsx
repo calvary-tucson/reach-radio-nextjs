@@ -1,3 +1,4 @@
+import { connection } from 'next/server'
 import { sanityFetch } from '@/lib/sanity/client'
 import { scheduleQuery } from '@/lib/sanity/queries'
 import { to24h, toMinutes } from '@/lib/utils/time'
@@ -32,6 +33,7 @@ function isInFuture(endTime: string): boolean {
 }
 
 export async function TodaySchedule() {
+  await connection()
   const day = dayjs().tz(TZ).format('dddd')
 
   const raw = await sanityFetch<{

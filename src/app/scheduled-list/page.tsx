@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { sanityFetch } from '@/lib/sanity/client'
 import { fullScheduleQuery } from '@/lib/sanity/queries'
@@ -8,6 +9,9 @@ import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
+import { ScheduleSkeleton } from '@/components/skeletons/ScheduleSkeleton'
+
+export const unstable_instant = { prefetch: 'static' }
 
 export const metadata: Metadata = {
   title: 'Full Schedule',
@@ -34,7 +38,7 @@ function timeToMinutes(t: string): number {
   return (h % 12 + (period === 'PM' ? 12 : 0)) * 60 + m
 }
 
-export default async function ScheduledListPage() {
+async function ScheduleContent() {
   const teachers = await sanityFetch<TeacherWithSchedule[]>(
     fullScheduleQuery,
     {},
@@ -71,10 +75,8 @@ export default async function ScheduledListPage() {
   )
 
   return (
-    <div>
-      <Breadcrumbs variant="standalone" items={BREADCRUMB_ITEMS} />
+    <>
       <EventSchema events={allEvents} />
-      <BreadcrumbJsonLd items={BREADCRUMB_ITEMS} />
       <div className="px-4 pt-6 pb-6">
       <h1 className="text-[22px] md:text-4xl font-extrabold text-white light:text-gray-900 tracking-tight mb-6">Full Schedule</h1>
       {byDay.length === 0 ? (
@@ -117,6 +119,18 @@ export default async function ScheduledListPage() {
         </div>
       )}
       </div>
+    </>
+  )
+}
+
+export default function ScheduledListPage() {
+  return (
+    <div>
+      <Breadcrumbs variant="standalone" items={BREADCRUMB_ITEMS} />
+      <BreadcrumbJsonLd items={BREADCRUMB_ITEMS} />
+      <Suspense fallback={<ScheduleSkeleton />}>
+        <ScheduleContent />
+      </Suspense>
     </div>
   )
 }

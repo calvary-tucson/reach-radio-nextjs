@@ -8,6 +8,9 @@ import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { PassiveSearchBar } from '@/components/global/PassiveSearchBar'
 import { RecommendedTeachers } from '@/components/teachers/RecommendedTeachers'
 import { RecommendedTeachersSkeleton } from '@/components/skeletons/RecommendedTeachersSkeleton'
+import { TeacherGridSkeleton } from '@/components/skeletons/TeacherCardSkeleton'
+
+export const unstable_instant = { prefetch: 'static' }
 
 const OG_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
 
@@ -28,12 +31,20 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function TeachersPage() {
+async function TeachersContent() {
   const [teachers, scheduleTeachers] = await Promise.all([
     sanityFetch<TeacherSummary[]>(teacherListQuery, {}, { tags: ['teachers'] }),
     sanityFetch<TeacherWithSchedule[]>(fullScheduleQuery, {}, { tags: ['teachers'] }),
   ])
+  return (
+    <TeachersClientView
+      teachers={teachers}
+      scheduleTeachers={scheduleTeachers}
+    />
+  )
+}
 
+export default function TeachersPage() {
   return (
     <div className="px-4 md:px-8 py-6 max-w-screen-xl mx-auto">
       <h1 className="text-[22px] md:text-4xl font-extrabold text-white light:text-gray-900 tracking-tight mb-3">Teachers</h1>
@@ -47,10 +58,9 @@ export default async function TeachersPage() {
       <Suspense fallback={<RecommendedTeachersSkeleton />}>
         <RecommendedTeachers />
       </Suspense>
-      <TeachersClientView
-        teachers={teachers}
-        scheduleTeachers={scheduleTeachers}
-      />
+      <Suspense fallback={<TeacherGridSkeleton />}>
+        <TeachersContent />
+      </Suspense>
     </div>
   )
 }

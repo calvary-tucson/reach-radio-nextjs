@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache'
 import type { MetadataRoute } from 'next'
 import { sanityFetch } from '@/lib/sanity/client'
 import { teacherSlugsWithDatesQuery } from '@/lib/sanity/queries'
@@ -5,6 +6,10 @@ import { teacherSlugsWithDatesQuery } from '@/lib/sanity/queries'
 const BASE_URL = 'https://reach.radio'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  'use cache'
+  cacheLife('days')
+  cacheTag('teachers')
+
   const slugs = await sanityFetch<{ slug: string; updatedAt: string }[]>(
     teacherSlugsWithDatesQuery,
     {},

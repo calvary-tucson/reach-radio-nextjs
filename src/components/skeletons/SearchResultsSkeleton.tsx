@@ -4,7 +4,7 @@ function Sk({ className }: { className: string }) {
 
 export function SearchResultsSkeleton() {
   return (
-    <div className="max-w-screen-xl mx-auto space-y-4">
+    <div className="max-w-screen-xl mx-auto space-y-4" role="status" aria-busy="true" aria-label="Loading search results...">
       {/* Search input */}
       <div className="flex items-center gap-[10px]">
         <Sk className="h-5 w-4 rounded flex-shrink-0" />

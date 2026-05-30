@@ -26,7 +26,7 @@ export const teacherDetailQuery = `
 `
 
 export const teacherSlugsQuery = `
-  *[_type == "teacher"] { "slug": slug.current }
+  *[_type == "teacher" && defined(slug.current)] { "slug": slug.current }
 `
 
 export const teacherSlugsWithDatesQuery = `
