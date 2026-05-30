@@ -116,8 +116,23 @@ async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
       {!isMobileApp && <Header />}
       {!isMobileApp && <MobileHeader />}
       {modal ? <div key="modal">{modal}</div> : null}
-      {!isMobileApp && <Footer />}
-      {!isMobileApp && <MobileNav />}
+    </>
+  )
+}
+
+async function LayoutFooter() {
+  const headersList = await headers()
+  const cookieHeader = headersList.get('cookie') ?? ''
+  const isMobileApp =
+    headersList.get('mobile-app') === 'true' ||
+    cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
+
+  if (isMobileApp) return null
+
+  return (
+    <>
+      <Footer />
+      <MobileNav />
     </>
   )
 }
@@ -134,7 +149,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark|system)/);var t=m?m[1]:'system';var r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;document.documentElement.classList.add(r);}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark|system)/);var t=m?m[1]:'dark';var r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;document.documentElement.classList.add(r);}catch(e){}})();`,
           }}
         />
         <link rel="preconnect" href="https://cdn.sanity.io" />
@@ -155,6 +170,9 @@ export default function RootLayout({
             <main id="main-content" className="pt-16">
               {children}
             </main>
+            <Suspense>
+              <LayoutFooter />
+            </Suspense>
             <MediaBar />
             <Toaster richColors position="top-center" />
           </TooltipProvider>
