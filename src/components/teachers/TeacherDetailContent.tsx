@@ -4,15 +4,17 @@ import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChi
 import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { DAYS_ORDER } from '@/lib/teachers/schedule'
+import { cn } from '@/lib/utils'
 import type { TeacherDetail, TeacherSummary } from '@/lib/sanity/types'
 
 interface Props {
   teacher: TeacherDetail
   relatedTeachers?: TeacherSummary[]
   headingLevel?: 'h1' | 'h2'
+  isOverlay?: boolean
 }
 
-export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLevel = 'h1' }: Props) {
+export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLevel = 'h1', isOverlay = false }: Props) {
   const Heading = headingLevel
 
   const sortedSchedule = [...(teacher.schedule ?? [])].sort(
@@ -46,13 +48,13 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
         />
       </div>
 
-      {/* Two-column layout at md */}
-      <div className="md:flex md:gap-8 md:px-8 md:items-start">
+      {/* Two-column layout at md (suppressed in overlay) */}
+      <div className={cn(!isOverlay && "md:flex md:gap-8 md:px-8 md:items-start")}>
 
         {/* LEFT SIDEBAR */}
-        <div className="md:w-72 md:flex-shrink-0">
+        <div className={cn(!isOverlay && "md:w-72 md:flex-shrink-0")}>
           {/* Avatar overlap row */}
-          <div className="flex items-end justify-between px-4 md:px-0 mt-[-88px] md:mt-[-88px] mb-3">
+          <div className={cn("flex items-end justify-between px-4 mt-[-88px] mb-3", !isOverlay && "md:px-0")}>
             <ViewTransition name={`teacher-${teacher.slug}`}>
               <TeacherAvatar
                 name={teacher.name}
@@ -69,7 +71,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="md:hidden bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
+                className={cn("bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors", !isOverlay && "md:hidden")}
               >
                 {`${primaryLink.title} ↗`}
               </a>
@@ -77,7 +79,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
           </div>
 
           {/* Name + title */}
-          <div className="px-4 md:px-0 mb-[10px]">
+          <div className={cn("px-4 mb-[10px]", !isOverlay && "md:px-0")}>
             <Heading className="text-[26px] md:text-3xl font-extrabold tracking-tight">{teacher.name}</Heading>
             {(teacher.title || teacher.subtitle) && (
               <p className="text-base text-white/85 light:text-gray-700 mt-[3px] font-medium">
@@ -88,7 +90,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
 
           {/* Info chips */}
           {(hoursPerWeek > 0 || daysOnAir > 0) && (
-            <div className="flex flex-wrap gap-[7px] px-4 md:px-0 mb-3">
+            <div className={cn("flex flex-wrap gap-[7px] px-4 mb-3", !isOverlay && "md:px-0")}>
               {hoursPerWeek > 0 && (
                 <TeacherInfoChip icon="📻" label={`${hoursPerWeek} hrs/wk`} variant="accent" />
               )}
@@ -98,8 +100,8 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
             </div>
           )}
 
-          {/* Primary link — desktop only (mobile version is in avatar row above) */}
-          {primaryLink && (
+          {/* Primary link — desktop only, not shown in overlay (avatar row already shows it) */}
+          {primaryLink && !isOverlay && (
             <div className="hidden md:block px-0 mb-3">
               <a
                 href={primaryLink.url}
@@ -114,7 +116,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
 
           {/* Other external links */}
           {otherLinks.length > 0 && (
-            <div className="flex flex-wrap gap-2 px-4 md:px-0 mb-4">
+            <div className={cn("flex flex-wrap gap-2 px-4 mb-4", !isOverlay && "md:px-0")}>
               {otherLinks.map((link) => (
                 <a
                   key={link.url}
@@ -131,11 +133,11 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
         </div>
 
         {/* RIGHT MAIN */}
-        <div className="md:flex-1 md:min-w-0 md:pt-4">
+        <div className={cn(!isOverlay && "md:flex-1 md:min-w-0 md:pt-4")}>
           {sortedSchedule.length > 0 && (
             <>
-              <div className="h-px bg-white/6 light:bg-gray-200 mx-4 md:hidden mb-3" />
-              <div className="px-4 md:px-0 mb-4">
+              <div className={cn("h-px bg-white/6 light:bg-gray-200 mx-4 mb-3", !isOverlay && "md:hidden")} />
+              <div className={cn("px-4 mb-4", !isOverlay && "md:px-0")}>
                 <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 light:text-gray-600 mb-[10px]">
                   On Air This Week
                 </p>
@@ -163,12 +165,12 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
       {/* Also on Reach Radio */}
       {relatedTeachers.length > 0 && (
         <>
-          <div className="h-px bg-white/6 light:bg-gray-200 mx-4 md:mx-8 mb-3" />
-          <div className="pb-6 md:pb-10">
-            <p className="text-sm font-bold uppercase tracking-[0.1em] text-white/80 light:text-gray-600 px-4 md:px-8 mb-3">
+          <div className={cn("h-px bg-white/6 light:bg-gray-200 mx-4 mb-3", !isOverlay && "md:mx-8")} />
+          <div className={cn("pb-6", !isOverlay && "md:pb-10")}>
+            <p className={cn("text-sm font-bold uppercase tracking-[0.1em] text-white/80 light:text-gray-600 px-4 mb-3", !isOverlay && "md:px-8")}>
               Also on Reach Radio
             </p>
-            <div className="flex gap-[10px] md:gap-4 overflow-x-auto px-4 md:px-8 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className={cn("flex gap-[10px] overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden", !isOverlay && "md:gap-4 md:px-8")}>
               {relatedTeachers.map((t) => (
                 <TeacherModalLink
                   key={t.slug}

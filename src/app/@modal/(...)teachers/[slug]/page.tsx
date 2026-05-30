@@ -29,7 +29,7 @@ async function ModalTeacherContent({ slug }: { slug: string }) {
     .slice(0, 8)
 
   return (
-    <TeacherDetailContent teacher={teacher} relatedTeachers={relatedTeachers} headingLevel="h2" />
+    <TeacherDetailContent teacher={teacher} relatedTeachers={relatedTeachers} headingLevel="h2" isOverlay />
   )
 }
 
