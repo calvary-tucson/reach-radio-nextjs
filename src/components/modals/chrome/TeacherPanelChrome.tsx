@@ -46,7 +46,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           {/* Drag handle is also a button for keyboard dismiss */}
           <button
             type="button"
-            aria-label="Drag to dismiss"
+            aria-label="Close"
             className="cursor-grab active:cursor-grabbing touch-none"
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
             onTouchStart={drag.onTouchStart}
@@ -58,7 +58,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           <button
             type="button"
             onClick={onDismiss}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -70,7 +70,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           <button
             type="button"
             onClick={onDismiss}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="h-5 w-5" />

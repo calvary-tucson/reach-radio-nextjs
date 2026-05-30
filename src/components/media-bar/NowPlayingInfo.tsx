@@ -13,7 +13,7 @@ export function NowPlayingInfo() {
       <div className="w-12 h-12 relative overflow-hidden rounded-md flex-shrink-0">
         <Image
           src={image}
-          alt="Album art"
+          alt={artist ? `${title} — ${artist}` : (title ?? 'Album art')}
           fill
           sizes="48px"
           className="object-cover"

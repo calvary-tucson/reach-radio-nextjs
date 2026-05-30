@@ -38,13 +38,16 @@ describe('SheetChrome', () => {
     const onDismiss = vi.fn()
     const user = userEvent.setup()
     render(<Wrapper onDismiss={onDismiss} />)
-    await user.click(screen.getByRole('button', { name: /close/i }))
+    // Two "Close" buttons exist: drag handle (sm:hidden) and X button. Click the X.
+    const closeButtons = screen.getAllByRole('button', { name: /close/i })
+    await user.click(closeButtons[closeButtons.length - 1])
     expect(onDismiss).toHaveBeenCalledOnce()
   })
 
   it('close button has cursor-pointer', () => {
     render(<Wrapper />)
-    const btn = screen.getByRole('button', { name: /close/i })
-    expect(btn.className).toContain('cursor-pointer')
+    const closeButtons = screen.getAllByRole('button', { name: /close/i })
+    const xButton = closeButtons[closeButtons.length - 1]
+    expect(xButton.className).toContain('cursor-pointer')
   })
 })

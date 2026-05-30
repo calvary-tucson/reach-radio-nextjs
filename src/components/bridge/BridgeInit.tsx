@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { initBridgeProxy } from '@/lib/bridge/proxy'
 import { initUnpolyShim } from '@/lib/bridge/compat'
 import { postMessageToNative } from '@/lib/bridge/post-message'

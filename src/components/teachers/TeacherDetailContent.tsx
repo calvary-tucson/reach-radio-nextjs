@@ -31,7 +31,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
   return (
     <div className="text-white light:text-gray-900 motion-safe:animate-[fade-in_0.2s_ease-out_both]">
       {/* Banner */}
-      <div className="relative w-full h-[100px] md:h-[180px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
+      <div className="relative w-full h-[100px] md:h-[180px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] light:from-green-100 light:to-green-50 overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
@@ -55,7 +55,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
         <div className={cn(!isOverlay && "md:w-72 md:flex-shrink-0")}>
           {/* Avatar overlap row */}
           <div className={cn("flex items-end justify-between px-4 mt-[-88px] mb-3", !isOverlay && "md:px-0")}>
-            <ViewTransition name={`teacher-${teacher.slug}`}>
+            {isOverlay ? (
               <TeacherAvatar
                 name={teacher.name}
                 photo={teacher.photo}
@@ -65,13 +65,25 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                 ring
                 sizes="176px"
               />
-            </ViewTransition>
+            ) : (
+              <ViewTransition name={`teacher-${teacher.slug}`}>
+                <TeacherAvatar
+                  name={teacher.name}
+                  photo={teacher.photo}
+                  lqip={teacher.lqip}
+                  size="3xl"
+                  shape="circle"
+                  ring
+                  sizes="176px"
+                />
+              </ViewTransition>
+            )}
             {primaryLink && (
               <a
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={cn("bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors", !isOverlay && "md:hidden")}
+                className={cn("bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#84b84f] focus-visible:ring-offset-2", !isOverlay && "md:hidden")}
               >
                 {`${primaryLink.title} ↗`}
               </a>
@@ -107,7 +119,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-[#84b84f] rounded-full px-5 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
+                className="inline-block bg-[#84b84f] rounded-full px-5 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#84b84f] focus-visible:ring-offset-2"
               >
                 {`${primaryLink.title} ↗`}
               </a>
@@ -123,7 +135,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
+                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                 >
                   {link.title}
                 </a>

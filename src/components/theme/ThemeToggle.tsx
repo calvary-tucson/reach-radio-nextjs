@@ -26,7 +26,7 @@ export function ThemeToggle() {
           className={cn(
             'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer',
             theme === value
-              ? 'bg-green-600 text-white'
+              ? 'bg-[#84b84f] text-white'
               : 'text-white/60 hover:text-white/90 light:text-gray-500 light:hover:text-gray-900'
           )}
         >

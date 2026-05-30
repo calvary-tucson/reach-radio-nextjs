@@ -1,7 +1,6 @@
 import { sanityFetch } from '@/lib/sanity/client'
 import { appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
-
-const FALLBACK_STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
+import { FALLBACK_STREAM_URL } from '@/lib/constants'
 
 export async function GET(): Promise<Response> {
   const settings = await sanityFetch<{ radioAudioURL: string }>(

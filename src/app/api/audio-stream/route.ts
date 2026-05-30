@@ -1,4 +1,4 @@
-const STREAM_URL = 'http://stream.radiojar.com/g4d600bv6p5tv'
+const STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
 
 export async function GET(): Promise<Response> {
   const controller = new AbortController()

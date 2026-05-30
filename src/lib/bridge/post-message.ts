@@ -6,7 +6,7 @@ declare global {
         messageHandler: { postMessage: (msg: string) => void }
       }
     }
-    ReactNativeWebView?: boolean
+    ReactNativeWebView?: { postMessage: (msg: string) => void }
     inNativeApp?: boolean
   }
 }

@@ -44,7 +44,7 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
         {/* Drag handle — mobile only; button allows keyboard dismiss */}
         <button
           type="button"
-          aria-label="Drag to dismiss"
+          aria-label="Close"
           className="flex justify-center pt-3 pb-2 sm:hidden cursor-grab active:cursor-grabbing touch-none shrink-0 w-full"
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
           onTouchStart={drag.onTouchStart}

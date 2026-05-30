@@ -10,6 +10,11 @@ interface UseSheetDragOptions {
   contentRef: RefObject<HTMLDivElement | null>
 }
 
+function prefersReducedMotion(): boolean {
+  return typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
   const startY = useRef(0)
   const startTime = useRef(0)
@@ -34,7 +39,7 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     const deltaY = e.touches[0].clientY - startY.current
     currentY.current = Math.max(0, deltaY)
-    if (contentRef.current) {
+    if (contentRef.current && !prefersReducedMotion()) {
       contentRef.current.style.transform = `translateY(${currentY.current}px)`
       contentRef.current.style.opacity = String(
         Math.max(OPACITY_MIN, 1 - currentY.current / OPACITY_SCALE_DISTANCE)
@@ -74,7 +79,7 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
     function handleMouseMove(ev: MouseEvent) {
       const deltaY = ev.clientY - startY.current
       currentY.current = Math.max(0, deltaY)
-      if (contentRef.current) {
+      if (contentRef.current && !prefersReducedMotion()) {
         contentRef.current.style.transform = `translateY(${currentY.current}px)`
         contentRef.current.style.opacity = String(
           Math.max(OPACITY_MIN, 1 - currentY.current / OPACITY_SCALE_DISTANCE)

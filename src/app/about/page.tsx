@@ -26,7 +26,10 @@ export const metadata: Metadata = {
 
 async function AboutContent() {
   const headersList = await headers()
-  const isMobileApp = headersList.get('mobile-app') === 'true'
+  const cookieHeader = headersList.get('cookie') ?? ''
+  const isMobileApp =
+    headersList.get('mobile-app') === 'true' ||
+    cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
 
   const siteSettings = await sanityFetch<{
     siteTitle: string
