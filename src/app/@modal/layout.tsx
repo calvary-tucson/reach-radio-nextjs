@@ -8,6 +8,7 @@ import { ModalProvider } from '@/components/modals/ModalContext'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { useModalStore } from '@/lib/stores/modal'
+import { postMessageToNative } from '@/lib/bridge/post-message'
 import { cn } from '@/lib/utils'
 
 function ModalSkeleton({
@@ -73,6 +74,11 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     return () => { if (dismissTimer.current) clearTimeout(dismissTimer.current) }
+  }, [])
+
+  useEffect(() => {
+    postMessageToNative({ showMobileNav: false })
+    return () => { postMessageToNative({ showMobileNav: true }) }
   }, [])
 
   const pathname = usePathname()
