@@ -52,4 +52,13 @@ describe('useMediaStore', () => {
     expect(useMediaStore.getState().sleepTimerActive).toBe(true)
     expect(useMediaStore.getState().remainingSleepSeconds).toBe(0)
   })
+
+  it('setTeachersList updates teachersList', () => {
+    const list = [
+      { name: 'Alice', photo: 'https://example.com/alice.jpg' },
+      { name: 'Bob', photo: 'https://example.com/bob.jpg' },
+    ]
+    useMediaStore.getState().setTeachersList(list)
+    expect(useMediaStore.getState().teachersList).toEqual(list)
+  })
 })

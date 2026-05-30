@@ -1,12 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, act } from '@testing-library/react'
 import { AudioProvider } from '@/components/AudioProvider'
 import { useMediaStore } from '@/lib/store/media-store'
+
+let originalPlay: PropertyDescriptor | undefined
+let originalPause: PropertyDescriptor | undefined
 
 // jsdom does not implement HTMLMediaElement.play/pause — stub them
 function stubAudioElement() {
   const play = vi.fn().mockResolvedValue(undefined)
   const pause = vi.fn()
+  originalPlay = Object.getOwnPropertyDescriptor(window.HTMLMediaElement.prototype, 'play')
+  originalPause = Object.getOwnPropertyDescriptor(window.HTMLMediaElement.prototype, 'pause')
   Object.defineProperty(window.HTMLMediaElement.prototype, 'play', {
     configurable: true,
     value: play,
@@ -40,8 +45,20 @@ describe('AudioProvider', () => {
     }))
   })
 
+  afterEach(() => {
+    if (originalPlay) {
+      Object.defineProperty(window.HTMLMediaElement.prototype, 'play', originalPlay)
+    }
+    if (originalPause) {
+      Object.defineProperty(window.HTMLMediaElement.prototype, 'pause', originalPause)
+    }
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
   it('renders a hidden audio element with the given streamUrl', () => {
     const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+    // <audio> has no ARIA role — RTL role queries can't be used here
     const audio = container.querySelector('audio')
     expect(audio).not.toBeNull()
     expect(audio!.src).toBe('https://stream.example.com/radio')
@@ -118,6 +135,27 @@ describe('AudioProvider', () => {
     const audio = container.querySelector('audio') as HTMLAudioElement
     act(() => {
       audio.dispatchEvent(new Event('error'))
+    })
+    expect(useMediaStore.getState().isPlaying).toBe(false)
+    expect(useMediaStore.getState().isBuffering).toBe(false)
+  })
+
+  it('onWaiting fires setIsBuffering(true)', () => {
+    useMediaStore.setState({ isBuffering: false })
+    const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+    const audio = container.querySelector('audio') as HTMLAudioElement
+    act(() => {
+      audio.dispatchEvent(new Event('waiting'))
+    })
+    expect(useMediaStore.getState().isBuffering).toBe(true)
+  })
+
+  it('onPause fires setIsPlaying(false) and setIsBuffering(false)', () => {
+    useMediaStore.setState({ isPlaying: true, isBuffering: true })
+    const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+    const audio = container.querySelector('audio') as HTMLAudioElement
+    act(() => {
+      audio.dispatchEvent(new Event('pause'))
     })
     expect(useMediaStore.getState().isPlaying).toBe(false)
     expect(useMediaStore.getState().isBuffering).toBe(false)

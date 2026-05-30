@@ -15,6 +15,7 @@ describe('SleepTimerProvider', () => {
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.restoreAllMocks()
   })
 
   it('renders null — no DOM output', () => {
@@ -60,7 +61,7 @@ describe('SleepTimerProvider', () => {
 
     act(() => { useMediaStore.getState().setSleepTimerActive(false) })
 
-    expect(clearIntervalSpy).toHaveBeenCalled()
+    expect(clearIntervalSpy).toHaveBeenCalledWith(expect.anything())
 
     // No further decrements after deactivation
     act(() => { vi.advanceTimersByTime(5000) })
@@ -72,6 +73,22 @@ describe('SleepTimerProvider', () => {
     useMediaStore.getState().startSleepTimer(60)
     const { unmount } = render(<SleepTimerProvider />)
     unmount()
-    expect(clearIntervalSpy).toHaveBeenCalled()
+    expect(clearIntervalSpy).toHaveBeenCalledWith(expect.anything())
+  })
+
+  it('calling startSleepTimer() while already active resets without leaving orphaned intervals', () => {
+    useMediaStore.getState().startSleepTimer(30)
+    render(<SleepTimerProvider />)
+
+    // Advance 1s — one tick
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(useMediaStore.getState().remainingSleepSeconds).toBe(29)
+
+    // Start a second timer while first is still running
+    act(() => { useMediaStore.getState().startSleepTimer(10) })
+
+    // Only one interval should be running — 1 tick = 9s remaining, not 8s
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(useMediaStore.getState().remainingSleepSeconds).toBe(9)
   })
 })

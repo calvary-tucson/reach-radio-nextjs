@@ -66,15 +66,19 @@ describe('useMediaStore — toggleMute and setMuted', () => {
   })
 
   describe('setVolume', () => {
-    it('setVolume(0) sets isMuted true implicitly', () => {
+    it('setVolume(0) sets isMuted true and volume to 0', () => {
       useMediaStore.getState().setVolume(0)
-      expect(useMediaStore.getState().isMuted).toBe(true)
+      const { isMuted, volume } = useMediaStore.getState()
+      expect(isMuted).toBe(true)
+      expect(volume).toBe(0)
     })
 
-    it('setVolume(50) sets isMuted false when was muted', () => {
+    it('setVolume(50) sets isMuted false and volume to 50', () => {
       useMediaStore.setState({ isMuted: true })
       useMediaStore.getState().setVolume(50)
-      expect(useMediaStore.getState().isMuted).toBe(false)
+      const { isMuted, volume } = useMediaStore.getState()
+      expect(isMuted).toBe(false)
+      expect(volume).toBe(50)
     })
   })
 })
