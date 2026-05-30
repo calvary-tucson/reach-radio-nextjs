@@ -4,7 +4,7 @@ function Sk({ className }: { className: string }) {
 
 export function ScheduleTabSkeleton() {
   return (
-    <div>
+    <div role="status" aria-busy="true" aria-label="Loading schedule...">
       {/* Most on air banner */}
       <Sk className="h-[44px] rounded-[12px] mb-3" />
 

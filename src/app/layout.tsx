@@ -80,13 +80,16 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-async function LayoutChrome({
-  children,
-  modal,
-}: {
-  children: React.ReactNode
-  modal: React.ReactNode
-}) {
+function ChromeFallback() {
+  return (
+    <div
+      className="fixed top-0 left-0 right-0 h-16 bg-[var(--color-brand-purple)] border-b border-white/10 z-40"
+      aria-hidden="true"
+    />
+  )
+}
+
+async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
   const headersList = await headers()
   const isMobileApp = headersList.get('mobile-app') === 'true'
 
@@ -108,11 +111,6 @@ async function LayoutChrome({
       {!isMobileApp && <SleepTimerProvider />}
       {!isMobileApp && <Header />}
       {!isMobileApp && <MobileHeader />}
-      <main
-        id="main-content"
-        className={!isMobileApp ? 'pt-16' : ''}
-        style={isMobileApp ? { paddingBottom: 'var(--safe-bottom)' } : undefined}
-      >{children}</main>
       {modal ? <div key="modal">{modal}</div> : null}
       {!isMobileApp && <Footer />}
       {!isMobileApp && <MobileNav />}
@@ -140,9 +138,12 @@ export default function RootLayout({
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded">
             Skip to main content
           </a>
-          <Suspense fallback={<main id="main-content" className="pt-16">{children}</main>}>
-            <LayoutChrome modal={modal}>{children}</LayoutChrome>
+          <Suspense fallback={<ChromeFallback />}>
+            <LayoutChrome modal={modal} />
           </Suspense>
+          <main id="main-content" className="pt-16">
+            {children}
+          </main>
           <MediaBar />
           <Toaster richColors position="top-center" />
         </TooltipProvider>

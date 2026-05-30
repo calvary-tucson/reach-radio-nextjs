@@ -72,7 +72,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers, headingLevel = 
                 rel="noopener noreferrer"
                 className="md:hidden bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
               >
-                {primaryLink.title} &#8599;
+                {`${primaryLink.title} ↗`}
               </a>
             )}
           </div>
@@ -108,7 +108,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers, headingLevel = 
                 rel="noopener noreferrer"
                 className="inline-block bg-[#84b84f] rounded-full px-5 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors"
               >
-                {primaryLink.title} &#8599;
+                {`${primaryLink.title} ↗`}
               </a>
             </div>
           )}

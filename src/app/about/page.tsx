@@ -7,6 +7,9 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery } from '@/lib/sanity/queries'
 import { OrganizationSchema } from '@/components/seo/OrganizationSchema'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
+import { AboutPageSkeleton } from '@/components/skeletons/AboutPageSkeleton'
+
+export const unstable_instant = { prefetch: 'static' }
 
 export const metadata: Metadata = {
   title: 'About',
@@ -213,7 +216,7 @@ async function AboutContent() {
 export default function AboutPage() {
   return (
     <div className="page-enter px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-6">
-      <Suspense fallback={null}>
+      <Suspense fallback={<AboutPageSkeleton />}>
         <AboutContent />
       </Suspense>
     </div>

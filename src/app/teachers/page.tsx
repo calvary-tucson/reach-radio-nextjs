@@ -10,6 +10,8 @@ import { RecommendedTeachers } from '@/components/teachers/RecommendedTeachers'
 import { RecommendedTeachersSkeleton } from '@/components/skeletons/RecommendedTeachersSkeleton'
 import { TeacherGridSkeleton } from '@/components/skeletons/TeacherCardSkeleton'
 
+export const unstable_instant = { prefetch: 'static' }
+
 const OG_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
 
 export const metadata: Metadata = {

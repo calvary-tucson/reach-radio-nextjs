@@ -1,6 +1,6 @@
 export function RadioPlayerSkeleton() {
   return (
-    <div className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded animate-pulse">
+    <div className="p-2 pb-5 md:p-5 bg-gray-700/50 rounded animate-pulse" role="status" aria-busy="true" aria-label="Loading player...">
       <div className="relative flex items-center justify-center w-full">
         <div className="max-w-[420px] h-64 w-full bg-gray-700 rounded" />
       </div>

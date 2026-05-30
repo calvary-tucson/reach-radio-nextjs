@@ -1,6 +1,6 @@
 export function ScheduleSkeleton() {
   return (
-    <div className="space-y-3 animate-pulse">
+    <div className="space-y-3 animate-pulse" role="status" aria-busy="true" aria-label="Loading schedule...">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded">
           <div className="w-12 h-12 bg-gray-700 rounded-full flex-shrink-0" />

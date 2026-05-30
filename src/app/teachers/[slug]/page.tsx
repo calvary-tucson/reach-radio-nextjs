@@ -1,5 +1,4 @@
-import { cache } from 'react'
-import { Suspense } from 'react'
+import { cache, Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { sanityFetch } from '@/lib/sanity/client'
@@ -16,6 +15,8 @@ import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import Breadcrumbs from '@/components/global/Breadcrumbs'
 import { TeacherDetailContent } from '@/components/teachers/TeacherDetailContent'
 import { TeacherDetailSkeleton } from '@/components/skeletons/TeacherDetailSkeleton'
+
+export const unstable_instant = { prefetch: 'static' }
 
 interface Props {
   params: Promise<{ slug: string }>
