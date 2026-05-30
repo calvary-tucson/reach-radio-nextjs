@@ -47,7 +47,7 @@ export async function RecommendedTeachers() {
             </TeacherModalLink>
           ))}
         </div>
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[oklch(24%_0.05_280)] from-30% to-transparent md:hidden" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[oklch(24%_0.05_280)] light:from-white from-30% to-transparent md:hidden" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-6 flex items-center justify-end pr-1 md:hidden">
           <svg className="w-4 h-4 text-white/50 light:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
