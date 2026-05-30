@@ -44,8 +44,41 @@
 
 `scope-name` (from AGENTS.md canonical scope table)
 
+## A11y Requirements
+
+> These are build-time requirements (from AGENTS.md), not review-time suggestions.
+
+- [ ] Every `<div>` acting as button has `role="button"` + `tabIndex={0}` (or use native `<button>`)
+- [ ] Every icon-only button has `aria-label`
+- [ ] Every form input has `<label>` or `aria-label`
+- [ ] Mobile interactive elements: min `h-11 w-11` (44px touch target)
+- [ ] Text on dark surfaces: `text-white/90` minimum — never `text-white/50` for readable content
+- [ ] All interactive elements: `focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none`
+- [ ] All clickables: `cursor-pointer`. Disabled: `cursor-not-allowed`
+- [ ] All animations wrapped in `motion-safe:` variant
+
+## Loading & Error States
+
+| Component | Suspense fallback | Error boundary? | Notes |
+|-----------|------------------|-----------------|-------|
+| e.g. FeatureContent | `<FeatureSkeleton />` | Yes — `<FeatureErrorBoundary />` | - |
+
+- Use `use cache` + Suspense for server components that fetch data
+- Wrap client boundaries in `<ErrorBoundary>` from `react-error-boundary`
+
+## Caching & Revalidation
+
+| Component | `use cache`? | Sanity revalidate tag | TTL |
+|-----------|-------------|----------------------|-----|
+| e.g. FeatureContent | Yes | e.g. `teachers` | - |
+
+- Does this feature require a **new tag in `TAG_MAP`** in `src/app/api/revalidate/route.ts`?
+  - [ ] Yes — add it before implementing
+  - [ ] No — existing tags cover it
+
 ## Open Questions (resolve before implementing)
 
+- [ ] Does this feature need a new Sanity revalidation tag in TAG_MAP?
 - [ ] Question 1
 - [ ] Question 2
 
