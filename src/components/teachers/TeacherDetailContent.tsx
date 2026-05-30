@@ -29,7 +29,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
   const otherLinks = teacher.links?.slice(1) ?? []
 
   return (
-    <div className="text-white light:text-gray-900">
+    <div className="text-white light:text-gray-900 motion-safe:animate-[fade-in_0.2s_ease-out_both]">
       {/* Banner */}
       <div className="relative w-full h-[100px] md:h-[180px] mt-3 bg-gradient-to-br from-[#1e3a0a] to-[#0a1305] overflow-hidden">
         <div

@@ -22,7 +22,7 @@ function ModalSkeleton({
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center"
+      className="fixed inset-0 z-[70] flex items-end sm:items-center sm:justify-center"
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
     >
       <div
@@ -118,12 +118,12 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         <DialogPrimitive.Overlay
           className={
             isClosing
-              ? 'fixed inset-0 z-50 bg-black/80 motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
-              : 'fixed inset-0 z-50 bg-black/80 motion-safe:animate-[fade-in_0.2s_ease-out_both]'
+              ? 'fixed inset-0 z-[70] bg-black/80 motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
+              : 'fixed inset-0 z-[70] bg-black/80 motion-safe:animate-[fade-in_0.2s_ease-out_both]'
           }
         />
         <DialogPrimitive.Content
-          className="fixed inset-0 z-50 outline-none"
+          className="fixed inset-0 z-[70] outline-none"
           onEscapeKeyDown={(e) => {
             const active = document.activeElement as HTMLInputElement | null
             if (active?.tagName === 'INPUT' && active.value.length > 0) {

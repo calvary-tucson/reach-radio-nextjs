@@ -9,15 +9,15 @@ export function TeacherDetailSkeleton() {
       <Sk className="h-[14px] md:h-5 w-[60px] md:w-24 rounded mx-4 md:mx-8 mt-[14px] mb-0" />
 
       {/* Banner */}
-      <Sk className="w-full h-[88px] md:h-[160px] mt-3" />
+      <Sk className="w-full h-[100px] md:h-[180px] mt-3" />
 
       {/* Two-column at md */}
       <div className="md:flex md:gap-8 md:px-8 md:items-start">
 
         {/* Left sidebar */}
         <div className="md:w-72 md:flex-shrink-0">
-          <div className="flex items-end justify-between px-4 md:px-0 mt-[-36px] md:mt-[-50px] mb-3">
-            <Sk className="w-[72px] md:w-[80px] h-[72px] md:h-[80px] rounded-full" />
+          <div className="flex items-end justify-between px-4 md:px-0 mt-[-88px] mb-3">
+            <Sk className="w-[176px] h-[176px] rounded-full" />
             <Sk className="h-[28px] w-[80px] rounded-full md:hidden" />
           </div>
           <Sk className="h-[18px] md:h-8 w-2/3 rounded mx-4 md:mx-0 mb-[6px]" />
@@ -50,9 +50,9 @@ export function TeacherDetailSkeleton() {
       <Sk className="h-[9px] md:h-4 w-[80px] md:w-36 rounded mx-4 md:mx-8 mb-3" />
       <div className="flex gap-[10px] md:gap-4 px-4 md:px-8 overflow-hidden">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[46px] md:w-[60px]">
-            <Sk className="w-[38px] h-[38px] rounded-full" />
-            <Sk className="h-[7px] md:h-[10px] w-[35px] md:w-[45px]" />
+          <div key={i} className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[72px]">
+            <Sk className="w-[48px] h-[48px] rounded-full" />
+            <Sk className="h-[7px] md:h-[10px] w-[45px] md:w-[55px]" />
           </div>
         ))}
       </div>
