@@ -32,6 +32,7 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
     startTime.current = Date.now()
     currentY.current = 0
     if (contentRef.current) {
+      contentRef.current.style.animation = 'none'
       contentRef.current.style.transition = 'none'
     }
   }, [contentRef])
@@ -73,6 +74,7 @@ export function useSheetDrag({ onDismiss, contentRef }: UseSheetDragOptions) {
     startTime.current = Date.now()
     currentY.current = 0
     if (contentRef.current) {
+      contentRef.current.style.animation = 'none'
       contentRef.current.style.transition = 'none'
     }
 
