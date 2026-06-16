@@ -10,6 +10,7 @@ vi.mock('@/lib/hooks/useSheetDrag', () => ({
     onTouchStart: vi.fn(),
     onTouchMove: vi.fn(),
     onTouchEnd: vi.fn(),
+    onMouseDown: vi.fn(),
   }),
 }))
 

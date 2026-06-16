@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { DragHandle } from '@/components/global/DragHandle'
 
 interface BottomSheetProps {
   open: boolean
@@ -77,17 +78,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
             visible ? 'translate-y-0' : 'translate-y-full'
           } ${className ?? ''}`}
         >
-          <div
-            className="touch-none cursor-grab active:cursor-grabbing"
-            onTouchStart={drag.onTouchStart}
-            onTouchMove={drag.onTouchMove}
-            onTouchEnd={drag.onTouchEnd}
-            onMouseDown={drag.onMouseDown}
-          >
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" />
-            </div>
-          </div>
+          <DragHandle drag={drag} onDismiss={handleClose} className="w-full pt-3 pb-2" />
           {children}
         </div>
       </div>

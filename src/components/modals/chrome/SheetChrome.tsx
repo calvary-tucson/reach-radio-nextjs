@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { useRef } from 'react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { DragHandle } from '@/components/global/DragHandle'
 import { MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { cn } from '@/lib/utils'
 
@@ -41,18 +42,7 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
-        {/* Drag handle — mobile only; button allows keyboard dismiss */}
-        <button
-          type="button"
-          aria-label="Close"
-          className="flex justify-center pt-3 pb-2 sm:hidden cursor-grab active:cursor-grabbing touch-none shrink-0 w-full"
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
-          onTouchStart={drag.onTouchStart}
-          onTouchMove={drag.onTouchMove}
-          onTouchEnd={drag.onTouchEnd}
-        >
-          <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" aria-hidden="true" />
-        </button>
+        <DragHandle drag={drag} onDismiss={onDismiss} className="w-full pt-3 pb-2 sm:hidden shrink-0" />
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between border-b border-white/10 light:border-gray-200 bg-gray-800 light:bg-white px-6 py-4">
           {title ? (
