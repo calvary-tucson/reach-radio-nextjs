@@ -3,13 +3,19 @@ const RADIOJAR_URL = 'https://proxy.radiojar.com/api/stations/g4d600bv6p5tv/now_
 export async function GET(): Promise<Response> {
   const encoder = new TextEncoder()
   let interval: ReturnType<typeof setInterval> | undefined
+  const abortController = new AbortController()
+  let cancelled = false
 
   const stream = new ReadableStream({
     async start(controller) {
       async function poll() {
+        if (cancelled) return
         try {
           const res = await fetch(RADIOJAR_URL, {
-            signal: AbortSignal.timeout(5_000),
+            signal: AbortSignal.any([
+              AbortSignal.timeout(5_000),
+              abortController.signal,
+            ]),
           })
           const text = await res.text()
           const json = JSON.parse(text.substring(1, text.length - 2)) as {
@@ -19,9 +25,11 @@ export async function GET(): Promise<Response> {
           const title = json.title || 'Reach Radio'
           const artist = json.artist || ''
           const data = JSON.stringify({ title, artist })
-          controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+          if (!cancelled) {
+            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+          }
         } catch {
-          // retain previous state — send nothing on error
+          // retain previous state on error or abort
         }
       }
 
@@ -29,7 +37,9 @@ export async function GET(): Promise<Response> {
       interval = setInterval(poll, 30_000)
     },
     cancel() {
+      cancelled = true
       clearInterval(interval)
+      abortController.abort()
     },
   })
 
