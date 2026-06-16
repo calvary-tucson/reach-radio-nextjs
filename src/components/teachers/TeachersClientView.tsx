@@ -62,18 +62,13 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
           )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (
-              <button
+              <TeacherCard
                 key={teacher.slug}
-                type="button"
-                onClick={() => openModal(teacher.name)}
-                className="block w-full text-left cursor-pointer"
-              >
-                <TeacherCard
-                  teacher={teacher}
-                  index={index}
-                  scheduleDays={scheduleDaysMap.get(teacher.slug)}
-                />
-              </button>
+                teacher={teacher}
+                index={index}
+                scheduleDays={scheduleDaysMap.get(teacher.slug)}
+                onNavigate={() => openModal(teacher.name)}
+              />
             ))}
           </div>
         </div>
