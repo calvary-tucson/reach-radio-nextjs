@@ -93,7 +93,7 @@ export default function DonatePage() {
       ) : (
         <>
           {!loaded && (
-            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 h-[900px] bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-4">
+            <div role="status" aria-label="Loading donation form..." className="animate-pulse flex flex-col gap-4 min-h-[1300px] md:min-h-[1200px] bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-4">
               <div className="h-[60px] bg-white/5 light:bg-gray-200 rounded-xl" />
               <div className="h-[1.2em] w-[90%] bg-white/5 light:bg-gray-200 rounded-xl" />
               <div className="h-[1.2em] w-[60%] bg-white/5 light:bg-gray-200 rounded-xl" />
@@ -112,7 +112,7 @@ export default function DonatePage() {
             onLoad={handleLoad}
             onError={handleError}
             sandbox="allow-scripts allow-forms allow-popups"
-            className={`w-full min-h-[900px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
+            className={`w-full min-h-[1300px] md:min-h-[1200px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
           />
         </>
       )}
