@@ -7,6 +7,15 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ back: vi.fn() }),
 }))
 
+vi.mock('@/lib/hooks/useSheetDrag', () => ({
+  useSheetDrag: () => ({
+    onTouchStart: vi.fn(),
+    onTouchMove: vi.fn(),
+    onTouchEnd: vi.fn(),
+    onMouseDown: vi.fn(),
+  }),
+}))
+
 vi.mock('@radix-ui/react-dialog', async () => {
   const actual = await vi.importActual<typeof import('@radix-ui/react-dialog')>('@radix-ui/react-dialog')
   return {

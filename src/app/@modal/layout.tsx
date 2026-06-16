@@ -6,6 +6,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useRef } from 'react'
 import { ModalProvider } from '@/components/modals/ModalContext'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { DragHandle } from '@/components/global/DragHandle'
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { useModalStore } from '@/lib/stores/modal'
 import { postMessageToNative } from '@/lib/bridge/post-message'
@@ -20,6 +22,9 @@ function ModalSkeleton({
   onDismiss: () => void
   isClosing?: boolean
 }) {
+  const skeletonRef = useRef<HTMLDivElement>(null)
+  const drag = useSheetDrag({ onDismiss, contentRef: skeletonRef })
+
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
@@ -27,14 +32,13 @@ function ModalSkeleton({
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
     >
       <div
+        ref={skeletonRef}
         className={cn(
           'w-full max-h-[90dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0 h-[85dvh] sm:h-auto sm:max-w-2xl sm:w-[95vw]',
           isClosing ? MODAL_EXIT_ANIMATION : MODAL_ENTER_ANIMATION
         )}
       >
-        <div className="flex justify-center pt-3 pb-2 sm:hidden">
-          <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" />
-        </div>
+        <DragHandle drag={drag} onDismiss={onDismiss} className="w-full pt-3 pb-2 sm:hidden" />
         <div className="flex items-center justify-between border-b border-white/10 light:border-gray-200 bg-gray-800 light:bg-white px-6 py-4">
           {title ? (
             <h2 className="text-xl font-bold text-white light:text-gray-900">{title}</h2>

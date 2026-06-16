@@ -8,6 +8,9 @@ declare global {
   interface Window {
     iFrameResize?: (options: Record<string, unknown>, selector: string) => void
   }
+  interface HTMLIFrameElement {
+    iFrameResizer?: { close(): void }
+  }
 }
 
 const DONATE_URL =
@@ -54,9 +57,17 @@ export default function DonatePage() {
     setLoaded(true)
     const resizeOpts = { log: false, heightCalculationMethod: 'bodyOffset', warningTimeout: 0 }
     window.iFrameResize?.(resizeOpts, '#donation-iframe')
-    // Form dynamically injects its scripts after iframe onLoad — retry to catch contentWindow once ready
-    resizeRetry1Ref.current = setTimeout(() => window.iFrameResize?.(resizeOpts, '#donation-iframe'), 3000)
-    resizeRetry2Ref.current = setTimeout(() => window.iFrameResize?.(resizeOpts, '#donation-iframe'), 6000)
+    // Form dynamically loads iFrameResizer.contentWindow after onLoad fires.
+    // Delete the iFrameResizer property to bypass the "already setup" guard
+    // (without calling close() which removes the iframe from the DOM).
+    function retryResize() {
+      const el = iframeRef.current
+      if (!el || el.style.height) return
+      delete el.iFrameResizer
+      window.iFrameResize?.(resizeOpts, '#donation-iframe')
+    }
+    resizeRetry1Ref.current = setTimeout(retryResize, 3000)
+    resizeRetry2Ref.current = setTimeout(retryResize, 6000)
     let remaining = 5
     function trySend() {
       try {
