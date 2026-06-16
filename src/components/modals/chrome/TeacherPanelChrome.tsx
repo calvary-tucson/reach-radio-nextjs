@@ -59,7 +59,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
               <ArrowLeft className="h-5 w-5" />
             </button>
           ) : (
-            <div className="w-9" />
+            <div className="w-11" />
           )}
           <DragHandle drag={mobileDrag} onDismiss={onDismiss} />
           <button
