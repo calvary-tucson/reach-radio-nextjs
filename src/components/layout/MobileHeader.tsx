@@ -42,10 +42,9 @@ export function MobileHeader() {
         <Image
           src="/reach_radio_logo.svg"
           alt="Reach Radio"
-          width={250}
-          height={40}
+          width={248}
+          height={58}
           className="h-8 w-auto"
-          style={{ width: 'auto' }}
           priority
         />
       </Link>

@@ -52,10 +52,9 @@ export function Header() {
         <Image
           src="/reach_radio_logo.svg"
           alt=""
-          width={186}
-          height={40}
+          width={248}
+          height={58}
           className="h-10 w-auto"
-          style={{ width: 'auto' }}
           priority
         />
       </Link>

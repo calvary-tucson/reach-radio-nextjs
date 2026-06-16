@@ -63,7 +63,7 @@ export function RadioPlayer() {
             src={image || FALLBACK_IMAGE}
             alt={altText}
             width={420}
-            height={420}
+            height={256}
             sizes="(max-width: 640px) 100vw, 420px"
             className="max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 transition-opacity"
             priority
