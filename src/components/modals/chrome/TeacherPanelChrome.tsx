@@ -19,7 +19,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
   const canGoBack = stackDepth > 0
 
   const backButtonClass =
-    'flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+    'flex h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white/60 light:text-gray-500 hover:bg-white/40 light:hover:bg-gray-300 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
   const closeButtonClass =
     'flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
