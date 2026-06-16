@@ -21,6 +21,8 @@ export default function DonatePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const retryRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const resizeRetry1Ref = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const resizeRetry2Ref = useRef<ReturnType<typeof setTimeout> | null>(null)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
 
   useEffect(() => {
@@ -29,6 +31,8 @@ export default function DonatePage() {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
       if (retryRef.current) clearTimeout(retryRef.current)
+      if (resizeRetry1Ref.current) clearTimeout(resizeRetry1Ref.current)
+      if (resizeRetry2Ref.current) clearTimeout(resizeRetry2Ref.current)
     }
   }, [setShowMediaBar])
 
@@ -48,10 +52,11 @@ export default function DonatePage() {
   function handleLoad() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
     setLoaded(true)
-    window.iFrameResize?.(
-      { log: false, heightCalculationMethod: 'bodyOffset' },
-      '#donation-iframe'
-    )
+    const resizeOpts = { log: false, heightCalculationMethod: 'bodyOffset', warningTimeout: 0 }
+    window.iFrameResize?.(resizeOpts, '#donation-iframe')
+    // Form dynamically injects its scripts after iframe onLoad — retry to catch contentWindow once ready
+    resizeRetry1Ref.current = setTimeout(() => window.iFrameResize?.(resizeOpts, '#donation-iframe'), 3000)
+    resizeRetry2Ref.current = setTimeout(() => window.iFrameResize?.(resizeOpts, '#donation-iframe'), 6000)
     let remaining = 5
     function trySend() {
       try {
