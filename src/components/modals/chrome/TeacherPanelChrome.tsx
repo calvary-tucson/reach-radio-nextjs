@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { DragHandle } from '@/components/global/DragHandle'
 import { cn } from '@/lib/utils'
 
 interface TeacherPanelChromeProps {
@@ -13,7 +14,8 @@ interface TeacherPanelChromeProps {
 export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
   const { onDismiss, isClosing } = useModal()
   const contentRef = useRef<HTMLDivElement>(null)
-  const drag = useSheetDrag({ onDismiss, contentRef })
+  const mobileDrag = useSheetDrag({ onDismiss, contentRef, axis: 'y' })
+  const tabletDrag = useSheetDrag({ onDismiss, contentRef, axis: 'x' })
 
   return (
     <div
@@ -38,39 +40,36 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
             : 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
         )}
       >
-        {/* Drag handle + close — mobile only */}
-        <div
-          className="flex items-center justify-between px-3 pt-3 pb-2 md:hidden shrink-0"
-        >
+        {/* Mobile: drag handle + close button */}
+        <div className="flex items-center justify-between px-3 pt-3 pb-2 md:hidden shrink-0">
           <div className="w-9" />
-          {/* Drag handle is also a button for keyboard dismiss */}
-          <button
-            type="button"
-            aria-label="Close"
-            className="cursor-grab active:cursor-grabbing touch-none"
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
-            onTouchStart={drag.onTouchStart}
-            onTouchMove={drag.onTouchMove}
-            onTouchEnd={drag.onTouchEnd}
-          >
-            <div className="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300" aria-hidden="true" />
-          </button>
+          <DragHandle drag={mobileDrag} onDismiss={onDismiss} />
           <button
             type="button"
             onClick={onDismiss}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Close button — desktop only */}
-        <div className="hidden md:flex justify-end px-4 pt-4 pb-0 shrink-0">
+        {/* Desktop close button + tablet swipe zone.
+            touch-pan-y: browser owns vertical scroll; our handlers receive horizontal swipes.
+            stopPropagation on the X button prevents tap-on-X from triggering drag context. */}
+        <div
+          data-testid="tablet-drag-zone"
+          className="hidden md:flex justify-end px-4 pt-4 pb-0 shrink-0 touch-pan-y"
+          onTouchStart={tabletDrag.onTouchStart}
+          onTouchMove={tabletDrag.onTouchMove}
+          onTouchEnd={tabletDrag.onTouchEnd}
+        >
           <button
+            data-testid="desktop-close-btn"
             type="button"
             onClick={onDismiss}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer"
+            onTouchStart={(e) => e.stopPropagation()}
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
