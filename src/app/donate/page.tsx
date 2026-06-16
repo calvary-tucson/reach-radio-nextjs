@@ -62,8 +62,8 @@ export default function DonatePage() {
     // (without calling close() which removes the iframe from the DOM).
     function retryResize() {
       const el = iframeRef.current
-      if (!el || el.style.height) return
-      delete el.iFrameResizer
+      if (!el || (el.style.height && el.style.height !== '0px')) return
+      try { delete el.iFrameResizer } catch { /* non-configurable property — skip */ }
       window.iFrameResize?.(resizeOpts, '#donation-iframe')
     }
     resizeRetry1Ref.current = setTimeout(retryResize, 3000)
