@@ -24,6 +24,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
   const startPos = useRef(0)
   const startTime = useRef(0)
   const currentDelta = useRef(0)
+  const reducedMotionRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mouseCleanupRef = useRef<(() => void) | null>(null)
 
@@ -45,6 +46,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
     startPos.current = axis === 'x' ? e.touches[0].clientX : e.touches[0].clientY
     startTime.current = Date.now()
     currentDelta.current = 0
+    reducedMotionRef.current = prefersReducedMotion()
     if (contentRef.current) {
       contentRef.current.style.animation = 'none'
       contentRef.current.style.transition = 'none'
@@ -54,7 +56,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     const pos = axis === 'x' ? e.touches[0].clientX : e.touches[0].clientY
     currentDelta.current = Math.max(0, pos - startPos.current)
-    if (contentRef.current && !prefersReducedMotion()) {
+    if (contentRef.current && !reducedMotionRef.current) {
       contentRef.current.style.transform = axis === 'x'
         ? `translateX(${currentDelta.current}px)`
         : `translateY(${currentDelta.current}px)`
@@ -97,6 +99,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
     startPos.current = axis === 'x' ? e.clientX : e.clientY
     startTime.current = Date.now()
     currentDelta.current = 0
+    const reducedMotion = prefersReducedMotion()
     if (contentRef.current) {
       contentRef.current.style.animation = 'none'
       contentRef.current.style.transition = 'none'
@@ -105,7 +108,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
     function handleMouseMove(ev: MouseEvent) {
       const pos = axis === 'x' ? ev.clientX : ev.clientY
       currentDelta.current = Math.max(0, pos - startPos.current)
-      if (contentRef.current && !prefersReducedMotion()) {
+      if (contentRef.current && !reducedMotion) {
         contentRef.current.style.transform = axis === 'x'
           ? `translateX(${currentDelta.current}px)`
           : `translateY(${currentDelta.current}px)`
