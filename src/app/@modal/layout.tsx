@@ -67,6 +67,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   const isOpen = useModalStore((s) => s.isOpen)
   const isClosing = useModalStore((s) => s.isClosing)
   const title = useModalStore((s) => s.title)
+  const stackDepth = useModalStore((s) => s.stackDepth)
   const close = useModalStore((s) => s.close)
   const startClosing = useModalStore((s) => s.startClosing)
   const expectingRoute = useModalStore((s) => s.expectingRoute)
@@ -98,32 +99,37 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
-  const handleDismiss = useCallback(() => {
+  // Force-close: always dismisses the entire panel regardless of stack depth.
+  // Pops all stacked history entries (depth + 1) in one go via window.history.go
+  // so the user lands on the page they had before the modal was opened.
+  const handleClose = useCallback(() => {
     if (dismissGuardRef.current) return
     dismissGuardRef.current = true
     startClosing()
     dismissTimer.current = setTimeout(() => {
       const state = useModalStore.getState()
       const triggerEl = state.triggerRef
-      if (state.stackDepth > 0) {
-        // Stacked modal — back to parent sheet without fully closing
-        state.prepareBack()
-        router.back()
-      } else {
-        state.close()
-        router.back()
-      }
+      const depth = state.stackDepth
+      state.close()
+      window.history.go(-(depth + 1))
       dismissGuardRef.current = false
       triggerEl?.focus()
     }, EXIT_DURATION)
-  }, [startClosing, router])
+  }, [startClosing])
 
-  const handleBack = useCallback(() => { router.back() }, [router])
+  // Back: pop one step in the stack, keep panel open showing the previous teacher.
+  // prepareBack() signals the pathname effect to treat the upcoming pop as an
+  // in-panel navigation (not a full close).
+  const handleBack = useCallback(() => {
+    const state = useModalStore.getState()
+    state.prepareBack()
+    router.back()
+  }, [router])
 
   if (!isOpen) return null
 
   return (
-    <DialogPrimitive.Root open onOpenChange={(open) => { if (!open) handleDismiss() }}>
+    <DialogPrimitive.Root open onOpenChange={(open) => { if (!open) handleClose() }}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
           className={
@@ -140,7 +146,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
               e.preventDefault()
               return
             }
-            handleDismiss()
+            handleClose()
           }}
         >
           <DialogPrimitive.Title className="sr-only">
@@ -149,10 +155,15 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
           <DialogPrimitive.Description className="sr-only">
             Press Escape to close.
           </DialogPrimitive.Description>
-          <ModalProvider onDismiss={handleDismiss} onBack={handleBack} isClosing={isClosing}>
+          <ModalProvider
+            onDismiss={handleClose}
+            onBack={handleBack}
+            isClosing={isClosing}
+            stackDepth={stackDepth}
+          >
             <Suspense
               fallback={
-                <ModalSkeleton title={title} onDismiss={handleDismiss} isClosing={isClosing} />
+                <ModalSkeleton title={title} onDismiss={handleClose} isClosing={isClosing} />
               }
             >
               {children}

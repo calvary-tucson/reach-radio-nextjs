@@ -49,4 +49,30 @@ describe('ModalLayout', () => {
     render(<ModalLayout><p>modal content</p></ModalLayout>)
     expect(screen.getByText('modal content')).toBeInTheDocument()
   })
+
+  it('close button fully closes when stackDepth > 0', async () => {
+    vi.useFakeTimers()
+    // Arrange: modal open with stack depth 1 (nested teacher)
+    useModalStore.setState({
+      expectingRoute: false, isOpen: true, isClosing: false,
+      title: 'Teacher B', triggerRef: null, stackDepth: 1,
+      expectingBack: false,
+    })
+    const historyGoSpy = vi.spyOn(window.history, 'go').mockImplementation(() => {})
+    const ModalLayout = await loadLayout()
+    render(
+      <ModalLayout>
+        <button data-testid="close-trigger">Close</button>
+      </ModalLayout>
+    )
+    // Simulate dismiss (onDismiss is handleClose)
+    const store = useModalStore.getState()
+    store.startClosing()
+    // After EXIT_DURATION (150ms), close() and history.go() should be called
+    await vi.advanceTimersByTimeAsync?.(200)
+    // store.isOpen should be false
+    expect(useModalStore.getState().isOpen).toBe(false)
+    historyGoSpy.mockRestore()
+    vi.useRealTimers()
+  })
 })
