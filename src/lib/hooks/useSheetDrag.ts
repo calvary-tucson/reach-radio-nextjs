@@ -2,6 +2,7 @@ import { type RefObject, useCallback, useEffect, useRef } from 'react'
 
 const DISMISS_THRESHOLD = 120
 const VELOCITY_THRESHOLD = 0.5
+// 60px floor prevents ghost-touch dismissal at near-zero displacement
 const MIN_VELOCITY_DELTA = 60
 const OPACITY_SCALE_DISTANCE = 400
 const OPACITY_MIN = 0.5
@@ -78,6 +79,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
         contentRef.current.style.transform = axis === 'x' ? 'translateX(100%)' : 'translateY(100%)'
         contentRef.current.style.opacity = '0'
       }
+      if (dismissTimer.current) clearTimeout(dismissTimer.current)
       dismissTimer.current = setTimeout(onDismiss, 150)
     } else {
       if (contentRef.current) {
@@ -85,6 +87,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
         contentRef.current.style.transform = axis === 'x' ? 'translateX(0)' : 'translateY(0)'
         contentRef.current.style.opacity = '1'
       }
+      if (dismissTimer.current) clearTimeout(dismissTimer.current)
       dismissTimer.current = setTimeout(clearInlineStyles, SNAP_BACK_DURATION)
     }
   }, [contentRef, onDismiss, axis, clearInlineStyles])
@@ -131,6 +134,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
           contentRef.current.style.transform = axis === 'x' ? 'translateX(100%)' : 'translateY(100%)'
           contentRef.current.style.opacity = '0'
         }
+        if (dismissTimer.current) clearTimeout(dismissTimer.current)
         dismissTimer.current = setTimeout(onDismiss, 150)
       } else {
         if (contentRef.current) {
@@ -138,6 +142,7 @@ export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDrag
           contentRef.current.style.transform = axis === 'x' ? 'translateX(0)' : 'translateY(0)'
           contentRef.current.style.opacity = '1'
         }
+        if (dismissTimer.current) clearTimeout(dismissTimer.current)
         dismissTimer.current = setTimeout(clearInlineStyles, SNAP_BACK_DURATION)
       }
     }

@@ -69,6 +69,20 @@ describe('useSheetDrag', () => {
       expect(el.style.animation).toBe('')
     })
 
+    it('dismisses via velocity when delta is 60–120 and swipe is fast', () => {
+      vi.useFakeTimers()
+      const onDismiss = vi.fn()
+      const { result } = renderHook(() => useSheetDrag({ onDismiss, contentRef }))
+      // No time advance between start and end → elapsed = max(1, 0) = 1ms → velocity = 70 > 0.5
+      act(() => { result.current.onTouchStart(touch(0, 0)) })
+      act(() => { result.current.onTouchMove(touch(0, 70)) })
+      act(() => { result.current.onTouchEnd() })
+      expect(el.style.transform).toBe('translateY(100%)')
+      act(() => { vi.advanceTimersByTime(200) })
+      expect(onDismiss).toHaveBeenCalledOnce()
+      vi.useRealTimers()
+    })
+
     it('ignores upward swipe (clamps to 0)', () => {
       const onDismiss = vi.fn()
       const { result } = renderHook(() => useSheetDrag({ onDismiss, contentRef }))
