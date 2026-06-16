@@ -7,6 +7,11 @@ function ConsumerComponent() {
   return <div>{isClosing ? 'closing' : 'open'}</div>
 }
 
+function StackConsumer() {
+  const { stackDepth } = useModal()
+  return <div data-testid="depth">{stackDepth}</div>
+}
+
 function ThrowingComponent() {
   useModal()
   return null
@@ -15,7 +20,7 @@ function ThrowingComponent() {
 describe('ModalContext', () => {
   it('provides values to children via useModal', () => {
     render(
-      <ModalProvider onDismiss={vi.fn()} onBack={vi.fn()} isClosing={false}>
+      <ModalProvider onDismiss={vi.fn()} onBack={vi.fn()} isClosing={false} stackDepth={0}>
         <ConsumerComponent />
       </ModalProvider>
     )
@@ -30,10 +35,19 @@ describe('ModalContext', () => {
 
   it('reflects isClosing=true', () => {
     render(
-      <ModalProvider onDismiss={vi.fn()} onBack={vi.fn()} isClosing={true}>
+      <ModalProvider onDismiss={vi.fn()} onBack={vi.fn()} isClosing={true} stackDepth={0}>
         <ConsumerComponent />
       </ModalProvider>
     )
     expect(screen.getByText('closing')).toBeInTheDocument()
+  })
+
+  it('provides stackDepth to children', () => {
+    render(
+      <ModalProvider onDismiss={vi.fn()} onBack={vi.fn()} isClosing={false} stackDepth={2}>
+        <StackConsumer />
+      </ModalProvider>
+    )
+    expect(screen.getByTestId('depth')).toHaveTextContent('2')
   })
 })

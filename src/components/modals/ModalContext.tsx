@@ -6,6 +6,7 @@ interface ModalContextValue {
   onDismiss: () => void
   onBack: () => void
   isClosing: boolean
+  stackDepth: number
 }
 
 export const ModalContext = createContext<ModalContextValue | null>(null)
@@ -15,9 +16,10 @@ export function ModalProvider({
   onDismiss,
   onBack,
   isClosing,
+  stackDepth,
 }: ModalContextValue & { children: React.ReactNode }) {
   return (
-    <ModalContext value={{ onDismiss, onBack, isClosing }}>
+    <ModalContext value={{ onDismiss, onBack, isClosing, stackDepth }}>
       {children}
     </ModalContext>
   )
