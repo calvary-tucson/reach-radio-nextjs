@@ -3,7 +3,7 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { scheduleQuery } from '@/lib/sanity/queries'
 import { to24h, toMinutes } from '@/lib/utils/time'
 import Image from 'next/image'
-import Link from 'next/link'
+import { ScheduleItemLink } from '@/components/home/ScheduleItemLink'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
@@ -151,14 +151,14 @@ export async function TodaySchedule() {
         }
 
         return (
-          <Link
+          <ScheduleItemLink
             key={`${item.slug}-${item.startTime}`}
-            href={`/teachers/${item.slug}`}
-            className="schedule-row flex items-center justify-between flex-wrap bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 transition-colors cursor-pointer"
-            style={{ '--stagger-i': idx } as React.CSSProperties}
+            slug={item.slug}
+            name={item.name}
+            idx={idx}
           >
-            <div className="flex gap-5">{content}</div>
-          </Link>
+            {content}
+          </ScheduleItemLink>
         )
       })}
     </div>
