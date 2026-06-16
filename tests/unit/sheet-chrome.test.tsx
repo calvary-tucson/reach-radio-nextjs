@@ -16,7 +16,7 @@ vi.mock('@/lib/hooks/useSheetDrag', () => ({
 
 function Wrapper({ isClosing = false, onDismiss = vi.fn() } = {}) {
   return (
-    <ModalProvider onDismiss={onDismiss} onBack={vi.fn()} isClosing={isClosing}>
+    <ModalProvider onDismiss={onDismiss} onBack={vi.fn()} isClosing={isClosing} stackDepth={0}>
       <SheetChrome title="Test Sheet">
         <p>Sheet content</p>
       </SheetChrome>

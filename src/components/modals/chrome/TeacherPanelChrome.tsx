@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { X } from 'lucide-react'
+import { X, ArrowLeft } from 'lucide-react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { DragHandle } from '@/components/global/DragHandle'
@@ -12,10 +12,17 @@ interface TeacherPanelChromeProps {
 }
 
 export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
-  const { onDismiss, isClosing } = useModal()
+  const { onDismiss, onBack, isClosing, stackDepth } = useModal()
   const contentRef = useRef<HTMLDivElement>(null)
   const mobileDrag = useSheetDrag({ onDismiss, contentRef, axis: 'y' })
   const tabletDrag = useSheetDrag({ onDismiss, contentRef, axis: 'x' })
+  const canGoBack = stackDepth > 0
+
+  const backButtonClass =
+    'flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+
+  const closeButtonClass =
+    'flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
   return (
     <div
@@ -40,36 +47,63 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
             : 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
         )}
       >
-        {/* Mobile: drag handle + close button */}
+        {/* Mobile: drag handle + optional back button + close button */}
         <div className="flex items-center justify-between px-3 pt-3 pb-2 md:hidden shrink-0">
-          <div className="w-9" />
+          {canGoBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className={backButtonClass}
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          ) : (
+            <div className="w-9" />
+          )}
           <DragHandle drag={mobileDrag} onDismiss={onDismiss} />
           <button
             type="button"
             onClick={onDismiss}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={closeButtonClass}
             aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Desktop close button + tablet swipe zone.
+        {/* Desktop: tablet swipe zone + optional back button + close button.
             touch-pan-y: browser owns vertical scroll; our handlers receive horizontal swipes.
-            stopPropagation on the X button prevents tap-on-X from triggering drag context. */}
+            stopPropagation on buttons prevents tap from triggering drag context. */}
         <div
           data-testid="tablet-drag-zone"
-          className="hidden md:flex justify-end px-4 pt-4 pb-0 shrink-0 touch-pan-y"
+          className={cn(
+            'hidden md:flex items-center px-4 pt-4 pb-0 shrink-0 touch-pan-y',
+            canGoBack ? 'justify-between' : 'justify-end',
+          )}
           onTouchStart={tabletDrag.onTouchStart}
           onTouchMove={tabletDrag.onTouchMove}
           onTouchEnd={tabletDrag.onTouchEnd}
         >
+          {canGoBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              className={backButtonClass}
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          )}
           <button
             data-testid="desktop-close-btn"
             type="button"
             onClick={onDismiss}
             onTouchStart={(e) => e.stopPropagation()}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onTouchEnd={(e) => e.stopPropagation()}
+            className={closeButtonClass}
             aria-label="Close"
           >
             <X className="h-5 w-5" />
