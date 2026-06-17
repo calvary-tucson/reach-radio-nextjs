@@ -3,12 +3,15 @@ import { NextRequest, NextResponse } from 'next/server'
 export function proxy(request: NextRequest): NextResponse {
   const response = NextResponse.next()
 
-  if (request.headers.get('mobile-app') === 'true') {
+  const hasMobileHeader = request.headers.get('mobile-app') === 'true'
+  const hasMobileCookie = request.cookies.get('mobile-app')?.value === 'true'
+
+  if (hasMobileHeader && !hasMobileCookie) {
     response.cookies.set('mobile-app', 'true', {
-      maxAge: 60 * 60 * 24 * 365,
       path: '/',
+      maxAge: 60 * 60 * 24 * 365,
       sameSite: 'lax',
-      // Not httpOnly — BridgeInit.tsx needs to clear this when the bridge is absent
+      httpOnly: false, // Not httpOnly — BridgeInit.tsx reads and clears this cookie client-side
     })
   }
 

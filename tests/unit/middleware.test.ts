@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { NextRequest } from 'next/server'
-import { middleware } from '@/middleware'
+import { proxy } from '@/proxy'
 
 function makeRequest(
   headers: Record<string, string> = {},
@@ -17,28 +17,40 @@ function makeRequest(
   })
 }
 
-describe('middleware', () => {
+describe('proxy', () => {
   it('sets mobile-app cookie when header present and no cookie', () => {
     const req = makeRequest({ 'mobile-app': 'true' })
-    const res = middleware(req)
+    const res = proxy(req)
     expect(res.cookies.get('mobile-app')?.value).toBe('true')
   })
 
   it('does not set cookie when mobile-app cookie already exists', () => {
     const req = makeRequest({ 'mobile-app': 'true' }, { 'mobile-app': 'true' })
-    const res = middleware(req)
+    const res = proxy(req)
     expect(res.cookies.get('mobile-app')).toBeUndefined()
   })
 
   it('does not set cookie when no mobile-app header', () => {
     const req = makeRequest()
-    const res = middleware(req)
+    const res = proxy(req)
     expect(res.cookies.get('mobile-app')).toBeUndefined()
   })
 
   it('does not set cookie when mobile-app header is not "true"', () => {
     const req = makeRequest({ 'mobile-app': 'false' })
-    const res = middleware(req)
+    const res = proxy(req)
+    expect(res.cookies.get('mobile-app')).toBeUndefined()
+  })
+
+  it('does not set cookie when mobile-app header is "1"', () => {
+    const req = makeRequest({ 'mobile-app': '1' })
+    const res = proxy(req)
+    expect(res.cookies.get('mobile-app')).toBeUndefined()
+  })
+
+  it('does not set cookie when mobile-app header is "yes"', () => {
+    const req = makeRequest({ 'mobile-app': 'yes' })
+    const res = proxy(req)
     expect(res.cookies.get('mobile-app')).toBeUndefined()
   })
 })
