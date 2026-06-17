@@ -92,5 +92,5 @@ export const highlightedTeachersQuery = `
 export const APP_SETTINGS_ID = 'a2939b52-e844-45f4-ba97-c335991cea4b'
 
 export const appSettingsQuery = `
-  *[_type == "appSettings" && _id == $id][0] { radioAudioURL }
+  *[_type == "appSettings" && _id == $id][0] { radioAudioURL, hostURL }
 `
