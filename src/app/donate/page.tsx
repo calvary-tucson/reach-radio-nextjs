@@ -54,6 +54,9 @@ export default function DonatePage() {
 
   function handleLoad() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    if (retryRef.current) clearTimeout(retryRef.current)
+    if (resizeRetry1Ref.current) clearTimeout(resizeRetry1Ref.current)
+    if (resizeRetry2Ref.current) clearTimeout(resizeRetry2Ref.current)
     setLoaded(true)
     const resizeOpts = { log: false, heightCalculationMethod: 'bodyOffset', warningTimeout: 0 }
     window.iFrameResize?.(resizeOpts, '#donation-iframe')
