@@ -13,8 +13,8 @@ export async function GET(): Promise<Response> {
     {
       protocolVersion: 1,
       streamUrl: settings?.radioAudioURL ?? FALLBACK_STREAM_URL,
-      hostURL: settings?.hostURL ?? FALLBACK_HOST_URL,
-      webUrl: settings?.hostURL ?? FALLBACK_HOST_URL,
+      hostURL: settings?.hostURL || FALLBACK_HOST_URL,
+      webUrl: settings?.hostURL || FALLBACK_HOST_URL,
       minAppVersion: { ios: '1.0.0', android: '1.0.0' },
     },
     {
