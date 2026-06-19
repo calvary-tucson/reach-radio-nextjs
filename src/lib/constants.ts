@@ -1,4 +1,4 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://reach.radio'
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://reach-radio-nextjs.vercel.app'
 
 export const FALLBACK_STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
 
