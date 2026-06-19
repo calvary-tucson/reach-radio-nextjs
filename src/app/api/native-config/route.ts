@@ -1,6 +1,6 @@
 import { sanityFetch } from '@/lib/sanity/client'
 import { appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
-import { FALLBACK_STREAM_URL, FALLBACK_HOST_URL } from '@/lib/constants'
+import { FALLBACK_STREAM_URL, FALLBACK_HOST_URL, SITE_URL } from '@/lib/constants'
 
 export async function GET(): Promise<Response> {
   const settings = await sanityFetch<{ radioAudioURL: string; hostURL: string }>(
@@ -14,7 +14,7 @@ export async function GET(): Promise<Response> {
       protocolVersion: 1,
       streamUrl: settings?.radioAudioURL ?? FALLBACK_STREAM_URL,
       hostURL: settings?.hostURL || FALLBACK_HOST_URL,
-      webUrl: settings?.hostURL || FALLBACK_HOST_URL,
+      webUrl: SITE_URL,
       minAppVersion: { ios: '1.0.0', android: '1.0.0' },
     },
     {
