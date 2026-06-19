@@ -32,7 +32,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
 
   // One-time setup: init bridge globals and wire online/offline
   useEffect(() => {
-    initUnpolyShim()
+    initUnpolyShim(router)
     initBridgeProxy(router)
 
     const handleOnline = () => postMessageToNative({ offline: false })

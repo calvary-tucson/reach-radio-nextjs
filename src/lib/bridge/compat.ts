@@ -3,11 +3,12 @@ declare global {
     up: {
       history: { readonly location: string }
       reload: () => void
+      navigate: (opts: { url: string }) => void
     }
   }
 }
 
-export function initUnpolyShim(): void {
+export function initUnpolyShim(router?: { push: (path: string) => void }): void {
   if (typeof window === 'undefined') return
   window.up = {
     history: {
@@ -16,5 +17,12 @@ export function initUnpolyShim(): void {
       },
     },
     reload: () => window.location.reload(),
+    navigate: (opts: { url: string }) => {
+      if (router) {
+        router.push(opts.url)
+      } else {
+        window.location.href = opts.url
+      }
+    },
   }
 }
