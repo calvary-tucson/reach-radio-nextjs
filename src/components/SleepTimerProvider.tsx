@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
+import { postMessageToNative } from '@/lib/bridge/post-message'
 
 export function SleepTimerProvider() {
   const sleepTimerActive = useMediaStore((s) => s.sleepTimerActive)
@@ -21,6 +22,7 @@ export function SleepTimerProvider() {
         setRemainingSleepSeconds(0)
         setIsPlaying(false)
         setSleepTimerActive(false)
+        postMessageToNative({ isPlaying: false })
       } else {
         setRemainingSleepSeconds(next)
       }
