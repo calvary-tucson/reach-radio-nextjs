@@ -35,6 +35,7 @@ export function MobileHeader() {
   return (
     <header
       ref={ref}
+      data-web-chrome=""
       className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200"
       style={{ transition: 'transform 0.5s, opacity 0.5s' }}
     >

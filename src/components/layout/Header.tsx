@@ -45,6 +45,7 @@ export function Header() {
     <header
       ref={ref}
       id="site-header"
+      data-web-chrome=""
       style={{ viewTransitionName: 'site-header', transition: 'transform 0.5s, opacity 0.5s' }}
       className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6"
     >

@@ -31,6 +31,14 @@
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
+/* === Native app chrome suppression ===
+   .native-app class is set synchronously in <head> (before paint) when
+   window.inNativeApp or mobile-app cookie is detected. Hides web chrome
+   regardless of whether Vercel served a cached (non-personalised) response. */
+html.native-app [data-web-chrome] {
+  display: none !important;
+}
+
 /* === Webview / Mobile Shell === */
 
 body {

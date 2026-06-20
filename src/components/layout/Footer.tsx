@@ -4,7 +4,7 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="overflow-hidden relative z-10 border-t border-t-gray-500 light:border-t-gray-200 px-[clamp(10px,_3vw,_30px)] py-[clamp(20px,_3vw,_30px)] bg-[var(--color-brand-gray)] light:bg-gray-100 mt-5">
+    <footer data-web-chrome="" className="overflow-hidden relative z-10 border-t border-t-gray-500 light:border-t-gray-200 px-[clamp(10px,_3vw,_30px)] py-[clamp(20px,_3vw,_30px)] bg-[var(--color-brand-gray)] light:bg-gray-100 mt-5">
       <div>
         <p className="text-gray-400 light:text-gray-500 text-xs mb-2 uppercase tracking-wider font-semibold">
           Appearance
