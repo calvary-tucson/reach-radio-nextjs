@@ -82,9 +82,10 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   }, [])
 
   useEffect(() => {
+    if (!isOpen) return
     postMessageToNative({ showMobileNav: false })
     return () => { postMessageToNative({ showMobileNav: true }) }
-  }, [])
+  }, [isOpen])
 
   const pathname = usePathname()
 
