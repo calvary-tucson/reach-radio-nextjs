@@ -16,26 +16,39 @@ Covers: web-side bridge changes, v4 native bridge contract, domain migration seq
 
 ## Architecture Snapshot
 
-| | v3 (App Store) | v4 (in dev) |
+iOS only (Android is a separate case — see below):
+
+| | iOS v3 (App Store) | iOS v4 (in dev) |
 |---|---|---|
 | WebView URL | hardcoded `reach-radio-web.pages.dev` | fetched from `/api/native-config` |
-| Audio stream | hardcoded `reach.radio/api/audio-stream` | fetched from `/api/native-config` |
+| Audio stream | hardcoded `reach-radio-web.pages.dev/api/audio-stream` | fetched from `/api/native-config` |
 | Bridge | Unpoly shim (Astro site) | `window.nativeBridge.*` (agnostic) |
 | Config fetch | none | reach.radio → reachradiotucson.com → vercel.app |
 
+Android has no v3/v4 distinction — one codebase:
+
+| | Android prod (`main`) | Android (`bridge-testing`) |
+|---|---|---|
+| WebView URL | hardcoded `reach-radio-web.pages.dev` | `YOUR_TUNNEL_DOMAIN` placeholder (not shipped) |
+| Audio stream | hardcoded `reach.radio/api/audio-stream` ✅ | same |
+| Bridge | `window.globalActions.goToPage` (old pattern) | same (not yet updated to `window.nativeBridge`) |
+
 ---
 
-## v3 compatibility
+## v3 / prod compatibility
 
-v3 WebView hardcodes `reach-radio-web.pages.dev` — the Astro/Cloudflare site.
-v3 **never loads Next.js**. Domain migration doesn't affect v3's WebView at all.
+**iOS v3 (prod `main`):** WebView hardcodes `reach-radio-web.pages.dev` — the Astro/Cloudflare site. v3 **never loads Next.js**. Domain migration doesn't affect v3's WebView.
 
-The only thing Next.js provides for v3: `/api/audio-stream` (v3 audio hardcodes `reach.radio/api/audio-stream`). That endpoint already exists. ✅
+iOS v3 audio also hardcodes `reach-radio-web.pages.dev/api/audio-stream` (NOT `reach.radio`). The audio stream must stay on Astro until v3 install base is negligible.
+
+**Android prod (`main`):** Same WebView constraint — hardcodes `reach-radio-web.pages.dev`. Android `bridge-testing` branch uses `YOUR_TUNNEL_DOMAIN` placeholder (dev-only, never shipped to Play Store). Android audio already points to `reach.radio/api/audio-stream` — no Astro dependency on audio.
+
+The only thing Next.js provides for v3 iOS: `/api/audio-stream` (proxied at `reach.radio/api/audio-stream`). That endpoint already exists. ✅
 
 **The Unpoly shim (`compat.ts`) and globalActions proxy (`proxy.ts`) in Next.js are dead code.**
-v3 never loads Next.js so those shims never run for v3 users. They will be deleted.
+Neither v3 iOS nor Android prod loads Next.js, so those shims never ran for any users. Deleted.
 
-**Constraint:** Keep Astro (`reach-radio-web.pages.dev`) alive until v3 install base is negligible.
+**Constraint:** Keep Astro (`reach-radio-web.pages.dev`) alive until v3 iOS AND Android prod install bases are negligible.
 
 ---
 

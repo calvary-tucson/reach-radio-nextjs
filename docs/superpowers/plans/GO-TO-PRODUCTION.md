@@ -75,8 +75,10 @@ Must happen after Vercel deploy — Sanity webhook needs the live production URL
 
 ## Step 4 — Go Live
 
-**v3 iOS:** WebView hardcodes `reach-radio-web.pages.dev` (Astro). Domain migration does NOT affect v3.
-**v4 iOS:** Fetches `webUrl` from `/api/native-config` at launch. URL comes from config, no hardcode to change.
+**v3 iOS (prod `main`):** WebView hardcodes `reach-radio-web.pages.dev` (Astro). Audio stream also hardcodes `reach-radio-web.pages.dev/api/audio-stream`. Domain migration does NOT affect v3.
+**v4 iOS (in dev):** Fetches `webUrl` from `/api/native-config` at launch. URL comes from config, no hardcode to change.
+**Android (prod `main`):** Same as iOS v3 — WebView hardcodes `reach-radio-web.pages.dev`. Audio stream already points to `https://reach.radio/api/audio-stream` (no Astro dependency on audio). Domain migration does NOT affect prod Android WebView.
+**Android (`bridge-testing`):** WebView uses `YOUR_TUNNEL_DOMAIN` placeholder — not shipped, dev-only.
 
 | Task | Status |
 |------|--------|
@@ -85,8 +87,10 @@ Must happen after Vercel deploy — Sanity webhook needs the live production URL
 | Migrate `reachradiotucson.com` DNS → Vercel (fixes second fallback in v4 config chain) | 🔲 Not started |
 | iOS v4: replace dev tunnel fallback with `https://reach.radio` (⚠️ blocks App Store) | 🔲 Not started — iOS repo |
 | Ship iOS v4 to App Store | 🔲 Not started |
+| Android: replace `YOUR_TUNNEL_DOMAIN` → `https://reach.radio` on bridge-testing before Play Store | 🔲 Not started — Android repo |
+| Ship Android to Play Store | 🔲 Not started |
 | Verify native apps work end-to-end against production | 🔲 Not started |
-| Keep Astro (`reach-radio-web.pages.dev`) alive — v3 iOS audio stream hardcoded there | ⚠️ Permanent constraint |
+| Keep Astro (`reach-radio-web.pages.dev`) alive — v3 iOS WebView + audio hardcoded there; Android WebView also hardcoded there | ⚠️ Permanent constraint |
 
 ---
 
@@ -111,6 +115,6 @@ These require App Store / Play Store submissions. Not blocking the URL switch.
 
 ## Key Constraints (never forget)
 
-- **Keep Astro alive forever** — iOS native audio stream is hardcoded to `reach-radio-web.pages.dev/api/audio-stream`. Do NOT shut it down without an iOS app update.
+- **Keep Astro alive forever** — iOS v3 WebView AND audio stream both hardcode `reach-radio-web.pages.dev`. Android prod WebView also hardcodes `reach-radio-web.pages.dev` (audio is fine — already `reach.radio`). Do NOT shut down Astro without App Store + Play Store updates for both apps.
 - **Vercel required for PPR** — Cloudflare Pages does not support `cacheComponents`.
 - **Sanity webhook secret** — already set in Vercel env. Do not commit to git.
