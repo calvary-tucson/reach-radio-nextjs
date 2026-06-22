@@ -9,6 +9,18 @@ interface BridgeInitProps {
   streamUrl?: string
 }
 
+type NativeCommand =
+  | { type: 'navigate'; path: string }
+  | { type: 'refresh' }
+  | { type: 'setPlayState'; playing: boolean }
+  | { type: 'setBuffering'; buffering: boolean }
+
+declare global {
+  interface WindowEventMap {
+    nativeCommand: CustomEvent<NativeCommand>
+  }
+}
+
 function isNativeBridgePresent(): boolean {
   return !!(
     window.Android?.postMessage ||
@@ -29,35 +41,52 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // One-time setup (re-runs on route change to keep getLocation closure current)
+  // Native bridge: receive commands from iOS/Android via CustomEvent
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    window.nativeBridge = {
-      navigate: (path: string) => router.push(path),
-      refresh: () => router.refresh(),
-      getLocation: () => pathname,
-      setPlayState: (playing: boolean) => useMediaStore.getState().setIsPlaying(playing),
-      setBuffering: (buffering: boolean) => useMediaStore.getState().setIsBuffering(buffering),
+    if (!window.inNativeApp) return
+
+    const handler = (e: CustomEvent<NativeCommand>) => {
+      const cmd = e.detail
+      switch (cmd.type) {
+        case 'navigate': router.push(cmd.path); break
+        case 'refresh': router.refresh(); break
+        case 'setPlayState': useMediaStore.getState().setIsPlaying(cmd.playing); break
+        case 'setBuffering': useMediaStore.getState().setIsBuffering(cmd.buffering); break
+      }
+    }
+    window.addEventListener('nativeCommand', handler)
+
+    // loaded: true AFTER listener attached — iOS isBridgeReady gates on this
+    postMessageToNative({ loaded: true, streamUrl })
+
+    // V3 shims — remove when v3 iOS retires from App Store
+    ;(window as any).up = {
+      navigate: ({ url }: { url: string }) => router.push(url),
+      reload: () => router.refresh(),
+      history: { get location() { return pathname } }
+    }
+    ;(window as any).globalState = {
+      mediaBarState: {
+        isPlaying: { set: (v: boolean) => useMediaStore.getState().setIsPlaying(v) },
+        isBuffering: { set: (v: boolean) => useMediaStore.getState().setIsBuffering(v) }
+      }
     }
 
+    return () => window.removeEventListener('nativeCommand', handler)
+  }, [])
+
+  // Online/offline → notify native
+  useEffect(() => {
     const handleOnline = () => postMessageToNative({ offline: false })
     const handleOffline = () => postMessageToNative({ offline: true })
-
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
-
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [router, pathname])
-
-  // Send loaded + streamUrl after mount (streamUrl is a static server prop)
-  useEffect(() => {
-    postMessageToNative({
-      loaded: true,
-      ...(streamUrl ? { streamUrl } : {}),
-    })
-  }, [streamUrl])
+  }, [])
 
   // On route change: send location + showMediaBar + restore native nav bar
   useEffect(() => {

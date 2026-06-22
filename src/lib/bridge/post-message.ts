@@ -8,13 +8,6 @@ declare global {
     }
     ReactNativeWebView?: { postMessage: (msg: string) => void }
     inNativeApp?: boolean
-    nativeBridge?: {
-      navigate: (path: string) => void
-      refresh: () => void
-      getLocation: () => string
-      setPlayState: (playing: boolean) => void
-      setBuffering: (buffering: boolean) => void
-    }
   }
 }
 
