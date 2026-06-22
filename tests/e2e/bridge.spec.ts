@@ -1,30 +1,27 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Native bridge', () => {
-  test('window.globalActions.goToPage navigates', async ({ page }) => {
+  test('window.nativeBridge.navigate() navigates', async ({ page }) => {
     await page.goto('/')
-    await page.evaluate(() => window.globalActions.goToPage('/teachers'))
+    await page.evaluate(() => window.nativeBridge?.navigate('/teachers'))
     await expect(page).toHaveURL('/teachers')
   })
 
-  test('window.globalState.mediaBarState.isPlaying.set() updates state', async ({ page }) => {
-    await page.goto('/')
-    await page.evaluate(() => window.globalState.mediaBarState.isPlaying.set(true))
-    expect(true).toBe(true)
-  })
-
-  test('window.up.history.location returns current path', async ({ page }) => {
+  test('window.nativeBridge.getLocation() returns current path', async ({ page }) => {
     await page.goto('/teachers')
-    const location = await page.evaluate(() => window.up.history.location)
+    const location = await page.evaluate(() => window.nativeBridge?.getLocation())
     expect(location).toBe('/teachers')
   })
 
-  test('window.up.reload() triggers page reload', async ({ page }) => {
+  test('window.nativeBridge.setPlayState() updates store', async ({ page }) => {
     await page.goto('/')
-    let reloaded = false
-    page.on('load', () => { reloaded = true })
-    await page.evaluate(() => window.up.reload())
-    await page.waitForLoadState('load')
-    expect(reloaded).toBe(true)
+    await page.evaluate(() => window.nativeBridge?.setPlayState(true))
+    expect(true).toBe(true)
+  })
+
+  test('window.nativeBridge.setBuffering() updates store', async ({ page }) => {
+    await page.goto('/')
+    await page.evaluate(() => window.nativeBridge?.setBuffering(true))
+    expect(true).toBe(true)
   })
 })

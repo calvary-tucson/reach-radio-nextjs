@@ -2,9 +2,8 @@
 
 import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { initBridgeProxy } from '@/lib/bridge/proxy'
-import { initUnpolyShim } from '@/lib/bridge/compat'
 import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useMediaStore } from '@/lib/store/media-store'
 
 interface BridgeInitProps {
   streamUrl?: string
@@ -30,10 +29,15 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // One-time setup: init bridge globals and wire online/offline
+  // One-time setup (re-runs on route change to keep getLocation closure current)
   useEffect(() => {
-    initUnpolyShim(router)
-    initBridgeProxy(router)
+    window.nativeBridge = {
+      navigate: (path: string) => router.push(path),
+      refresh: () => router.refresh(),
+      getLocation: () => pathname,
+      setPlayState: (playing: boolean) => useMediaStore.getState().setIsPlaying(playing),
+      setBuffering: (buffering: boolean) => useMediaStore.getState().setIsBuffering(buffering),
+    }
 
     const handleOnline = () => postMessageToNative({ offline: false })
     const handleOffline = () => postMessageToNative({ offline: true })
@@ -45,7 +49,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [router])
+  }, [router, pathname])
 
   // Send loaded + streamUrl after mount (streamUrl is a static server prop)
   useEffect(() => {
@@ -55,10 +59,11 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     })
   }, [streamUrl])
 
-  // On route change: send location + showMediaBar state
+  // On route change: send location + showMediaBar + restore native nav bar
   useEffect(() => {
     postMessageToNative({ location: pathname })
     postMessageToNative({ showMediaBar: pathname !== '/' })
+    postMessageToNative({ showMobileNav: true })
   }, [pathname])
 
   // Input focus/blur: hide native nav when keyboard appears, restore after

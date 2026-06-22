@@ -9,13 +9,14 @@ import { postMessageToNative } from '@/lib/bridge/post-message'
 export function MediaBar() {
   const showMediaBar = useMediaStore((s) => s.showMediaBar)
   const isPlaying = useMediaStore((s) => s.isPlaying)
+  const isBuffering = useMediaStore((s) => s.isBuffering)
   const title = useMediaStore((s) => s.title)
   const artist = useMediaStore((s) => s.artist)
   const image = useMediaStore((s) => s.image)
 
   useEffect(() => {
-    postMessageToNative({ isPlaying, title, artist, image })
-  }, [isPlaying, title, artist, image])
+    postMessageToNative({ isPlaying, isBuffering, title, artist, image })
+  }, [isPlaying, isBuffering, title, artist, image])
 
   return (
     <div
