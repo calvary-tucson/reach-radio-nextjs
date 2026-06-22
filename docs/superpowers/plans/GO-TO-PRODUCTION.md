@@ -26,20 +26,20 @@ Step 1 (web fixes) → Step 2 (Vercel deploy) → Step 3 (PPR Phase 3) → Step 
 
 ## Step 1 — Native Bridge Fixes (web-side only)
 
-**Plan:** `docs/superpowers/plans/2026-05-29-native-webview-bridge-fixes.md`
-
-All changes are in `reach-radio-nextjs`. No native app updates needed for these.
+**Original plan:** `docs/superpowers/plans/2026-05-29-native-webview-bridge-fixes.md`
+**v4 bridge plan (supersedes some tasks):** `docs/superpowers/plans/2026-06-22-v4-bridge-and-migration.md`
 
 | Task | File | Status |
 |------|------|--------|
 | T1: Fix audio stream 10s timeout | `src/app/api/audio-stream/route.ts` | ✅ Done |
-| T2: Add middleware for native detection | `src/middleware.ts` | 🔲 Not started |
+| T2: Middleware for native detection | superseded — `BridgeInit` sets `mobile-app` cookie client-side when bridge objects detected | ✅ Done (differently) |
 | T3: Fix BridgeInit gaps (loaded, showMediaBar, focus/blur, streamUrl) | `src/components/bridge/BridgeInit.tsx` | ✅ Done |
 | T4: Add protocolVersion to all bridge messages | `src/lib/bridge/post-message.ts` | ✅ Done |
 | T5: Add /api/native-config endpoint | `src/app/api/native-config/route.ts` | ✅ Done |
-| T6: Manual verification in native apps (pre-switch checklist) | — | 🔲 Not started |
+| T6: Implement `window.nativeBridge` for iOS v4 (T1–T7 in v4 plan) | `BridgeInit.tsx`, `MediaBar.tsx`, `post-message.ts` | ✅ Done |
+| T7: Manual verification in native apps (pre-switch checklist) | — | 🔲 Not started |
 
-**Only blocker remaining: T2 (middleware)**
+**All web-side bridge tasks complete.**
 
 ---
 
@@ -75,13 +75,18 @@ Must happen after Vercel deploy — Sanity webhook needs the live production URL
 
 ## Step 4 — Go Live
 
+**v3 iOS:** WebView hardcodes `reach-radio-web.pages.dev` (Astro). Domain migration does NOT affect v3.
+**v4 iOS:** Fetches `webUrl` from `/api/native-config` at launch. URL comes from config, no hardcode to change.
+
 | Task | Status |
 |------|--------|
-| Update `native-config` `webUrl` from `reach-radio-web.pages.dev` → `reach.radio` | 🔲 Not started |
-| Switch iOS WebView URL to `reach.radio` | 🔲 Not started |
-| Switch Android WebView URL to `reach.radio` | 🔲 Not started |
+| Set `NEXT_PUBLIC_SITE_URL=https://reach.radio` in Vercel env (fixes `webUrl` in native-config) | 🔲 Not started |
+| Migrate `reach.radio` DNS → Vercel | 🔲 Not started |
+| Migrate `reachradiotucson.com` DNS → Vercel (fixes second fallback in v4 config chain) | 🔲 Not started |
+| iOS v4: replace dev tunnel fallback with `https://reach.radio` (⚠️ blocks App Store) | 🔲 Not started — iOS repo |
+| Ship iOS v4 to App Store | 🔲 Not started |
 | Verify native apps work end-to-end against production | 🔲 Not started |
-| Keep Astro (`reach-radio-web.pages.dev`) alive — iOS audio stream hardcoded there | ⚠️ Permanent constraint |
+| Keep Astro (`reach-radio-web.pages.dev`) alive — v3 iOS audio stream hardcoded there | ⚠️ Permanent constraint |
 
 ---
 
@@ -91,16 +96,16 @@ These require App Store / Play Store submissions. Not blocking the URL switch.
 
 **Plan:** See "Native App Issues" section in `docs/superpowers/plans/2026-05-29-native-webview-bridge-fixes.md`
 
-| Issue | Platform | Severity |
-|-------|----------|---------|
-| iOS-1: `scheduleBufferingEnd()` guard bug | iOS | Medium |
-| iOS-2: `handleRefresh` retain cycle | iOS | Low |
-| iOS-3: Replace 2s splash timer with `loaded` message | iOS | Medium |
-| iOS-4: Consume `streamUrl` from bridge | iOS | Low |
-| Android-1: IIFE guard on `up.history.location` | Android | High |
-| Android-2: Remove `isPlaying=false` from `isBuffering` | Android | High |
-| Android-3: Back button exit at SPA root | Android | Medium |
-| Android-4: JSON-encode path in `goToPage` | Android | Low |
+| Issue | Platform | Severity | Notes |
+|-------|----------|---------|-------|
+| iOS-1: `scheduleBufferingEnd()` guard bug | iOS | Medium | |
+| iOS-2: `handleRefresh` retain cycle | iOS | Low | |
+| iOS-3: Replace 2s splash timer with `loaded` postMessage | iOS | Medium | v4 already handles via `{ loaded: true }` |
+| iOS-4: Consume `streamUrl` from bridge | iOS | Low | v4 fetches from `/api/native-config` instead |
+| Android-1: IIFE guard on `up.history.location` | Android | ~~High~~ | **Moot** — `window.up` shim deleted from Next.js |
+| Android-2: Remove `isPlaying=false` from `isBuffering` | Android | High | |
+| Android-3: Back button exit at SPA root | Android | Medium | |
+| Android-4: JSON-encode path in `goToPage` | Android | ~~Low~~ | **Moot** — `window.globalActions` deleted from Next.js |
 
 ---
 
