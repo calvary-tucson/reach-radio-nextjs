@@ -39,6 +39,11 @@ html.native-app [data-web-chrome] {
   display: none !important;
 }
 
+/* Remove header offset when web chrome is hidden in native app */
+html.native-app main {
+  padding-top: 0;
+}
+
 /* === Webview / Mobile Shell === */
 
 body {
