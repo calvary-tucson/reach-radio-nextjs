@@ -38,7 +38,7 @@ describe('AudioProvider', () => {
     })
     ;({ play, pause } = stubAudioElement())
     // Silence useNowPlaying's EventSource — needs constructor form for `new EventSource(...)`
-    vi.stubGlobal('EventSource', vi.fn(function MockEventSource() {
+    vi.stubGlobal('EventSource', vi.fn(function MockEventSource(this: Record<string, unknown>) {
       this.onmessage = null
       this.onerror = null
       this.close = vi.fn()
