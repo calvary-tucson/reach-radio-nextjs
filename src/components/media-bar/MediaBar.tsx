@@ -23,6 +23,7 @@ export function MediaBar() {
       role="region"
       aria-label="Media player"
       aria-hidden={!showMediaBar}
+      inert={!showMediaBar}
       data-web-chrome=""
       data-media-bar=""
       data-hidden={!showMediaBar ? '' : undefined}
