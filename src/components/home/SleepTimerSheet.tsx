@@ -56,7 +56,11 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
             <p className="text-white light:text-gray-900 text-5xl font-mono mb-2" aria-hidden="true">
               {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </p>
-            <p className="text-white/60 light:text-gray-500 text-sm mb-8">
+            <p
+              className="text-white/60 light:text-gray-500 text-sm mb-8"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               Radio stops in {minutes}m {secs}s
             </p>
             <button

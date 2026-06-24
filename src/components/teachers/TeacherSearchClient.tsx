@@ -166,7 +166,7 @@ export function TeacherSearchClient({
           aria-live="polite"
           aria-atomic="true"
         >
-          {results.length} {results.length === 1 ? 'teacher' : 'teachers'} found
+          {isPending ? 'Loading…' : `${results.length} ${results.length === 1 ? 'teacher' : 'teachers'} found`}
         </p>
 
         {isPending ? (
