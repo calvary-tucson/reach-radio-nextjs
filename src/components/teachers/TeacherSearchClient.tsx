@@ -50,8 +50,12 @@ export function TeacherSearchClient({
   )
 
   useEffect(() => {
-    inputRef.current?.focus()
+    // Delay past the 200ms sheet slide-up animation so focus lands on a visible element
+    const focusId = setTimeout(() => {
+      inputRef.current?.focus()
+    }, 250)
     return () => {
+      clearTimeout(focusId)
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [])
@@ -154,7 +158,7 @@ export function TeacherSearchClient({
             onKeyDown={(e) => {
               if (e.key === 'Escape') clearQuery()
             }}
-            className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base sm:text-sm text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
             aria-label="Search teachers"
           />
           {displayValue && (
