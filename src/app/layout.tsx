@@ -21,6 +21,8 @@ import './globals.css'
 
 export const viewport: Viewport = {
   viewportFit: 'cover',
+  initialScale: 1,
+  width: 'device-width',
 }
 
 const FALLBACK_DESCRIPTION = "Listen to Reach Radio, Tucson's Christian radio station featuring Bible teachings and gospel music on 106.7FM and 690AM."
