@@ -40,6 +40,9 @@ function clearMobileAppCookie() {
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const title = useMediaStore((s) => s.title)
+  const artist = useMediaStore((s) => s.artist)
+  const image = useMediaStore((s) => s.image)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,12 +91,20 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
   }, [])
 
-  // On route change: send location + showMediaBar + restore native nav bar
+  // On route change: send location + showMediaBar + nav visibility
   useEffect(() => {
+    const segments = pathname.split('/').filter(Boolean)
+    const isTeacherDetail =
+      segments[0] === 'teachers' && segments.length === 2 && segments[1] !== 'search'
     postMessageToNative({ location: pathname })
-    postMessageToNative({ showMediaBar: pathname !== '/' })
-    postMessageToNative({ showMobileNav: true })
+    postMessageToNative({ showMediaBar: pathname !== '/' && !isTeacherDetail })
+    postMessageToNative({ showMobileNav: !isTeacherDetail })
   }, [pathname])
+
+  // Forward track metadata to native whenever it changes in the store
+  useEffect(() => {
+    postMessageToNative({ title, artist, image })
+  }, [title, artist, image])
 
   // Input focus/blur: hide native nav when keyboard appears, restore after
   useEffect(() => {
