@@ -16,7 +16,7 @@ export function DragHandle({ drag, onDismiss, className }: DragHandleProps) {
       aria-label="Close"
       className={cn(
         'hidden touch:flex items-center justify-center min-h-11',
-        'touch-none cursor-pointer',
+        'touch-none cursor-pointer bg-transparent border-0',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         className,
       )}
