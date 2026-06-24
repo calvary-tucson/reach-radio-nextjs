@@ -54,7 +54,7 @@ export function TeacherSearchBar() {
           value={displayValue}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Escape') clear() }}
-          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base sm:text-sm text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
           aria-label="Search teachers"
         />
         {displayValue && (
