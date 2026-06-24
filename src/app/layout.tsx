@@ -18,6 +18,7 @@ import { WebSiteSchema } from '@/components/seo/WebSiteSchema'
 import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { FALLBACK_STREAM_URL, FALLBACK_OG_IMAGE } from '@/lib/constants'
+import { RouteAnnouncer } from '@/components/bridge/RouteAnnouncer'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -172,7 +173,7 @@ export default function RootLayout({
             <Suspense fallback={<ChromeFallback />}>
               <LayoutChrome modal={modal} />
             </Suspense>
-            <main id="main-content" className="pt-16">
+            <main id="main-content" className="pt-16 focus:outline-none" tabIndex={-1}>
               {children}
             </main>
             <Suspense>
@@ -180,6 +181,7 @@ export default function RootLayout({
             </Suspense>
             <MediaBar />
             <Toaster richColors position="top-center" />
+            <RouteAnnouncer />
           </TooltipProvider>
         </ThemeProvider>
       </body>
