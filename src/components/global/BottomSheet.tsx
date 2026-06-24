@@ -18,11 +18,15 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
   const [mounted, setMounted] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   const handleClose = useCallback(() => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
     setVisible(false)
-    closeTimerRef.current = setTimeout(onClose, 280)
+    closeTimerRef.current = setTimeout(() => {
+      onClose()
+      triggerRef.current?.focus()
+    }, 280)
   }, [onClose])
 
   const drag = useSheetDrag({ onDismiss: handleClose, contentRef: sheetRef })
@@ -35,6 +39,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
 
   useEffect(() => {
     if (!open) return
+    triggerRef.current = document.activeElement as HTMLElement
     const id = requestAnimationFrame(() => {
       setVisible(true)
       sheetRef.current?.focus()
@@ -46,6 +51,19 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
     if (!open) return
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') handleClose()
+      if (e.key === 'Tab') {
+        const focusable = sheetRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+        if (!focusable?.length) { e.preventDefault(); return }
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus()
+        }
+      }
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
@@ -70,17 +88,18 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
         onClick={handleClose}
         aria-hidden="true"
       />
-      <div role="dialog" aria-modal="true" aria-label={ariaLabel}>
-        <div
-          ref={sheetRef}
-          tabIndex={-1}
-          className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 light:bg-white rounded-t-2xl transition-transform duration-[280ms] ease-out ${
-            visible ? 'translate-y-0' : 'translate-y-full'
-          } ${className ?? ''}`}
-        >
-          <DragHandle drag={drag} onDismiss={handleClose} className="w-full pt-3 pb-2" />
-          {children}
-        </div>
+      <div
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel}
+        tabIndex={-1}
+        className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 light:bg-white rounded-t-2xl transition-transform duration-[280ms] ease-out ${
+          visible ? 'translate-y-0' : 'translate-y-full'
+        } ${className ?? ''}`}
+      >
+        <DragHandle drag={drag} onDismiss={handleClose} className="w-full pt-3 pb-2" />
+        {children}
       </div>
     </>,
     document.body
