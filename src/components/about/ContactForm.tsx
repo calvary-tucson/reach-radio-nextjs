@@ -37,21 +37,21 @@ export function ContactForm() {
         <label htmlFor="name" className="text-white/80 light:text-gray-700 text-sm block mb-1">Name *</label>
         <input
           id="name" name="name" type="text" required minLength={2} maxLength={100}
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
         />
       </div>
       <div>
         <label htmlFor="email" className="text-white/80 light:text-gray-700 text-sm block mb-1">Email *</label>
         <input
           id="email" name="email" type="email" required
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
         />
       </div>
       <div>
         <label htmlFor="message" className="text-white/80 light:text-gray-700 text-sm block mb-1">Message *</label>
         <textarea
           id="message" name="message" required rows={5} minLength={10} maxLength={2000}
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400 resize-none"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400 resize-none"
         />
       </div>
 
