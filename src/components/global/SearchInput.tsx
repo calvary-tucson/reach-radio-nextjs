@@ -50,7 +50,7 @@ export function SearchInput({
           type="button"
           onClick={() => { onChange(''); onClear?.() }}
           aria-label="Clear search"
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded border border-white/20 light:border-gray-300 bg-white/5 light:bg-gray-50 text-white/60 light:text-gray-400 hover:text-white/80 light:hover:text-gray-700 hover:border-white/40 light:hover:border-gray-400 cursor-pointer"
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded border border-white/20 light:border-gray-300 bg-white/5 light:bg-gray-50 text-white/60 light:text-gray-400 hover:text-white/80 light:hover:text-gray-700 hover:border-white/40 light:hover:border-gray-400 cursor-pointer"
         >
           <X size={16} aria-hidden="true" />
         </button>

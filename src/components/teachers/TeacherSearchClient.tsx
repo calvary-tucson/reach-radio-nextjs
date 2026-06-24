@@ -151,7 +151,7 @@ export function TeacherSearchClient({
             <button
               type="button"
               onClick={clearAll}
-              className="ml-auto text-xs text-white/70 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
+              className="ml-auto text-xs text-white/70 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded min-h-[44px] flex items-center px-2"
             >
               Clear all
             </button>

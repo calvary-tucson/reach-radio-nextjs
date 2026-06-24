@@ -62,7 +62,7 @@ export function TeacherSearchBar() {
             <button
               type="button"
               onClick={clear}
-              className="flex h-8 w-8 items-center justify-center rounded text-white/60 light:text-gray-400 hover:text-white light:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-11 w-11 items-center justify-center rounded text-white/60 light:text-gray-400 hover:text-white light:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
