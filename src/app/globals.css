@@ -47,6 +47,7 @@ html.native-app main {
 html.native-app body {
   padding-bottom: 0;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 /* === Webview / Mobile Shell === */
