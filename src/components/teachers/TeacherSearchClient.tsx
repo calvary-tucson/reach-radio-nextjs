@@ -50,12 +50,7 @@ export function TeacherSearchClient({
   )
 
   useEffect(() => {
-    // Delay past the 200ms sheet slide-up animation so focus lands on a visible element
-    const focusId = setTimeout(() => {
-      inputRef.current?.focus()
-    }, 250)
     return () => {
-      clearTimeout(focusId)
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [])
@@ -152,6 +147,7 @@ export function TeacherSearchClient({
           <input
             ref={inputRef}
             type="text"
+            autoFocus
             placeholder="Search teachers..."
             value={displayValue}
             onChange={(e) => handleQueryChange(e.target.value)}
