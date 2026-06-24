@@ -37,6 +37,7 @@ export function MobileNav() {
     <nav
       id="site-nav"
       data-web-chrome=""
+      aria-label="Main navigation"
       className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around w-full px-1 text-white light:text-gray-900 bg-black light:bg-white border-t border-t-green-500 light:border-t-green-600"
     >
       {navItems.map((item) => {

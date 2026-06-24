@@ -133,7 +133,7 @@ export function TeacherSearchClient({
       {/* Sort filter */}
       <div>
         <p className={sectionLabel}>Sort</p>
-        <div className="flex items-center flex-wrap gap-2">
+        <div role="group" aria-label="Sort by" className="flex items-center flex-wrap gap-2">
           {SORT_OPTIONS.map((option) => (
             <button
               key={option.value}

@@ -173,7 +173,7 @@ export default function RootLayout({
             <Suspense fallback={<ChromeFallback />}>
               <LayoutChrome modal={modal} />
             </Suspense>
-            <main id="main-content" className="pt-16 focus:outline-none" tabIndex={-1}>
+            <main id="main-content" aria-label="Main content" className="pt-16 focus:outline-none" tabIndex={-1}>
               {children}
             </main>
             <Suspense>

@@ -60,7 +60,7 @@ export function Header() {
         />
       </Link>
 
-      <nav className="flex items-center">
+      <nav aria-label="Primary navigation" className="flex items-center">
         {navItems.map((item) => {
           const isActive = item.href === '/'
             ? pathname === '/'
