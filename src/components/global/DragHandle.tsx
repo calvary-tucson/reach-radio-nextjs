@@ -14,6 +14,7 @@ export function DragHandle({ drag, onDismiss, className }: DragHandleProps) {
     <button
       type="button"
       aria-hidden="true"
+      tabIndex={-1}
       className={cn(
         'hidden touch:flex items-center justify-center min-h-11',
         'touch-none cursor-pointer bg-transparent border-0 appearance-none',
