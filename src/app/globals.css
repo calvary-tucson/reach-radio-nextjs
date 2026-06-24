@@ -63,6 +63,7 @@ main {
 
 button, a, [role="button"], input, label {
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* === MediaBar slide-up animation === */
