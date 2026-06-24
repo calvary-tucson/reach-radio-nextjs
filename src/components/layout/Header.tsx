@@ -91,7 +91,6 @@ export function Header() {
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
           rel="noopener noreferrer"
-          title="Facebook"
           className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >

@@ -13,7 +13,7 @@ export function DragHandle({ drag, onDismiss, className }: DragHandleProps) {
   return (
     <button
       type="button"
-      aria-label="Close"
+      aria-hidden="true"
       className={cn(
         'hidden touch:flex items-center justify-center min-h-11',
         'touch-none cursor-pointer bg-transparent border-0 appearance-none',

@@ -48,7 +48,7 @@ export function TeacherSearchBar() {
         />
         <input
           ref={inputRef}
-          type="text"
+          type="search"
           autoFocus
           placeholder="Search teachers..."
           value={displayValue}

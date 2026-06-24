@@ -20,7 +20,7 @@ export function Footer() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Calvary Tucson Church
+          Calvary Tucson Church<span className="sr-only"> (opens in new tab)</span>
         </a>{' '}
         © {year}
       </div>
@@ -35,7 +35,7 @@ export function Footer() {
             rel="noopener noreferrer"
             href="https://www.sanity.io/"
           >
-            Sanity.io
+            Sanity.io<span className="sr-only"> (opens in new tab)</span>
           </a>
         </div>
       </div>

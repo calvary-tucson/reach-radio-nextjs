@@ -39,7 +39,7 @@ export function MobileHeader() {
       className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200"
       style={{ transition: 'transform 0.5s, opacity 0.5s' }}
     >
-      <Link href="/" className="w-[clamp(180px,40vw,250px)]">
+      <Link href="/" aria-label="Reach Radio home" className="w-[clamp(180px,40vw,250px)]">
         <Image
           src="/reach_radio_logo.svg"
           alt="Reach Radio"
@@ -54,7 +54,6 @@ export function MobileHeader() {
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
           rel="noopener noreferrer"
-          title="Facebook"
           className="w-8 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >

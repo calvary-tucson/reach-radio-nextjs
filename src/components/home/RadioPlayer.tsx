@@ -48,10 +48,8 @@ export function RadioPlayer() {
     postMessageToNative({ isPlaying: next })
   }
 
-  const altText = title ? `Now playing: ${title}${artist ? ` by ${artist}` : ''}` : 'Now playing album art'
-
   return (
-    <div ref={containerRef} className="p-2 pb-5 md:p-5 bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px]">
+    <div ref={containerRef} role="region" aria-label="Radio player" className="p-2 pb-5 md:p-5 bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px]">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
         <button
@@ -61,7 +59,7 @@ export function RadioPlayer() {
         >
           <Image
             src={image || FALLBACK_IMAGE}
-            alt={altText}
+            alt=""
             width={420}
             height={256}
             sizes="(max-width: 640px) 100vw, 420px"

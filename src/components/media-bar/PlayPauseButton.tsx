@@ -24,9 +24,10 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
 
   return (
     <button
+      type="button"
       onClick={toggle}
       aria-label={isPlaying ? 'Pause' : 'Play'}
-      className={`${btnSize} rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0 cursor-pointer`}
+      className={`${btnSize} rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2`}
     >
       {isBuffering ? (
         <span
