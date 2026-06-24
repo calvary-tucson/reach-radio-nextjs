@@ -2,14 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
-import { useNowPlaying } from '@/hooks/useNowPlaying'
 
 interface AudioProviderProps {
   streamUrl: string
 }
 
 export function AudioProvider({ streamUrl }: AudioProviderProps) {
-  useNowPlaying()
   const audioRef = useRef<HTMLAudioElement>(null)
   const isPlaying = useMediaStore((s) => s.isPlaying)
   const volume = useMediaStore((s) => s.volume)

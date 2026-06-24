@@ -8,6 +8,7 @@ import { MobileHeader } from '@/components/layout/MobileHeader'
 import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { AudioProvider } from '@/components/AudioProvider'
+import { NowPlayingProvider } from '@/components/NowPlayingProvider'
 import { SleepTimerProvider } from '@/components/SleepTimerProvider'
 import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery, appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
@@ -114,6 +115,7 @@ async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
   return (
     <>
       <BridgeInit streamUrl={streamUrl} />
+      <NowPlayingProvider />
       {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
       {!isMobileApp && <SleepTimerProvider />}
       {!isMobileApp && <Header />}
