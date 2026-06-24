@@ -91,26 +91,14 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
   }, [])
 
-  // On route change: send location + showMediaBar + nav visibility + reset zoom
+  // On route change: send location + showMediaBar + nav visibility
   useEffect(() => {
-    // Reset any pinch-zoom carried over from the previous page
-    const meta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null
-    let t: ReturnType<typeof setTimeout> | undefined
-    if (meta) {
-      meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover'
-      t = setTimeout(() => {
-        meta.content = 'width=device-width, initial-scale=1, viewport-fit=cover'
-      }, 50)
-    }
-
     const segments = pathname.split('/').filter(Boolean)
     const isTeacherDetail =
       segments[0] === 'teachers' && segments.length === 2 && segments[1] !== 'search'
     postMessageToNative({ location: pathname })
     postMessageToNative({ showMediaBar: pathname !== '/' && !isTeacherDetail })
     postMessageToNative({ showMobileNav: !isTeacherDetail })
-
-    return () => clearTimeout(t)
   }, [pathname])
 
   // Forward track metadata to native whenever it changes in the store
