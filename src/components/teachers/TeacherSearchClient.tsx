@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef, useTransition } from 'react'
+import { useState, useMemo, useTransition } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { Search, X, Loader2, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
@@ -35,25 +35,15 @@ export function TeacherSearchClient({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const urlQ = searchParams.get('q') ?? ''
   const urlDays = searchParams.get('days')?.split(',').filter(Boolean) ?? []
   const urlSort = searchParams.get('sort') ?? ''
 
-  const [displayValue, setDisplayValue] = useState(urlQ)
-  const [query, setQuery] = useState(urlQ)
   const [activeDays, setActiveDays] = useState<string[]>(urlDays)
   const [sort, setSort] = useState<SortOption | undefined>(
     VALID_SORTS.has(urlSort) ? (urlSort as SortOption) : undefined
   )
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
-  }, [])
 
   const scheduleMap = useMemo(
     () => new Map<string, ScheduleDay[]>(scheduleTeachers.map((t) => [t.slug, t.schedule])),
@@ -68,15 +58,15 @@ export function TeacherSearchClient({
   )
 
   const results = useMemo(
-    () => filterTeachers(teachers, query, { sort, days: activeDays, scheduleMap, hoursMap }),
-    [teachers, query, sort, activeDays, scheduleMap, hoursMap]
+    () => filterTeachers(teachers, urlQ, { sort, days: activeDays, scheduleMap, hoursMap }),
+    [teachers, urlQ, sort, activeDays, scheduleMap, hoursMap]
   )
 
-  const hasFilter = displayValue.trim().length > 0 || !!sort || activeDays.length > 0
+  const hasFilter = urlQ.trim().length > 0 || !!sort || activeDays.length > 0
 
-  function pushURL(nextQ: string, nextDays: string[], nextSort: SortOption | undefined) {
+  function pushURL(nextDays: string[], nextSort: SortOption | undefined) {
     const params = new URLSearchParams()
-    if (nextQ.trim()) params.set('q', nextQ.trim())
+    if (urlQ.trim()) params.set('q', urlQ.trim())
     if (nextDays.length) params.set('days', nextDays.join(','))
     if (nextSort) params.set('sort', nextSort)
     const search = params.toString()
@@ -85,41 +75,22 @@ export function TeacherSearchClient({
     })
   }
 
-  function handleQueryChange(value: string) {
-    setDisplayValue(value)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      setQuery(value)
-      pushURL(value, activeDays, sort)
-    }, 300)
-  }
-
-  function clearQuery() {
-    setDisplayValue('')
-    setQuery('')
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    pushURL('', activeDays, sort)
-  }
-
   function toggleDay(day: string) {
     const next = activeDays.includes(day)
       ? activeDays.filter((d) => d !== day)
       : [...activeDays, day]
     setActiveDays(next)
-    pushURL(displayValue, next, sort)
+    pushURL(next, sort)
   }
 
   function setAndPushSort(next: SortOption | undefined) {
     setSort(next)
-    pushURL(displayValue, activeDays, next)
+    pushURL(activeDays, next)
   }
 
   function clearAll() {
-    setDisplayValue('')
-    setQuery('')
     setSort(undefined)
     setActiveDays([])
-    if (debounceRef.current) clearTimeout(debounceRef.current)
     startTransition(() => {
       router.replace(pathname, { scroll: false })
     })
@@ -136,51 +107,6 @@ export function TeacherSearchClient({
 
   return (
     <div className="max-w-screen-xl mx-auto space-y-4">
-
-      {/* Search input */}
-      <div className="flex items-center gap-[10px]">
-        <div className="relative flex-1">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 light:text-gray-400"
-            aria-hidden="true"
-          />
-          <input
-            ref={inputRef}
-            type="text"
-            autoFocus
-            placeholder="Search teachers..."
-            value={displayValue}
-            onChange={(e) => handleQueryChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') clearQuery()
-            }}
-            className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base sm:text-sm text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
-            aria-label="Search teachers"
-          />
-          {displayValue && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2">
-              {isPending ? (
-                <Loader2
-                  className="h-4 w-4 text-white/40 light:text-gray-400 animate-spin"
-                  aria-hidden="true"
-                />
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearQuery()
-                    inputRef.current?.focus()
-                  }}
-                  className="flex h-8 w-8 items-center justify-center text-white/40 light:text-gray-400 hover:text-white light:hover:text-gray-900 cursor-pointer"
-                  aria-label="Clear search"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Day filter */}
       <div>

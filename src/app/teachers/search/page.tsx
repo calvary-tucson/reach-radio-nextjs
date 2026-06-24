@@ -4,6 +4,7 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { teacherListQuery, fullScheduleQuery } from '@/lib/sanity/queries'
 import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
+import { TeacherSearchBar } from '@/components/teachers/TeacherSearchBar'
 import { SearchResultsSkeleton } from '@/components/skeletons/SearchResultsSkeleton'
 
 export const metadata: Metadata = {
@@ -16,17 +17,13 @@ async function SearchContent() {
     sanityFetch<TeacherSummary[]>(teacherListQuery, {}, { tags: ['teachers'] }),
     sanityFetch<TeacherWithSchedule[]>(fullScheduleQuery, {}, { tags: ['teachers'] }),
   ])
-  return (
-    <TeacherSearchClient
-      teachers={teachers}
-      scheduleTeachers={scheduleTeachers}
-    />
-  )
+  return <TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />
 }
 
 export default function TeachersSearchPage() {
   return (
-    <div className="px-4 py-6 sm:px-6">
+    <div className="px-4 py-6 sm:px-6 space-y-4">
+      <TeacherSearchBar />
       <Suspense fallback={<SearchResultsSkeleton />}>
         <SearchContent />
       </Suspense>
