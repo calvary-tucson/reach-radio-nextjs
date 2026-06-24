@@ -21,7 +21,6 @@ export function DragHandle({ drag, onDismiss, className }: DragHandleProps) {
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         className,
       )}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onDismiss() }}
       onTouchStart={drag.onTouchStart}
       onTouchMove={drag.onTouchMove}
       onTouchEnd={drag.onTouchEnd}
