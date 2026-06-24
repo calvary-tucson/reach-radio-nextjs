@@ -1,7 +1,7 @@
 'use client'
 
 import { X } from 'lucide-react'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { DragHandle } from '@/components/global/DragHandle'
@@ -21,6 +21,31 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
   const contentRef = useRef<HTMLDivElement>(null)
   const drag = useSheetDrag({ onDismiss, contentRef })
 
+  // Focus into panel on mount so VoiceOver enters dialog mode
+  useEffect(() => { contentRef.current?.focus() }, [])
+
+  // Focus trap: constrain Tab/Shift+Tab to focusable children
+  useEffect(() => {
+    const el = contentRef.current
+    if (!el) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      const focusable = el.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusable.length) { e.preventDefault(); return }
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus()
+      }
+    }
+    el.addEventListener('keydown', handleKeyDown)
+    return () => el.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   return (
     <div
       role="presentation"
@@ -30,6 +55,10 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
     >
       <div
         ref={contentRef}
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
+        {...(title ? { 'aria-labelledby': 'sheet-chrome-title' } : { 'aria-label': 'Sheet' })}
         className={cn(
           'w-full max-h-[90dvh] overflow-hidden flex flex-col border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0',
           'rounded-t-2xl rounded-b-none h-[85dvh]',
@@ -46,7 +75,7 @@ export function SheetChrome({ children, title, padded = true, className }: Sheet
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between border-b border-white/10 light:border-gray-200 bg-gray-800 light:bg-white px-6 py-4">
           {title ? (
-            <h2 className="text-xl font-bold text-white light:text-gray-900">{title}</h2>
+            <h2 id="sheet-chrome-title" className="text-xl font-bold text-white light:text-gray-900">{title}</h2>
           ) : (
             <span />
           )}
