@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useTransition } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
@@ -31,7 +31,6 @@ export function TeacherSearchClient({
   teachers,
   scheduleTeachers,
 }: TeacherSearchClientProps) {
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
@@ -70,30 +69,28 @@ export function TeacherSearchClient({
     if (nextDays.length) params.set('days', nextDays.join(','))
     if (nextSort) params.set('sort', nextSort)
     const search = params.toString()
-    startTransition(() => {
-      router.replace(search ? `${pathname}?${search}` : pathname, { scroll: false })
-    })
+    window.history.replaceState(null, '', search ? `${pathname}?${search}` : pathname)
   }
 
   function toggleDay(day: string) {
     const next = activeDays.includes(day)
       ? activeDays.filter((d) => d !== day)
       : [...activeDays, day]
-    setActiveDays(next)
+    startTransition(() => setActiveDays(next))
     pushURL(next, sort)
   }
 
   function setAndPushSort(next: SortOption | undefined) {
-    setSort(next)
+    startTransition(() => setSort(next))
     pushURL(activeDays, next)
   }
 
   function clearAll() {
-    setSort(undefined)
-    setActiveDays([])
     startTransition(() => {
-      router.replace(pathname, { scroll: false })
+      setSort(undefined)
+      setActiveDays([])
     })
+    window.history.replaceState(null, '', pathname)
   }
 
   const chipBase =
@@ -154,7 +151,7 @@ export function TeacherSearchClient({
             <button
               type="button"
               onClick={clearAll}
-              className="ml-auto text-xs text-white/45 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
+              className="ml-auto text-xs text-white/70 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded"
             >
               Clear all
             </button>
@@ -175,7 +172,7 @@ export function TeacherSearchClient({
         {isPending ? (
           <div className="space-y-2" aria-busy="true">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-[68px] rounded-xl bg-white/5 light:bg-gray-50 animate-pulse" />
+              <div key={i} className="h-[68px] rounded-xl bg-white/5 light:bg-gray-50 motion-safe:animate-pulse" />
             ))}
           </div>
         ) : results.length > 0 ? (
@@ -214,7 +211,7 @@ export function TeacherSearchClient({
             })}
           </ul>
         ) : (
-          <p className="text-sm text-white/45 light:text-gray-400 py-12">
+          <p className="text-sm text-white/70 light:text-gray-400 py-12">
             No teachers found. Try a different search.
           </p>
         )}

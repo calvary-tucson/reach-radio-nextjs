@@ -3,6 +3,7 @@
 @custom-variant light (&:where(.light, .light *));
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant touch (@media (any-pointer: coarse));
+@custom-variant can-hover (@media (any-hover: hover));
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
