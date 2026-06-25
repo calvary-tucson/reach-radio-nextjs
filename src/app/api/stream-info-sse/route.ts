@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
           })
           const text = await res.text()
           // Robust JSONP strip — handles named callback and whitespace variations
-          const stripped = text.replace(/^[^(]+\(/, '').replace(/\);\s*$/, '')
+          const stripped = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '')
           const json = JSON.parse(stripped) as { title?: string; artist?: string }
           const title = json.title || 'Reach Radio'
           const artist = json.artist || ''

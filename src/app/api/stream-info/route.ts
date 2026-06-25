@@ -7,8 +7,9 @@ export async function GET(): Promise<Response> {
       next: { revalidate: 0 },
     })
     const text = await res.text()
-    // Strip JSONP wrapper: callback(...)
-    const json = JSON.parse(text.substring(1, text.length - 2)) as {
+    // Robust JSONP strip — handles named callback and whitespace variations
+    const stripped = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '')
+    const json = JSON.parse(stripped) as {
       title?: string
       artist?: string
     }
