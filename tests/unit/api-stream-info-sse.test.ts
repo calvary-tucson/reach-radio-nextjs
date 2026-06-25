@@ -7,7 +7,7 @@ describe('GET /api/stream-info-sse', () => {
       text: async () => '({"song":{"title":"Test Show","artist":"John Doe"}});',
     }))
     const { GET } = await import('@/app/api/stream-info-sse/route')
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/'))
     expect(res.headers.get('content-type')).toContain('text/event-stream')
   })
 })

@@ -9,7 +9,7 @@ describe('GET /api/audio-stream', () => {
   it('returns 502 when upstream fetch fails', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('upstream down')))
     const { GET } = await import('@/app/api/audio-stream/route')
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/'))
     expect(res.status).toBe(502)
   })
 
@@ -21,7 +21,7 @@ describe('GET /api/audio-stream', () => {
       headers: new Headers({ 'content-type': 'audio/mpeg' }),
     }))
     const { GET } = await import('@/app/api/audio-stream/route')
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/'))
     expect(res.status).toBe(200)
     expect(res.headers.get('content-type')).toBe('audio/mpeg')
   })
@@ -35,7 +35,7 @@ describe('GET /api/audio-stream', () => {
       headers: new Headers({ 'content-type': 'audio/mpeg' }),
     }))
     const { GET } = await import('@/app/api/audio-stream/route')
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/'))
     expect(res.status).toBe(200)
     expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
   })
@@ -61,7 +61,7 @@ describe('GET /api/audio-stream', () => {
       }))
 
       const { GET } = await import('@/app/api/audio-stream/route')
-      const responsePromise = GET()
+      const responsePromise = GET(new Request('http://localhost/'))
 
       await vi.advanceTimersByTimeAsync(11_000)
 

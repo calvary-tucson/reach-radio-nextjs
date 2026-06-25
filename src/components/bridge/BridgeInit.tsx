@@ -30,7 +30,8 @@ function isNativeBridgePresent(): boolean {
 }
 
 function setMobileAppCookie() {
-  document.cookie = 'mobile-app=true; path=/; max-age=31536000; SameSite=Lax'
+  const secure = location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `mobile-app=true; path=/; max-age=31536000; SameSite=Lax${secure}`
 }
 
 function clearMobileAppCookie() {

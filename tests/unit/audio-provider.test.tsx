@@ -129,8 +129,20 @@ describe('AudioProvider', () => {
     expect(useMediaStore.getState().isBuffering).toBe(false)
   })
 
-  it('onError stops playback and clears buffering', () => {
+  it('onError when isPlaying: schedules reconnect (isPlaying stays true, isBuffering cleared)', () => {
     useMediaStore.setState({ isPlaying: true, isBuffering: true })
+    const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+    const audio = container.querySelector('audio') as HTMLAudioElement
+    act(() => {
+      audio.dispatchEvent(new Event('error'))
+    })
+    // scheduleReconnect() keeps isPlaying true so playback can resume after retry
+    expect(useMediaStore.getState().isPlaying).toBe(true)
+    expect(useMediaStore.getState().isBuffering).toBe(false)
+  })
+
+  it('onError when not playing: sets isPlaying false and clears buffering', () => {
+    useMediaStore.setState({ isPlaying: false, isBuffering: true })
     const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
     const audio = container.querySelector('audio') as HTMLAudioElement
     act(() => {
