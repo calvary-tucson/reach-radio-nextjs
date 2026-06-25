@@ -88,6 +88,6 @@ describe('EventSchema', () => {
     const { container } = render(<EventSchema events={xssEvents} />)
     const script = container.querySelector('script[type="application/ld+json"]')!
     expect(script.innerHTML).not.toContain('</script>')
-    expect(script.innerHTML).toContain('<\\/script>')
+    expect(script.innerHTML).toContain('\\u003c/script>')
   })
 })

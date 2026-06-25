@@ -6,6 +6,38 @@ describe('GET /api/audio-stream', () => {
     vi.resetModules()
   })
 
+  it('returns 429 when rate limit exceeded', async () => {
+    const mockBody = new ReadableStream()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      body: mockBody,
+      headers: new Headers({ 'content-type': 'audio/mpeg' }),
+    }))
+    const { GET } = await import('@/app/api/audio-stream/route')
+    const ip = '5.6.7.8'
+    const makeRequest = () => GET(new Request('http://localhost/', {
+      headers: { 'x-forwarded-for': ip },
+    }))
+    // Exhaust the 10-request window
+    for (let i = 0; i < 10; i++) await makeRequest()
+    const res = await makeRequest()
+    expect(res.status).toBe(429)
+    expect(res.headers.get('Retry-After')).toBeTruthy()
+  })
+
+  it('treats missing x-forwarded-for as unknown IP bucket', async () => {
+    const mockBody = new ReadableStream()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      body: mockBody,
+      headers: new Headers({ 'content-type': 'audio/mpeg' }),
+    }))
+    const { GET } = await import('@/app/api/audio-stream/route')
+    // No x-forwarded-for header → falls into 'unknown' bucket
+    const res = await GET(new Request('http://localhost/'))
+    expect(res.status).toBe(200)
+  })
+
   it('returns 502 when upstream fetch fails', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('upstream down')))
     const { GET } = await import('@/app/api/audio-stream/route')
