@@ -228,6 +228,17 @@ body[data-app] [data-media-bar] {
   to { opacity: 0; transform: translateY(12px); }
 }
 
+/* Bottom-sheet animations (mobile) — full-height slide */
+@keyframes sheet-enter {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes sheet-exit {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
 @keyframes panel-slide-in {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
