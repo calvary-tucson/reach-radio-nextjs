@@ -1,6 +1,22 @@
+import { createRateLimiter } from '@/lib/rate-limit'
+
 const RADIOJAR_URL = 'https://proxy.radiojar.com/api/stations/g4d600bv6p5tv/now_playing/?callback='
 
-export async function GET(): Promise<Response> {
+const limiter = createRateLimiter({ windowMs: 60_000, max: 10 })
+
+export async function GET(request: Request): Promise<Response> {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const result = limiter.check(ip)
+  if (!result.success) {
+    return new Response('Too Many Requests', {
+      status: 429,
+      headers: {
+        'Retry-After': String(result.retryAfter),
+        'Content-Type': 'text/plain',
+      },
+    })
+  }
+
   const encoder = new TextEncoder()
   let interval: ReturnType<typeof setInterval> | undefined
   const abortController = new AbortController()

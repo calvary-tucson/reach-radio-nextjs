@@ -1,12 +1,24 @@
-const STREAM_URL = 'https://stream.radiojar.com/g4d600bv6p5tv'
+import { createRateLimiter } from '@/lib/rate-limit'
+import { FALLBACK_STREAM_URL } from '@/lib/constants'
 
-export async function GET(): Promise<Response> {
+const limiter = createRateLimiter({ windowMs: 60_000, max: 3 })
+
+export async function GET(request: Request): Promise<Response> {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const result = limiter.check(ip)
+  if (!result.success) {
+    return new Response('Too Many Requests', {
+      status: 429,
+      headers: { 'Retry-After': String(result.retryAfter) },
+    })
+  }
+
   const controller = new AbortController()
   const connectTimeout = setTimeout(() => controller.abort(), 10_000)
 
   try {
-    const upstream = await fetch(STREAM_URL, { signal: controller.signal })
-    clearTimeout(connectTimeout) // connected — don't abort the open stream
+    const upstream = await fetch(FALLBACK_STREAM_URL, { signal: controller.signal })
+    clearTimeout(connectTimeout)
 
     if (!upstream.ok || !upstream.body) {
       return new Response('Upstream error', { status: 502 })
