@@ -64,13 +64,13 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
             <p className="text-white light:text-gray-900 text-5xl font-mono mb-2" aria-hidden="true">
               {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </p>
-            <p className="text-white/60 light:text-gray-500 text-sm mb-8" aria-hidden="true">
+            <p className="text-white/70 light:text-gray-500 text-sm mb-8" aria-hidden="true">
               Radio stops in {minutes}m {secs}s
             </p>
             <button
               type="button"
               onClick={cancel}
-              className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold text-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+              className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold text-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none cursor-pointer"
             >
               Cancel Timer
             </button>
@@ -82,7 +82,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                 type="button"
                 key={mins}
                 onClick={() => start(mins)}
-                className="bg-gray-700 light:bg-gray-200 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+                className="bg-gray-700 light:bg-gray-200 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none cursor-pointer"
               >
                 {mins}m
               </button>

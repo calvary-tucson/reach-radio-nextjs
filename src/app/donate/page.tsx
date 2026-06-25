@@ -101,7 +101,7 @@ export default function DonatePage() {
     <div className="page-enter px-4 py-6 pb-8">
       <h1 className="text-[22px] md:text-4xl font-extrabold text-white light:text-gray-900 tracking-tight mb-6">Donate</h1>
       {failed ? (
-        <div role="alert" className="text-white/70 light:text-gray-500 text-sm py-8 text-center">
+        <div role="alert" className="text-white/90 light:text-gray-500 text-sm py-8 text-center">
           <p>Unable to load the donation form.</p>
           <a
             href={DONATE_URL}
@@ -133,7 +133,7 @@ export default function DonatePage() {
             tabIndex={0}
             onLoad={handleLoad}
             onError={handleError}
-            sandbox="allow-scripts allow-forms allow-popups"
+            sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
             className={`w-full min-h-[1300px] md:min-h-[1200px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
           />
         </>
