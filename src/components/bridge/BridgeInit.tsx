@@ -52,7 +52,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
   // Fix: gate on isNativeBridgePresent() (both platforms) not window.inNativeApp (iOS only)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- bridge must initialize exactly once; router is stable and adding it causes re-runs on every navigation
   useEffect(() => {
     if (!isNativeBridgePresent()) return
 

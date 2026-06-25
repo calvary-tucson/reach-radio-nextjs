@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
+import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
-const DEFAULT_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
 const MAX_BACKOFF_MS = 60_000
 
 function isNativeApp(): boolean {
@@ -51,7 +51,7 @@ export function useNowPlaying(): void {
 
           const { teachersList } = useMediaStore.getState()
 
-          let image = DEFAULT_IMAGE
+          let image = FALLBACK_OG_IMAGE
           let resolvedArtist = data.artist ?? useMediaStore.getState().artist
 
           if (resolvedArtist && teachersList.length > 0) {
@@ -60,7 +60,9 @@ export function useNowPlaying(): void {
               resolvedArtist.toLowerCase().includes(t.name.toLowerCase())
             )
             if (match) {
-              image = match.photo + '?w=420&fm=webp'
+              image = match.photo.includes('?')
+                ? `${match.photo}&w=420&fm=webp`
+                : `${match.photo}?w=420&fm=webp`
               resolvedArtist = match.name
             }
           }
@@ -107,6 +109,6 @@ export function useNowPlaying(): void {
       if (retryTimer) clearTimeout(retryTimer)
       if (es) es.close()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- setNowPlaying/setTeachersList are stable Zustand actions; SSE connects once on mount
   }, [])
 }
