@@ -27,6 +27,11 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
   }, [])
 
   const scheduleReconnect = useCallback(() => {
+    if (reconnectAttempts.current >= 10) {
+      setIsPlaying(false)
+      setIsBuffering(false)
+      return
+    }
     clearReconnect()
     const delay = Math.min(
       Math.pow(2, reconnectAttempts.current) * 1000 + Math.random() * 500,
