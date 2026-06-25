@@ -19,6 +19,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const encoder = new TextEncoder()
   let interval: ReturnType<typeof setInterval> | undefined
+  let keepaliveInterval: ReturnType<typeof setInterval> | undefined
   const abortController = new AbortController()
   let cancelled = false
 
@@ -34,10 +35,9 @@ export async function GET(request: Request): Promise<Response> {
             ]),
           })
           const text = await res.text()
-          const json = JSON.parse(text.substring(1, text.length - 2)) as {
-            title?: string
-            artist?: string
-          }
+          // Robust JSONP strip — handles named callback and whitespace variations
+          const stripped = text.replace(/^[^(]+\(/, '').replace(/\);\s*$/, '')
+          const json = JSON.parse(stripped) as { title?: string; artist?: string }
           const title = json.title || 'Reach Radio'
           const artist = json.artist || ''
           const data = JSON.stringify({ title, artist })
@@ -49,12 +49,20 @@ export async function GET(request: Request): Promise<Response> {
         }
       }
 
+      // Keepalive comments every 15s prevent proxy/Vercel from closing idle connections
+      keepaliveInterval = setInterval(() => {
+        if (!cancelled) {
+          controller.enqueue(encoder.encode(': keepalive\n\n'))
+        }
+      }, 15_000)
+
       await poll()
       interval = setInterval(poll, 30_000)
     },
     cancel() {
       cancelled = true
       clearInterval(interval)
+      clearInterval(keepaliveInterval)
       abortController.abort()
     },
   })
