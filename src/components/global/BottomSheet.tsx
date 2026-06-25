@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { DragHandle } from '@/components/global/DragHandle'
@@ -13,7 +13,14 @@ interface BottomSheetProps {
   className?: string
 }
 
-export function BottomSheet({ open, onClose, children, ariaLabel, className }: BottomSheetProps) {
+export interface BottomSheetHandle {
+  close: () => void
+}
+
+export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(function BottomSheet(
+  { open, onClose, children, ariaLabel, className }: BottomSheetProps,
+  ref
+) {
   const [visible, setVisible] = useState(false)
   const [mounted, setMounted] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -28,6 +35,8 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
       triggerRef.current?.focus()
     }, 280)
   }, [onClose])
+
+  useImperativeHandle(ref, () => ({ close: handleClose }), [handleClose])
 
   const drag = useSheetDrag({ onDismiss: handleClose, contentRef: sheetRef })
 
@@ -104,4 +113,4 @@ export function BottomSheet({ open, onClose, children, ariaLabel, className }: B
     </>,
     document.body
   )
-}
+})

@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback } from 'react'
-import { BottomSheet } from '@/components/global/BottomSheet'
+import { useRef } from 'react'
+import { BottomSheet, type BottomSheetHandle } from '@/components/global/BottomSheet'
 import { useMediaStore } from '@/lib/store/media-store'
 
 const TIMER_OPTIONS = [5, 10, 15, 30, 45, 60]
@@ -12,6 +12,7 @@ interface SleepTimerSheetProps {
 }
 
 export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
+  const sheetRef = useRef<BottomSheetHandle>(null)
   const active = useMediaStore((s) => s.sleepTimerActive)
   const remainingSeconds = useMediaStore((s) => s.remainingSleepSeconds)
   const startSleepTimer = useMediaStore((s) => s.startSleepTimer)
@@ -20,27 +21,27 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
 
   function start(mins: number) {
     startSleepTimer(mins * 60)
-    onClose()
+    sheetRef.current?.close()
   }
 
   function cancel() {
     setSleepTimerActive(false)
     setRemainingSleepSeconds(0)
-    onClose()
+    sheetRef.current?.close()
   }
 
   const minutes = Math.floor(remainingSeconds / 60)
   const secs = remainingSeconds % 60
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabel="Sleep timer">
+    <BottomSheet ref={sheetRef} open={open} onClose={onClose} ariaLabel="Sleep timer">
       <div className="flex items-center justify-between px-6 pb-4">
         <h2 id="sleep-timer-heading" className="text-white light:text-gray-900 text-xl font-bold select-none">
           Sleep Timer
         </h2>
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => sheetRef.current?.close()}
           className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer"
           aria-label="Close sleep timer"
         >
