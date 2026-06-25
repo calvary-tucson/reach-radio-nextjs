@@ -1,4 +1,5 @@
 import { revalidateTag } from 'next/cache'
+import { timingSafeEqual } from 'crypto'
 
 const TAG_MAP: Record<string, string> = {
   teacher: 'teachers',
@@ -11,8 +12,15 @@ const REPLAY_WINDOW_MS = 5 * 60_000
 
 export async function POST(req: Request): Promise<Response> {
   const secret = req.headers.get('x-webhook-secret')
+  const webhookSecret = process.env.SANITY_WEBHOOK_SECRET
 
-  if (!secret || secret !== process.env.SANITY_WEBHOOK_SECRET) {
+  if (!secret || !webhookSecret) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const secretBuf = Buffer.from(secret)
+  const expectedBuf = Buffer.from(webhookSecret)
+  if (secretBuf.length !== expectedBuf.length || !timingSafeEqual(secretBuf, expectedBuf)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

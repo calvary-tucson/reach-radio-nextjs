@@ -1,8 +1,10 @@
 import { createRateLimiter } from '@/lib/rate-limit'
-
-const RADIOJAR_URL = 'https://proxy.radiojar.com/api/stations/g4d600bv6p5tv/now_playing/?callback='
+import { RADIOJAR_URL } from '@/lib/constants'
 
 const limiter = createRateLimiter({ windowMs: 60_000, max: 10 })
+
+const MAX_POLL_BACKOFF_MS = 5 * 60_000
+const MAX_CONNECTION_MS = 30 * 60_000
 
 export async function GET(request: Request): Promise<Response> {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -18,13 +20,20 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const encoder = new TextEncoder()
-  let interval: ReturnType<typeof setInterval> | undefined
+  let pollTimer: ReturnType<typeof setTimeout> | undefined
   let keepaliveInterval: ReturnType<typeof setInterval> | undefined
+  let connectionTimeout: ReturnType<typeof setTimeout> | undefined
   const abortController = new AbortController()
   let cancelled = false
+  let consecutiveFailures = 0
 
   const stream = new ReadableStream({
     async start(controller) {
+      function schedulePoll(delay: number) {
+        if (cancelled) return
+        pollTimer = setTimeout(() => void poll(), delay)
+      }
+
       async function poll() {
         if (cancelled) return
         try {
@@ -40,12 +49,18 @@ export async function GET(request: Request): Promise<Response> {
           const json = JSON.parse(stripped) as { title?: string; artist?: string }
           const title = json.title || 'Reach Radio'
           const artist = json.artist || ''
-          const data = JSON.stringify({ title, artist })
+          consecutiveFailures = 0
           if (!cancelled) {
-            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ title, artist })}\n\n`))
           }
+          schedulePoll(30_000)
         } catch {
-          // retain previous state on error or abort
+          if (!cancelled) {
+            consecutiveFailures++
+            // Back off exponentially from 30s up to 5 min on repeated upstream failures
+            const delay = Math.min(30_000 * Math.pow(2, consecutiveFailures - 1), MAX_POLL_BACKOFF_MS)
+            schedulePoll(delay)
+          }
         }
       }
 
@@ -60,12 +75,21 @@ export async function GET(request: Request): Promise<Response> {
         }
       }, 15_000)
 
+      // Absolute connection timeout — forces client reconnect after 30 min
+      connectionTimeout = setTimeout(() => {
+        cancelled = true
+        clearTimeout(pollTimer)
+        clearInterval(keepaliveInterval)
+        abortController.abort()
+        try { controller.close() } catch { /* already closed */ }
+      }, MAX_CONNECTION_MS)
+
       await poll()
-      interval = setInterval(poll, 30_000)
     },
     cancel() {
       cancelled = true
-      clearInterval(interval)
+      clearTimeout(pollTimer)
+      clearTimeout(connectionTimeout)
       clearInterval(keepaliveInterval)
       abortController.abort()
     },
