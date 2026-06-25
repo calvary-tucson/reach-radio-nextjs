@@ -45,8 +45,8 @@ export default function Breadcrumbs({
     >
       <BreadcrumbJsonLd items={items} />
 
-      {/* Mobile back button — only in standalone variant (hero components own theirs) */}
-      {variant === 'standalone' && <BackButton variant="mobile" />}
+      {/* Mobile back button — inline for standalone so it sits above the page title, not over it */}
+      {variant === 'standalone' && <BackButton variant="mobile" className="relative top-0 left-0" />}
 
       {/* Desktop breadcrumb trail */}
       <Breadcrumb className="hidden md:block">
