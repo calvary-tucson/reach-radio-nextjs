@@ -48,7 +48,6 @@ export function useNowPlaying(): void {
       es.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data) as { title?: string; artist?: string }
-          if (data.title === '__keepalive__') return // skip keepalive sentinel
 
           const { teachersList } = useMediaStore.getState()
 

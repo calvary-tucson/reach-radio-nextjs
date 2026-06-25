@@ -52,7 +52,11 @@ export async function GET(request: Request): Promise<Response> {
       // Keepalive comments every 15s prevent proxy/Vercel from closing idle connections
       keepaliveInterval = setInterval(() => {
         if (!cancelled) {
-          controller.enqueue(encoder.encode(': keepalive\n\n'))
+          try {
+            controller.enqueue(encoder.encode(': keepalive\n\n'))
+          } catch {
+            cancelled = true
+          }
         }
       }, 15_000)
 
