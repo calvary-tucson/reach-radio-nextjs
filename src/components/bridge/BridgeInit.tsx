@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { useMediaStore } from '@/lib/store/media-store'
@@ -14,6 +14,7 @@ type NativeCommand =
   | { type: 'refresh' }
   | { type: 'setPlayState'; playing: boolean }
   | { type: 'setBuffering'; buffering: boolean }
+  | { type: 'prefetchRoutes'; paths: string[] }
 
 declare global {
   interface WindowEventMap {
@@ -49,6 +50,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const title = useMediaStore((s) => s.title)
   const artist = useMediaStore((s) => s.artist)
   const image = useMediaStore((s) => s.image)
+  const mediaBarStateBeforeFocus = useRef<boolean | null>(null)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
   // Fix: gate on isNativeBridgePresent() (both platforms) not window.inNativeApp (iOS only)
@@ -63,6 +65,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
         case 'refresh': router.refresh(); break
         case 'setPlayState': useMediaStore.getState().setIsPlaying(cmd.playing); break
         case 'setBuffering': useMediaStore.getState().setIsBuffering(cmd.buffering); break
+        case 'prefetchRoutes': cmd.paths.forEach(p => router.prefetch(p)); break
       }
     }
     window.addEventListener('nativeCommand', handler)
@@ -122,15 +125,20 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     postMessageToNative({ title, artist, image })
   }, [title, artist, image])
 
-  // Input focus/blur: hide native nav when keyboard appears, restore after
+  // Input focus/blur: hide bars when keyboard appears (native + web), restore after
   useEffect(() => {
     function onFocusIn(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
+      mediaBarStateBeforeFocus.current = useMediaStore.getState().showMediaBar
+      useMediaStore.getState().setShowMediaBar(false)
       postMessageToNative({ showMobileNav: false, showMediaBar: false })
     }
     function onFocusOut(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
-      // Fix: include isTeacherDetail check to match route-change logic
+      if (mediaBarStateBeforeFocus.current !== null) {
+        useMediaStore.getState().setShowMediaBar(mediaBarStateBeforeFocus.current)
+        mediaBarStateBeforeFocus.current = null
+      }
       const isDetail = isTeacherDetailPath(pathname)
       postMessageToNative({ showMobileNav: !isDetail, showMediaBar: pathname !== '/' && !isDetail })
     }
