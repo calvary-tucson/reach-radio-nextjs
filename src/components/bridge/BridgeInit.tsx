@@ -37,6 +37,11 @@ function clearMobileAppCookie() {
   document.cookie = 'mobile-app=; path=/; max-age=0; SameSite=Lax'
 }
 
+function isTeacherDetailPath(pathname: string): boolean {
+  const segments = pathname.split('/').filter(Boolean)
+  return segments[0] === 'teachers' && segments.length === 2 && segments[1] !== 'search'
+}
+
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -45,9 +50,10 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const image = useMediaStore((s) => s.image)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
+  // Fix: gate on isNativeBridgePresent() (both platforms) not window.inNativeApp (iOS only)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!window.inNativeApp) return
+    if (!isNativeBridgePresent()) return
 
     const handler = (e: CustomEvent<NativeCommand>) => {
       const cmd = e.detail
@@ -63,17 +69,28 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     // loaded: true AFTER listener attached — iOS isBridgeReady gates on this
     postMessageToNative({ loaded: true, streamUrl })
 
+    // Primary navigation API — both platforms call these for bottom nav tabs and back button
+    window.globalActions = {
+      goToPage: (path: string) => router.push(path),
+      goBack: () => window.history.back(),
+    }
+
     // V3 shims — remove when v3 iOS retires from App Store
-    ;(window as any).up = {
+    window.up = {
       navigate: ({ url }: { url: string }) => router.push(url),
       reload: () => router.refresh(),
-      history: { get location() { return pathname } }
+      // Fix: live read of window.location.pathname, not stale closure over mount-time pathname
+      history: { get location() { return window.location.pathname } },
     }
-    ;(window as any).globalState = {
+
+    // Android play state sync — isMuted and showMediaBar added to match Android bridge contracts
+    window.globalState = {
       mediaBarState: {
         isPlaying: { set: (v: boolean) => useMediaStore.getState().setIsPlaying(v) },
-        isBuffering: { set: (v: boolean) => useMediaStore.getState().setIsBuffering(v) }
-      }
+        isBuffering: { set: (v: boolean) => useMediaStore.getState().setIsBuffering(v) },
+        isMuted: { set: (v: boolean) => useMediaStore.getState().setMuted(v) },
+        showMediaBar: { set: (v: boolean) => useMediaStore.getState().setShowMediaBar(v) },
+      },
     }
 
     return () => window.removeEventListener('nativeCommand', handler)
@@ -93,12 +110,10 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
 
   // On route change: send location + showMediaBar + nav visibility
   useEffect(() => {
-    const segments = pathname.split('/').filter(Boolean)
-    const isTeacherDetail =
-      segments[0] === 'teachers' && segments.length === 2 && segments[1] !== 'search'
+    const isDetail = isTeacherDetailPath(pathname)
     postMessageToNative({ location: pathname })
-    postMessageToNative({ showMediaBar: pathname !== '/' && !isTeacherDetail })
-    postMessageToNative({ showMobileNav: !isTeacherDetail })
+    postMessageToNative({ showMediaBar: pathname !== '/' && !isDetail })
+    postMessageToNative({ showMobileNav: !isDetail })
   }, [pathname])
 
   // Forward track metadata to native whenever it changes in the store
@@ -114,7 +129,9 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
     function onFocusOut(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
-      postMessageToNative({ showMobileNav: true, showMediaBar: pathname !== '/' })
+      // Fix: include isTeacherDetail check to match route-change logic
+      const isDetail = isTeacherDetailPath(pathname)
+      postMessageToNative({ showMobileNav: !isDetail, showMediaBar: pathname !== '/' && !isDetail })
     }
     document.addEventListener('focusin', onFocusIn)
     document.addEventListener('focusout', onFocusOut)
@@ -124,24 +141,22 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
   }, [pathname])
 
-  // Native app detection: check injected bridge objects first (most reliable),
-  // then fall back to verified postMessage. Clear stale cookie if not in native app.
+  // Native app detection: check injected bridge objects (most reliable),
+  // then clear stale cookie if bridge absent. PostMessage fallback for future native versions.
   useEffect(() => {
     if (isNativeBridgePresent()) {
       setMobileAppCookie()
       return
     }
 
-    // If cookie is set but bridge objects are absent, clear it — stale from prior session
     if (document.cookie.split(';').some(c => c.trim() === 'mobile-app=true')) {
       clearMobileAppCookie()
     }
 
-    // Fallback: future native app versions may send a protocolVersion handshake via postMessage
-    // before bridge objects are injected. Current iOS/Android builds call JS APIs via
-    // evaluateJavaScript only and never postMessage here, so this is forward-compatible only.
+    // Fix: reject null-origin (e.origin === '') — sandboxed iframes (MinistryForms) could
+    // otherwise trigger setMobileAppCookie() and put browser users into native mode
     function handleMessage(e: MessageEvent) {
-      if (e.origin !== '' && e.origin !== window.location.origin) return
+      if (e.origin !== window.location.origin) return
       try {
         const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
         if (!data || typeof data !== 'object' || !('protocolVersion' in data)) return

@@ -6,8 +6,26 @@ declare global {
         messageHandler: { postMessage: (msg: string) => void }
       }
     }
-    ReactNativeWebView?: { postMessage: (msg: string) => void }
+    // ReactNativeWebView: iOS sets this to `true` (a boolean), never an object with postMessage.
+    // Kept for documentation only — postMessageToNative does not call it.
     inNativeApp?: boolean
+    globalActions?: {
+      goToPage: (path: string) => void
+      goBack: () => void
+    }
+    globalState?: {
+      mediaBarState: {
+        isPlaying: { set: (v: boolean) => void }
+        isBuffering: { set: (v: boolean) => void }
+        isMuted: { set: (v: boolean) => void }
+        showMediaBar: { set: (v: boolean) => void }
+      }
+    }
+    up?: {
+      navigate: (opts: { url: string }) => void
+      reload: () => void
+      history: { readonly location: string }
+    }
   }
 }
 
