@@ -26,13 +26,18 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
 
   // Focus into panel on mount so VoiceOver enters dialog mode.
   // When autoFocusInput is true, focus the first input instead of the container.
+  // Delay 250ms: iOS blocks programmatic focus() outside a user gesture callstack;
+  // waiting past the 200ms enter animation gives WKWebView enough slack to allow it.
   useEffect(() => {
-    if (autoFocusInput) {
-      const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
-      ;(input ?? contentRef.current)?.focus()
-    } else {
-      contentRef.current?.focus()
-    }
+    const timer = setTimeout(() => {
+      if (autoFocusInput) {
+        const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
+        ;(input ?? contentRef.current)?.focus()
+      } else {
+        contentRef.current?.focus()
+      }
+    }, 250)
+    return () => clearTimeout(timer)
   }, [])
 
   // Focus trap: constrain Tab/Shift+Tab to focusable children
