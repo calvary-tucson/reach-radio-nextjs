@@ -1,7 +1,7 @@
 import { createRateLimiter } from '@/lib/rate-limit'
 import { FALLBACK_STREAM_URL } from '@/lib/constants'
 
-const limiter = createRateLimiter({ windowMs: 60_000, max: 3 })
+const limiter = createRateLimiter({ windowMs: 60_000, max: 10 })
 
 export async function GET(request: Request): Promise<Response> {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'

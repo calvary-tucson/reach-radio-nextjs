@@ -7,7 +7,7 @@ const TAG_MAP: Record<string, string> = {
   appSettings: 'appSettings',
 }
 
-const REPLAY_WINDOW_MS = 60_000
+const REPLAY_WINDOW_MS = 5 * 60_000
 
 export async function POST(req: Request): Promise<Response> {
   const secret = req.headers.get('x-webhook-secret')
