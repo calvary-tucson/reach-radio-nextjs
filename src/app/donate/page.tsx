@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
 import { useMediaStore } from '@/lib/store/media-store'
+import { postMessageToNative } from '@/lib/bridge/post-message'
 
 declare global {
   interface Window {
@@ -44,8 +45,10 @@ export default function DonatePage() {
       if (event.origin !== EXPECTED_ORIGIN) return
       if (event.data?.type === 'donationFormInputFocus') {
         setShowMediaBar(false)
+        postMessageToNative({ showMobileNav: false, showMediaBar: false })
       } else if (event.data?.type === 'donationFormInputBlur') {
         setShowMediaBar(true)
+        postMessageToNative({ showMobileNav: true, showMediaBar: true })
       }
     }
     window.addEventListener('message', handleMessage)
