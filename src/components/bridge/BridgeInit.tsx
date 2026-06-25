@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { useMediaStore } from '@/lib/store/media-store'
+import { isTeacherDetailPath } from '@/lib/routes'
 
 interface BridgeInitProps {
   streamUrl?: string
@@ -39,10 +40,6 @@ function clearMobileAppCookie() {
   document.cookie = 'mobile-app=; path=/; max-age=0; SameSite=Lax'
 }
 
-function isTeacherDetailPath(pathname: string): boolean {
-  const segments = pathname.split('/').filter(Boolean)
-  return segments[0] === 'teachers' && segments.length === 2 && segments[1] !== 'search'
-}
 
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { isTeacherDetailPath } from '@/lib/routes'
 
 const navItems = [
   {
@@ -32,6 +33,8 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname()
+
+  if (isTeacherDetailPath(pathname)) return null
 
   return (
     <nav

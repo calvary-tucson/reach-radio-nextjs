@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { useMediaStore } from '@/lib/store/media-store'
 import { PlayPauseButton } from './PlayPauseButton'
 import { NowPlayingInfo } from './NowPlayingInfo'
 import { postMessageToNative } from '@/lib/bridge/post-message'
+import { isTeacherDetailPath } from '@/lib/routes'
 
 export function MediaBar() {
+  const pathname = usePathname()
   const showMediaBar = useMediaStore((s) => s.showMediaBar)
   const isPlaying = useMediaStore((s) => s.isPlaying)
   const isBuffering = useMediaStore((s) => s.isBuffering)
@@ -17,6 +20,8 @@ export function MediaBar() {
   useEffect(() => {
     postMessageToNative({ isPlaying, isBuffering, title, artist, image })
   }, [isPlaying, isBuffering, title, artist, image])
+
+  if (isTeacherDetailPath(pathname)) return null
 
   return (
     <div
