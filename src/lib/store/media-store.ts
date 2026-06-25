@@ -24,6 +24,7 @@ interface MediaState {
   setSleepTimerActive: (active: boolean) => void
   setRemainingSleepSeconds: (s: number) => void
   startSleepTimer: (seconds: number) => void
+  cancelSleepTimer: () => void
   teachersList: { name: string; photo: string }[]
   setTeachersList: (list: { name: string; photo: string }[]) => void
 }
@@ -64,6 +65,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   setSleepTimerActive: (active) => set({ sleepTimerActive: active }),
   setRemainingSleepSeconds: (s) => set({ remainingSleepSeconds: s }),
   startSleepTimer: (seconds) => set({ remainingSleepSeconds: seconds, sleepTimerActive: true }),
+  cancelSleepTimer: () => set({ sleepTimerActive: false, remainingSleepSeconds: 0 }),
   teachersList: [],
   setTeachersList: (list) => set({ teachersList: list }),
 }))

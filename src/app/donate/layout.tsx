@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: 'Donate to Reach Radio',
     description: 'Support Reach Radio — 106.7FM / 690AM in Tucson, AZ. Your donation keeps the ministry on air.',
     url: '/donate',
+    images: [{ url: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg', width: 1024, height: 1024, alt: 'Reach Radio' }],
   },
 }
 

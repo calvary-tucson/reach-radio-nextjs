@@ -130,7 +130,6 @@ export default function DonatePage() {
             ref={iframeRef}
             src={DONATE_URL}
             title="Donation Form"
-            tabIndex={0}
             onLoad={handleLoad}
             onError={handleError}
             sandbox="allow-scripts allow-forms allow-popups allow-same-origin"

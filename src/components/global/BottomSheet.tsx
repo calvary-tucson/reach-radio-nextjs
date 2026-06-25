@@ -3,6 +3,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { DragHandle } from '@/components/global/DragHandle'
 
 interface BottomSheetProps {
@@ -56,23 +57,12 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(funct
     return () => cancelAnimationFrame(id)
   }, [open])
 
+  useFocusTrap(sheetRef)
+
   useEffect(() => {
     if (!open) return
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') handleClose()
-      if (e.key === 'Tab') {
-        const focusable = sheetRef.current?.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-        if (!focusable?.length) { e.preventDefault(); return }
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
-        if (e.shiftKey && (document.activeElement === first || document.activeElement === sheetRef.current)) {
-          e.preventDefault(); last.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault(); first.focus()
-        }
-      }
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
@@ -91,7 +81,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(funct
     <>
       <div
         data-testid="bottom-sheet-backdrop"
-        className={`fixed inset-0 z-[70] bg-black/60 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[70] bg-black/60 motion-safe:transition-opacity duration-300 ${
           visible ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={handleClose}
@@ -103,7 +93,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(funct
         aria-modal="true"
         aria-label={ariaLabel}
         tabIndex={-1}
-        className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 light:bg-white rounded-t-2xl transition-transform duration-[280ms] ease-out ${
+        className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 light:bg-white rounded-t-2xl motion-safe:transition-transform duration-[280ms] ease-out ${
           visible ? 'translate-y-0' : 'translate-y-full'
         } ${className ?? ''}`}
       >

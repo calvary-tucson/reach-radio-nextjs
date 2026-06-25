@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { useEffect, useId, useRef } from 'react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { DragHandle } from '@/components/global/DragHandle'
 import { MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { cn } from '@/lib/utils'
@@ -40,34 +41,13 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
     return () => clearTimeout(timer)
   }, [autoFocusInput])
 
-  // Focus trap: constrain Tab/Shift+Tab to focusable children
-  useEffect(() => {
-    const el = contentRef.current
-    if (!el) return
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return
-      const focusable = el.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
-      if (!focusable.length) { e.preventDefault(); return }
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus()
-      }
-    }
-    el.addEventListener('keydown', handleKeyDown)
-    return () => el.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  useFocusTrap(contentRef)
 
   return (
     <div
       role="presentation"
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center"
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
-      onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) onDismiss() }}
     >
       <div
         ref={contentRef}
@@ -83,8 +63,8 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
           className
         )}
         style={{
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingTop: 'var(--safe-top)',
+          paddingBottom: 'var(--safe-bottom)',
         }}
       >
         <DragHandle drag={drag} onDismiss={onDismiss} className="w-full pt-3 pb-2 sm:hidden shrink-0" />
@@ -98,7 +78,7 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
           <button
             type="button"
             onClick={onDismiss}
-            className="ml-auto -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/75 light:text-gray-500 transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer"
+            className="ml-auto -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/75 light:text-gray-500 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             aria-label="Close"
           >
             <X className="h-5 w-5" aria-hidden="true" />

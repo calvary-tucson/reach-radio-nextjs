@@ -23,7 +23,7 @@
 }
 
 :root {
-  --color-brand-green: #84B84F;
+  --color-brand-green: var(--color-green-500);
   --color-brand-purple: oklch(24% 0.05 280);
   --color-brand-gray: oklch(30% 0.02 280);
   --safe-top: env(safe-area-inset-top, 0px);

@@ -16,8 +16,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
   const active = useMediaStore((s) => s.sleepTimerActive)
   const remainingSeconds = useMediaStore((s) => s.remainingSleepSeconds)
   const startSleepTimer = useMediaStore((s) => s.startSleepTimer)
-  const setSleepTimerActive = useMediaStore((s) => s.setSleepTimerActive)
-  const setRemainingSleepSeconds = useMediaStore((s) => s.setRemainingSleepSeconds)
+  const cancelSleepTimer = useMediaStore((s) => s.cancelSleepTimer)
 
   function start(mins: number) {
     startSleepTimer(mins * 60)
@@ -25,8 +24,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
   }
 
   function cancel() {
-    setSleepTimerActive(false)
-    setRemainingSleepSeconds(0)
+    cancelSleepTimer()
     sheetRef.current?.close()
   }
 
@@ -36,13 +34,13 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
   return (
     <BottomSheet ref={sheetRef} open={open} onClose={onClose} ariaLabel="Sleep timer">
       <div className="flex items-center justify-between px-6 pb-4">
-        <h2 id="sleep-timer-heading" className="text-white light:text-gray-900 text-xl font-bold select-none">
+        <h2 className="text-white light:text-gray-900 text-xl font-bold select-none">
           Sleep Timer
         </h2>
         <button
           type="button"
           onClick={() => sheetRef.current?.close()}
-          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer"
+          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer"
           aria-label="Close sleep timer"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -82,7 +80,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                 type="button"
                 key={mins}
                 onClick={() => start(mins)}
-                className="bg-gray-700 light:bg-gray-200 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none cursor-pointer"
+                className="bg-gray-700 light:bg-gray-200 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-gray-600 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none cursor-pointer"
               >
                 {mins}m
               </button>

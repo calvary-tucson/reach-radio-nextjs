@@ -52,7 +52,7 @@ export function MobileNav() {
             key={item.href}
             href={item.href}
             aria-current={isActive ? 'page' : undefined}
-            className="relative flex flex-col items-center pb-5 pt-4 px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+            className="relative flex flex-col items-center pb-5 pt-4 px-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
           >
             {isActive && (
               <div className="absolute top-0 w-full h-[6px] bg-green-500 rounded-b-md" />
