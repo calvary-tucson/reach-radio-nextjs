@@ -1,24 +1,15 @@
 import { sanityFetch } from '@/lib/sanity/client'
-import { siteSettingsQuery, appSettingsQuery, APP_SETTINGS_ID } from '@/lib/sanity/queries'
+import { siteSettingsQuery } from '@/lib/sanity/queries'
 import { safeJsonLd } from '@/lib/seo'
 
 export async function RadioStationSchema() {
-  const [siteSettings, appSettings] = await Promise.all([
-    sanityFetch<{
-      siteTitle: string
-      siteDescription?: string
-      siteIconURL?: string
-      twitterHandle?: string
-      facebookPage?: string
-    }>(siteSettingsQuery, {}, { tags: ['siteSettings'] }).catch(() => null),
-    sanityFetch<{ radioAudioURL?: string }>(
-      appSettingsQuery,
-      { id: APP_SETTINGS_ID },
-      { tags: ['appSettings'] }
-    ).catch(() => null),
-  ])
-
-  const streamUrl = appSettings?.radioAudioURL ?? 'https://stream.radiojar.com/g4d600bv6p5tv'
+  const siteSettings = await sanityFetch<{
+    siteTitle: string
+    siteDescription?: string
+    siteIconURL?: string
+    twitterHandle?: string
+    facebookPage?: string
+  }>(siteSettingsQuery, {}, { tags: ['siteSettings'] }).catch(() => null)
 
   const sameAs = [
     siteSettings?.facebookPage ?? null,
