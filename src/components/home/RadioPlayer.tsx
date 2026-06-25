@@ -64,6 +64,7 @@ export function RadioPlayer() {
             height={256}
             sizes="(max-width: 640px) 100vw, 420px"
             className="w-full max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 transition-opacity"
+            style={{ height: 'auto' }}
             priority
           />
         </button>
