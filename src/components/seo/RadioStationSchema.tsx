@@ -52,7 +52,18 @@ export async function RadioStationSchema() {
     },
     potentialAction: {
       '@type': 'ListenAction',
-      target: streamUrl,
+      target: [
+        {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://reach.radio',
+          actionPlatform: [
+            'https://schema.org/DesktopWebPlatform',
+            'https://schema.org/MobileWebPlatform',
+            'https://schema.org/IOSPlatform',
+            'https://schema.org/AndroidPlatform',
+          ],
+        },
+      ],
     },
     ...(sameAs.length > 0 ? { sameAs } : {}),
   }
