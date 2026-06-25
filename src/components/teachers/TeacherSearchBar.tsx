@@ -49,7 +49,6 @@ export function TeacherSearchBar() {
         <input
           ref={inputRef}
           type="search"
-          autoFocus
           placeholder="Search teachers..."
           value={displayValue}
           onChange={(e) => handleChange(e.target.value)}

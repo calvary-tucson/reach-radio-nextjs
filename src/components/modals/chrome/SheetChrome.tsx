@@ -13,17 +13,27 @@ interface SheetChromeProps {
   title?: string
   /** Wrap children in p-6 padding. Default true. */
   padded?: boolean
+  /** Focus the first input inside the sheet instead of the dialog container. */
+  autoFocusInput?: boolean
   className?: string
 }
 
-export function SheetChrome({ children, title, padded = true, className }: SheetChromeProps) {
+export function SheetChrome({ children, title, padded = true, autoFocusInput = false, className }: SheetChromeProps) {
   const { onDismiss, isClosing } = useModal()
   const contentRef = useRef<HTMLDivElement>(null)
   const drag = useSheetDrag({ onDismiss, contentRef })
   const titleId = useId()
 
-  // Focus into panel on mount so VoiceOver enters dialog mode
-  useEffect(() => { contentRef.current?.focus() }, [])
+  // Focus into panel on mount so VoiceOver enters dialog mode.
+  // When autoFocusInput is true, focus the first input instead of the container.
+  useEffect(() => {
+    if (autoFocusInput) {
+      const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
+      ;(input ?? contentRef.current)?.focus()
+    } else {
+      contentRef.current?.focus()
+    }
+  }, [])
 
   // Focus trap: constrain Tab/Shift+Tab to focusable children
   useEffect(() => {

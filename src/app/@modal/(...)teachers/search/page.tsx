@@ -24,7 +24,7 @@ async function ModalSearchContent() {
 
 export default function TeachersSearchSheetPage() {
   return (
-    <SheetChrome title="Search Teachers" padded={false}>
+    <SheetChrome title="Search Teachers" padded={false} autoFocusInput>
       <div className="px-4 pt-4 pb-3">
         <TeacherSearchBar />
       </div>
