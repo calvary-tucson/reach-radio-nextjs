@@ -21,7 +21,7 @@ type NativeCommand =
   | { type: 'resumeSleepTimer' }
   | { type: 'cancelSleepTimer' }
   | { type: 'setSleepTimer'; seconds: number }
-  | { type: 'setViewportInsets'; bottom: number }
+  | { type: 'setViewportInsets'; top: number; bottom: number }
 
 declare global {
   interface WindowEventMap {
@@ -89,8 +89,10 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
           if (typeof cmd.seconds !== 'number' || !Number.isFinite(cmd.seconds) || cmd.seconds < 0) break
           useMediaStore.getState().setSleepTimer(cmd.seconds); break
         case 'setViewportInsets':
-          if (typeof cmd.bottom !== 'number' || !Number.isFinite(cmd.bottom) || cmd.bottom < 0) break
-          document.documentElement.style.setProperty('--native-bottom-inset', `${Math.round(cmd.bottom)}px`)
+          if (typeof cmd.bottom === 'number' && Number.isFinite(cmd.bottom) && cmd.bottom >= 0)
+            document.documentElement.style.setProperty('--native-bottom-inset', `${Math.round(cmd.bottom)}px`)
+          if (typeof cmd.top === 'number' && Number.isFinite(cmd.top) && cmd.top >= 0)
+            document.documentElement.style.setProperty('--native-top-inset', `${Math.round(cmd.top)}px`)
           break
         default:
           if (process.env.NODE_ENV !== 'production') {

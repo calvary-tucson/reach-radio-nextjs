@@ -47,6 +47,7 @@ html.native-app main {
 }
 
 html.native-app body {
+  padding-top: var(--native-top-inset, 0px);
   padding-bottom: var(--native-bottom-inset, 152px);
   overflow-x: hidden;
   overscroll-behavior: none;
