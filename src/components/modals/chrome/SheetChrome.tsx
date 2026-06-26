@@ -57,7 +57,7 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
         {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': 'Dialog' })}
         className={cn(
           'w-full max-h-[90dvh] overflow-hidden flex flex-col border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0',
-          'rounded-t-2xl rounded-b-none h-[85dvh]',
+          'rounded-t-2xl rounded-b-none h-[85dvh] will-change-transform',
           isClosing ? MODAL_EXIT_ANIMATION : MODAL_ENTER_ANIMATION,
           'sm:inset-auto sm:h-auto sm:max-h-[90dvh] sm:max-w-2xl sm:w-[95vw] sm:rounded-2xl',
           className

@@ -63,7 +63,7 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
         tabIndex={-1}
         aria-label="Teacher profile"
         className={cn(
-          'w-full flex flex-col bg-[#0f1a0a] light:bg-white border-white/[0.08] light:border-gray-200 overflow-hidden',
+          'w-full flex flex-col bg-[#0f1a0a] light:bg-white border-white/[0.08] light:border-gray-200 overflow-hidden [will-change:opacity,transform]',
           // Mobile: bottom sheet
           'max-h-[92dvh] rounded-t-2xl border',
           isClosing

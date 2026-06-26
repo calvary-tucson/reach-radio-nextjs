@@ -80,6 +80,9 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     // loaded: true AFTER listener attached — iOS isBridgeReady gates on this
     postMessageToNative({ loaded: true, streamUrl })
 
+    // Pre-warm the teacher search RSC payload + Sanity Data Cache so first open is instant
+    router.prefetch('/teachers/search')
+
     // Primary navigation API — both platforms call these for bottom nav tabs and back button
     window.globalActions = {
       goToPage: (path: string) => router.push(path),

@@ -135,8 +135,8 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         <DialogPrimitive.Overlay
           className={
             isClosing
-              ? 'fixed inset-0 z-[70] bg-black/80 motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
-              : 'fixed inset-0 z-[70] bg-black/80 motion-safe:animate-[fade-in_0.2s_ease-out_both]'
+              ? 'fixed inset-0 z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
+              : 'fixed inset-0 z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-in_0.2s_ease-out_both]'
           }
         />
         <DialogPrimitive.Content

@@ -26,6 +26,8 @@ export function TeacherModalLink({
   return (
     <button
       type="button"
+      onPointerEnter={() => router.prefetch(`/teachers/${slug}`)}
+      onPointerDown={() => router.prefetch(`/teachers/${slug}`)}
       onClick={() => {
         // If a modal is already open (e.g. search sheet), stack on top rather than reset
         const store = useModalStore.getState()
