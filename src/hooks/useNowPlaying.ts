@@ -51,8 +51,8 @@ export function useNowPlaying(): void {
             )
             if (match) {
               image = match.photo.includes('?')
-                ? `${match.photo}&w=420&fm=webp`
-                : `${match.photo}?w=420&fm=webp`
+                ? `${match.photo}&w=420&fm=jpg`
+                : `${match.photo}?w=420&fm=jpg`
               resolvedArtist = match.name
             }
           }
