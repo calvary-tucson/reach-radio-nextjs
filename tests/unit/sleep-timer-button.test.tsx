@@ -21,7 +21,7 @@ function renderWithProvider() {
 }
 
 beforeEach(() => {
-  useMediaStore.setState({ sleepTimerActive: false, remainingSleepSeconds: 0 })
+  useMediaStore.setState({ sleepTimerActive: false, sleepTimerPaused: false, remainingSleepSeconds: 0, sleepTimerEndsAt: null })
 })
 
 describe('SleepTimerButton', () => {
