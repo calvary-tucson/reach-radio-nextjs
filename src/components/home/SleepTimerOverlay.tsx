@@ -6,8 +6,7 @@ import { useMediaStore } from '@/lib/store/media-store'
 export function SleepTimerOverlay() {
   const active = useMediaStore((s) => s.sleepTimerActive)
   const seconds = useMediaStore((s) => s.remainingSleepSeconds)
-  const setSleepTimerActive = useMediaStore((s) => s.setSleepTimerActive)
-  const setRemainingSleepSeconds = useMediaStore((s) => s.setRemainingSleepSeconds)
+  const cancelSleepTimer = useMediaStore((s) => s.cancelSleepTimer)
   const cancelBtnRef = useRef<HTMLButtonElement>(null)
   const prevFocusRef = useRef<HTMLElement | null>(null)
 
@@ -26,8 +25,7 @@ export function SleepTimerOverlay() {
     if (!active) return
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        setSleepTimerActive(false)
-        setRemainingSleepSeconds(0)
+        cancelSleepTimer()
       }
       // Focus trap: only one focusable element, keep Tab inside the dialog
       if (e.key === 'Tab') {
@@ -37,7 +35,7 @@ export function SleepTimerOverlay() {
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [active, setSleepTimerActive, setRemainingSleepSeconds])
+  }, [active, cancelSleepTimer])
 
   if (!active) return null
 
@@ -45,8 +43,7 @@ export function SleepTimerOverlay() {
   const secs = seconds % 60
 
   function cancel() {
-    setSleepTimerActive(false)
-    setRemainingSleepSeconds(0)
+    cancelSleepTimer()
   }
 
   return (

@@ -8,9 +8,6 @@ export function SleepTimerProvider() {
   const sleepTimerActive = useMediaStore((s) => s.sleepTimerActive)
   const sleepTimerPaused = useMediaStore((s) => s.sleepTimerPaused)
   const sleepTimerEndsAt = useMediaStore((s) => s.sleepTimerEndsAt)
-  const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
-  const setSleepTimerActive = useMediaStore((s) => s.setSleepTimerActive)
-  const setRemainingSleepSeconds = useMediaStore((s) => s.setRemainingSleepSeconds)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -27,12 +24,11 @@ export function SleepTimerProvider() {
       if (!endTime) return
       const remainingMs = endTime - Date.now()
       if (remainingMs <= 0) {
-        setRemainingSleepSeconds(0)
-        setIsPlaying(false)
-        setSleepTimerActive(false)
+        useMediaStore.getState().cancelSleepTimer()
+        useMediaStore.getState().setIsPlaying(false)
         postMessageToNative({ isPlaying: false })
       } else {
-        setRemainingSleepSeconds(Math.ceil(remainingMs / 1000))
+        useMediaStore.getState().setRemainingSleepSeconds(Math.ceil(remainingMs / 1000))
       }
     }, 500)
     return () => {
@@ -41,7 +37,6 @@ export function SleepTimerProvider() {
         intervalRef.current = null
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand actions (setIsPlaying, setSleepTimerActive, setRemainingSleepSeconds) are stable; adding them would cause unnecessary effect re-runs
   }, [sleepTimerActive, sleepTimerPaused])
 
   // Push structural state changes to native — not per-tick.
