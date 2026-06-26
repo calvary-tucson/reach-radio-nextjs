@@ -44,7 +44,8 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
       // Reassign src to reset NETWORK_NO_SOURCE state before retrying play
       el.src = streamUrl
       el.load()
-      el.play().catch(() => {
+      el.play().catch((err: unknown) => {
+        console.error('[AudioProvider] reconnect play failed:', err)
         setIsPlaying(false)
         setIsBuffering(false)
       })
@@ -66,7 +67,7 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
       reconnectAttempts.current = 0
       el.pause()
     }
-  }, [isPlaying, setIsPlaying, clearReconnect])
+  }, [isPlaying, setIsPlaying, clearReconnect, streamUrl])
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume / 100
@@ -84,6 +85,7 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
       ref={audioRef}
       src={streamUrl}
       preload="none"
+      aria-hidden="true"
       onLoadStart={() => setIsBuffering(true)}
       onWaiting={() => setIsBuffering(true)}
       onPlaying={() => {
@@ -95,11 +97,11 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
         setIsBuffering(false)
       }}
       onError={() => {
-        setIsBuffering(false)
-        // Only reconnect if the store says we should be playing
         if (useMediaStore.getState().isPlaying) {
+          setIsBuffering(true)
           scheduleReconnect()
         } else {
+          setIsBuffering(false)
           setIsPlaying(false)
         }
       }}
