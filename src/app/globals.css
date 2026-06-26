@@ -40,13 +40,13 @@ html.native-app [data-web-chrome] {
   display: none !important;
 }
 
-/* Remove header offset and footer/nav bottom padding when web chrome is hidden in native app */
+/* Remove header offset when web chrome is hidden in native app; apply glass overlay clearance */
 html.native-app main {
   padding-top: 0;
 }
 
 html.native-app body {
-  padding-bottom: 0;
+  padding-bottom: var(--native-bottom-inset, 152px);
   overflow-x: hidden;
   overscroll-behavior: none;
 }

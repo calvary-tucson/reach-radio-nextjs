@@ -89,7 +89,7 @@ window.dispatchEvent(new CustomEvent('nativeCommand', {
 | `pauseSleepTimer` | — | Pauses countdown; clears `endsAt` in store |
 | `resumeSleepTimer` | — | Resumes from `remainingSeconds`; recalculates `endsAt = now + remainingSeconds` |
 | `cancelSleepTimer` | — | Cancels and resets all timer state |
-| `setViewportInsets` | `{ bottom: number }` | Sets `--native-bottom-inset` CSS variable on `documentElement` (logical px = iOS pts); apply to scroll container via `padding-bottom: var(--native-bottom-inset, 0px)`. Sent on mount and whenever the glass overlay height changes (media bar shown/hidden). Value includes both glass bar height and device safe area inset. |
+| `setViewportInsets` *(iOS only)* | `{ bottom: number }` | Sets `--native-bottom-inset` CSS variable on `documentElement` (logical px = iOS pts). Web applies it via `html.native-app body { padding-bottom: var(--native-bottom-inset, 152px) }` in `globals.css` — fallback `152px` matches static body clearance and avoids layout shift on first render before bridge fires. Sent on WebView mount and whenever glass overlay height changes (media bar shown/hidden). Value = glass bar height + device safe area inset. |
 
 **Android additionally** calls these global functions directly (registered in `BridgeInit.tsx`):
 
@@ -224,7 +224,14 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 
 **Does NOT** call `window.globalState.*.set()` — iOS manages audio independently and does not push play state back to the web. This means the web play button won't reflect lock screen controls.
 
-**Native → Web**: dispatches `CustomEvent('nativeCommand')` via `evaluateJavaScript`.
+**Native → Web**: dispatches `CustomEvent('nativeCommand')` via `evaluateJavaScript`. Commands iOS currently sends:
+
+| Command | When |
+|---|---|
+| `navigate` | User taps a native bottom nav tab |
+| `refresh` | User triggers pull-to-refresh |
+| `setPlayState` | Lock screen / CarPlay play or pause |
+| `setViewportInsets` | On WebView mount and whenever glass overlay height changes (media bar shown/hidden); iOS-only |
 
 ---
 
@@ -483,6 +490,7 @@ private var streamURL: String = UserDefaults.standard.string(forKey: "streamUrl"
 | 7 | `post-message.ts`: wrap all messages with `protocolVersion: 1` | `src/lib/bridge/post-message.ts` | ✅ |
 | 8 | Add `/api/native-config` endpoint | `src/app/api/native-config/route.ts` | ✅ |
 | 9 | `useNowPlaying`: SSE runs in native WebView (do not skip) | `src/hooks/useNowPlaying.ts` | ✅ |
+| 10 | `html.native-app body`: `padding-bottom: var(--native-bottom-inset, 152px)` for glass overlay clearance | `src/app/globals.css` | ✅ |
 
 ### Group 2 — Device Testing (Before Domain Switch)
 
@@ -512,6 +520,7 @@ Test in debug mode. Android: `chrome://inspect`. iOS: Safari DevTools (already i
 | 20 | Android notification + play/pause | Android | Media notification reflects state |
 | 21 | `isMobileApp=true` → web chrome hidden | Both | Server layout check via header + cookie |
 | 22 | Regular browser — web chrome visible | Web | No bridge objects → BridgeInit clears stale cookie |
+| 23 | Scroll content clears glass overlay | iOS | `setViewportInsets` fires → `--native-bottom-inset` set → body bottom padding correct; no content hidden behind glass bar |
 
 ### Group 3 — Web Launch (Vercel + Cloudflare DNS)
 
