@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 
 export function TeacherSearchBar() {
   const pathname = usePathname()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -15,6 +16,10 @@ export function TeacherSearchBar() {
     setDisplayValue(searchParams.get('q') ?? '')
   }, [searchParams])
 
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
+
   function pushQuery(value: string) {
     const params = new URLSearchParams(searchParams.toString())
     if (value.trim()) {
@@ -23,7 +28,7 @@ export function TeacherSearchBar() {
       params.delete('q')
     }
     const search = params.toString()
-    window.history.replaceState(null, '', search ? `${pathname}?${search}` : pathname)
+    router.replace(search ? `${pathname}?${search}` : pathname)
   }
 
   function handleChange(value: string) {
@@ -53,7 +58,7 @@ export function TeacherSearchBar() {
           value={displayValue}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Escape') clear() }}
-          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Search teachers"
         />
         {displayValue && (
