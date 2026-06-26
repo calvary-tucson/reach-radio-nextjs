@@ -118,7 +118,7 @@ async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
       <BridgeInit streamUrl={streamUrl} />
       <NowPlayingProvider />
       {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
-      {!isMobileApp && <SleepTimerProvider />}
+      <SleepTimerProvider />
       {!isMobileApp && <Header />}
       {!isMobileApp && <MobileHeader />}
       {modal ? <div key="modal">{modal}</div> : null}
