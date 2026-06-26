@@ -1,6 +1,6 @@
 # Native WebView Bridge
 
-> Last updated: 2026-06-25 (sleep timer bridge added)
+> Last updated: 2026-06-26 (setViewportInsets added)
 > Status: Web bridge complete. Native apps load Astro (`reach-radio-web.pages.dev`) — switching to `reach.radio` requires an app store update.
 
 ---
@@ -89,6 +89,7 @@ window.dispatchEvent(new CustomEvent('nativeCommand', {
 | `pauseSleepTimer` | — | Pauses countdown; clears `endsAt` in store |
 | `resumeSleepTimer` | — | Resumes from `remainingSeconds`; recalculates `endsAt = now + remainingSeconds` |
 | `cancelSleepTimer` | — | Cancels and resets all timer state |
+| `setViewportInsets` | `{ bottom: number }` | Sets `--native-bottom-inset` CSS variable on `documentElement` (logical px = iOS pts); apply to scroll container via `padding-bottom: var(--native-bottom-inset, 0px)`. Sent on mount and whenever the glass overlay height changes (media bar shown/hidden). Value includes both glass bar height and device safe area inset. |
 
 **Android additionally** calls these global functions directly (registered in `BridgeInit.tsx`):
 
