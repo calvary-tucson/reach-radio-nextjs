@@ -61,13 +61,23 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     if (!isNativeBridgePresent()) return
 
     const handler = (e: CustomEvent<NativeCommand>) => {
-      const cmd = e.detail
+      // Defensive: native may accidentally JSON.stringify the detail object
+      const raw: unknown = typeof e.detail === 'string'
+        ? (() => { try { return JSON.parse(e.detail) } catch { return null } })()
+        : e.detail
+      if (!raw || typeof (raw as { type?: unknown }).type !== 'string') return
+      const cmd = raw as NativeCommand
       switch (cmd.type) {
-        case 'navigate': router.push(cmd.path); break
+        case 'navigate':
+          // Validate path to prevent open redirect via router.push('https://...')
+          if (typeof cmd.path !== 'string' || !cmd.path.startsWith('/')) break
+          router.push(cmd.path); break
         case 'refresh': router.refresh(); break
         case 'setPlayState': useMediaStore.getState().setIsPlaying(cmd.playing); break
         case 'setBuffering': useMediaStore.getState().setIsBuffering(cmd.buffering); break
-        case 'prefetchRoutes': cmd.paths.forEach(p => router.prefetch(p)); break
+        case 'prefetchRoutes':
+          if (!Array.isArray(cmd.paths)) break
+          cmd.paths.forEach(p => typeof p === 'string' && router.prefetch(p)); break
         case 'startSleepTimer':
           if (typeof cmd.seconds !== 'number' || !Number.isFinite(cmd.seconds) || cmd.seconds < 0) break
           useMediaStore.getState().startSleepTimer(cmd.seconds); break
@@ -77,6 +87,10 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
         case 'setSleepTimer':
           if (typeof cmd.seconds !== 'number' || !Number.isFinite(cmd.seconds) || cmd.seconds < 0) break
           useMediaStore.getState().setSleepTimer(cmd.seconds); break
+        default:
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('[BridgeInit] unknown nativeCommand type:', (raw as { type: unknown }).type)
+          }
       }
     }
     window.addEventListener('nativeCommand', handler)

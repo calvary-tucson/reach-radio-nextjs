@@ -85,7 +85,7 @@ window.dispatchEvent(new CustomEvent('nativeCommand', {
 | `setBuffering` | `{ buffering: boolean }` | Updates media store |
 | `prefetchRoutes` | `{ paths: string[] }` | `router.prefetch()` each path |
 | `startSleepTimer` | `{ seconds: number }` | Starts countdown; `seconds` must be a finite non-negative number — invalid values are silently dropped |
-| `setSleepTimer` | `{ seconds: number }` | Adjusts active/paused timer duration; same validation as `startSleepTimer` |
+| `setSleepTimer` | `{ seconds: number }` | Adjusts active/paused timer duration; auto-starts if timer is idle (safe default for CarPlay); same validation as `startSleepTimer` |
 | `pauseSleepTimer` | — | Pauses countdown; clears `endsAt` in store |
 | `resumeSleepTimer` | — | Resumes from `remainingSeconds`; recalculates `endsAt = now + remainingSeconds` |
 | `cancelSleepTimer` | — | Cancels and resets all timer state |
@@ -100,12 +100,14 @@ window.globalState.mediaBarState.isBuffering.set(boolean)  // push buffering sta
 window.globalState.mediaBarState.isMuted.set(boolean)
 ```
 
-**Both platforms** call these Unpoly compatibility shims (registered in `BridgeInit.tsx`):
+**Both platforms** call these Unpoly compatibility shims. The **web injects them** inside `BridgeInit.tsx` — native does not inject or polyfill them:
 
 ```ts
 up.history.location   // getter → current pathname
 up.reload()           // triggers router.refresh()
 ```
+
+Remove these shims only when v3 iOS and Android builds are fully retired from the App Store.
 
 ---
 
@@ -170,10 +172,12 @@ function isNativeBridgePresent(): boolean {
   return !!(
     window.Android?.postMessage ||                                 // Android JavascriptInterface
     window.webkit?.messageHandlers?.messageHandler?.postMessage || // iOS WKScriptMessageHandler
-    window.inNativeApp                                             // iOS WKUserScript flag
+    window.inNativeApp                                             // fallback flag
   )
 }
 ```
+
+iOS is detected via the **second check** (`window.webkit.messageHandlers.messageHandler.postMessage`). `window.inNativeApp` is only a fallback for edge cases where the webkit handler is absent. The web does not inject `window.inNativeApp` — if iOS ever sets it, it must come from the native side (e.g. via a `WKUserScript`), but it is not required for current detection to work.
 
 On mount, if bridge objects are detected → sets `mobile-app=true` cookie (fallback for deep links that skip the initial header). If bridge objects are absent but cookie exists → clears the stale cookie.
 
@@ -297,13 +301,19 @@ Sent whenever `sleepTimerActive`, `sleepTimerPaused`, or `sleepTimerEndsAt` chan
 
 ```
 idle ──startSleepTimer(s)──→ active  (endsAt = now+s)
-active ──pauseSleepTimer──→ paused  (endsAt = null, remainingSeconds preserved)
+idle ──setSleepTimer(s)────→ active  (same as startSleepTimer — safe default)
+active ──pauseSleepTimer───→ paused  (endsAt = null, remainingSeconds preserved)
 paused ──resumeSleepTimer──→ active  (endsAt = now+remainingSeconds)
 active ──setSleepTimer(s)──→ active  (endsAt = now+s)
 paused ──setSleepTimer(s)──→ paused  (remainingSeconds = s, endsAt stays null)
 active/paused ──cancelSleepTimer──→ idle
 active ──countdown hits 0──→ idle + isPlaying: false sent to native
+
+pauseSleepTimer when inactive/already-paused: no-op
+resumeSleepTimer when inactive/not-paused: no-op
 ```
+
+**`setSleepTimer` on idle auto-starts the timer** (safe default for callers like CarPlay that may not track web timer state). The preferred way to start a fresh timer is still `startSleepTimer`, but `setSleepTimer` on idle now behaves identically — it sets `sleepTimerActive=true` and starts the countdown. `pauseSleepTimer` and `resumeSleepTimer` are idempotent — duplicate calls are ignored.
 
 ### Pitfall: `remainingSeconds` is not live
 
@@ -333,6 +343,24 @@ Android splash never dismisses without this message. It is sent once, on `Bridge
 ### `window.globalActions.*` / `window.globalState.*` still exist
 
 These are registered in `BridgeInit.tsx` and must remain for Android backward compatibility. Do not remove them.
+
+### `nativeCommand` detail is a plain object, not a JSON string
+
+Web reads `event.detail` directly as an object — no `JSON.parse`. Native must dispatch:
+
+```swift
+// Correct
+window.dispatchEvent(new CustomEvent('nativeCommand', { detail: { type: 'navigate', path: '/teachers' } }))
+
+// Wrong — web will crash on e.detail.type
+window.dispatchEvent(new CustomEvent('nativeCommand', { detail: JSON.stringify({ type: 'navigate', ... }) }))
+```
+
+### CarPlay (or any pre-ready caller) — silent drop before bridge ready
+
+Web attaches the `nativeCommand` listener **before** sending `{ loaded: true }`, so there is no race on the web side — by the time native's `isBridgeReady` gate opens, the listener is already live.
+
+However, if a CarPlay picker or other native surface dispatches `setSleepTimer` / `startSleepTimer` before `isBridgeReady = true` (e.g. the user taps a CarPlay button before the first page load completes), the command is dropped silently. There is no queue on the web side. Native should add a queue-and-flush that drains into `evaluateJavaScript` once `isBridgeReady` is true, or disallow sleep timer UI in CarPlay until the bridge is ready.
 
 ### `window.addEventListener('message', ...)` in BridgeInit is dead code
 

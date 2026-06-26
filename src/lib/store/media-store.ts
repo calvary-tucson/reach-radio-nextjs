@@ -77,18 +77,25 @@ export const useMediaStore = create<MediaState>((set, get) => ({
     sleepTimerPaused: false,
     sleepTimerEndsAt: Date.now() + seconds * 1000,
   }),
-  pauseSleepTimer: () => set({ sleepTimerPaused: true, sleepTimerEndsAt: null }),
+  pauseSleepTimer: () => {
+    const { sleepTimerActive, sleepTimerPaused } = get()
+    if (!sleepTimerActive || sleepTimerPaused) return
+    set({ sleepTimerPaused: true, sleepTimerEndsAt: null })
+  },
   resumeSleepTimer: () => {
-    const { remainingSleepSeconds } = get()
+    const { sleepTimerActive, sleepTimerPaused, remainingSleepSeconds } = get()
+    if (!sleepTimerActive || !sleepTimerPaused) return
     set({ sleepTimerPaused: false, sleepTimerEndsAt: Date.now() + remainingSleepSeconds * 1000 })
   },
   cancelSleepTimer: () => set({ sleepTimerActive: false, sleepTimerPaused: false, remainingSleepSeconds: 0, sleepTimerEndsAt: null }),
   setSleepTimer: (seconds) => {
     const { sleepTimerActive, sleepTimerPaused } = get()
-    set({
-      remainingSleepSeconds: seconds,
-      sleepTimerEndsAt: sleepTimerActive && !sleepTimerPaused ? Date.now() + seconds * 1000 : null,
-    })
+    if (!sleepTimerActive) {
+      // Auto-start when idle — safe default for callers (e.g. CarPlay) that skip startSleepTimer
+      set({ remainingSleepSeconds: seconds, sleepTimerActive: true, sleepTimerPaused: false, sleepTimerEndsAt: Date.now() + seconds * 1000 })
+    } else {
+      set({ remainingSleepSeconds: seconds, sleepTimerEndsAt: !sleepTimerPaused ? Date.now() + seconds * 1000 : null })
+    }
   },
   teachersList: [],
   setTeachersList: (list) => set({ teachersList: list }),
