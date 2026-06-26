@@ -35,7 +35,9 @@ export function useNowPlaying(): void {
 
       es.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data) as { title?: string; artist?: string }
+          const raw = JSON.parse(event.data)
+          if (typeof raw !== 'object' || raw === null) return
+          const data = raw as { title?: string; artist?: string }
 
           const { teachersList } = useMediaStore.getState()
 

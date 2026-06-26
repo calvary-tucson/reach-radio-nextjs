@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
 
 interface AudioProviderProps {
@@ -13,11 +14,15 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reconnectAttempts = useRef(0)
-  const isPlaying = useMediaStore((s) => s.isPlaying)
-  const volume = useMediaStore((s) => s.volume)
-  const isMuted = useMediaStore((s) => s.isMuted)
-  const setIsBuffering = useMediaStore((s) => s.setIsBuffering)
-  const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
+  const { isPlaying, volume, isMuted, setIsBuffering, setIsPlaying } = useMediaStore(
+    useShallow((s) => ({
+      isPlaying: s.isPlaying,
+      volume: s.volume,
+      isMuted: s.isMuted,
+      setIsBuffering: s.setIsBuffering,
+      setIsPlaying: s.setIsPlaying,
+    }))
+  )
 
   const clearReconnect = useCallback(() => {
     if (reconnectTimer.current) {
