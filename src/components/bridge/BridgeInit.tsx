@@ -16,6 +16,11 @@ type NativeCommand =
   | { type: 'setPlayState'; playing: boolean }
   | { type: 'setBuffering'; buffering: boolean }
   | { type: 'prefetchRoutes'; paths: string[] }
+  | { type: 'startSleepTimer'; seconds: number }
+  | { type: 'pauseSleepTimer' }
+  | { type: 'resumeSleepTimer' }
+  | { type: 'cancelSleepTimer' }
+  | { type: 'setSleepTimer'; seconds: number }
 
 declare global {
   interface WindowEventMap {
@@ -63,6 +68,11 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
         case 'setPlayState': useMediaStore.getState().setIsPlaying(cmd.playing); break
         case 'setBuffering': useMediaStore.getState().setIsBuffering(cmd.buffering); break
         case 'prefetchRoutes': cmd.paths.forEach(p => router.prefetch(p)); break
+        case 'startSleepTimer': useMediaStore.getState().startSleepTimer(cmd.seconds); break
+        case 'pauseSleepTimer': useMediaStore.getState().pauseSleepTimer(); break
+        case 'resumeSleepTimer': useMediaStore.getState().resumeSleepTimer(); break
+        case 'cancelSleepTimer': useMediaStore.getState().cancelSleepTimer(); break
+        case 'setSleepTimer': useMediaStore.getState().setSleepTimer(cmd.seconds); break
       }
     }
     window.addEventListener('nativeCommand', handler)
