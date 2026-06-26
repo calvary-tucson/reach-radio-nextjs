@@ -116,10 +116,13 @@ describe('useMediaStore', () => {
     expect(useMediaStore.getState().sleepTimerEndsAt).toBeNull()
   })
 
-  it('setSleepTimer sets endsAt=null and leaves active=false when inactive', () => {
+  it('setSleepTimer auto-starts and sets endsAt when inactive', () => {
+    const before = Date.now()
     useMediaStore.getState().setSleepTimer(60)
-    expect(useMediaStore.getState().sleepTimerActive).toBe(false)
-    expect(useMediaStore.getState().sleepTimerEndsAt).toBeNull()
+    const { sleepTimerActive, sleepTimerEndsAt } = useMediaStore.getState()
+    expect(sleepTimerActive).toBe(true)
+    expect(sleepTimerEndsAt).toBeGreaterThanOrEqual(before + 60000 - 50)
+    expect(sleepTimerEndsAt).toBeLessThanOrEqual(Date.now() + 60000 + 50)
   })
 
   it('setTeachersList updates teachersList', () => {

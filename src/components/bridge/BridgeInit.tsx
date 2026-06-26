@@ -114,7 +114,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
 
     // V3 shims — remove when v3 iOS retires from App Store
     window.up = {
-      navigate: ({ url }: { url: string }) => router.push(url),
+      navigate: ({ url }: { url: string }) => { if (!url.startsWith('/')) return; router.push(url) },
       reload: () => router.refresh(),
       // Fix: live read of window.location.pathname, not stale closure over mount-time pathname
       history: { get location() { return window.location.pathname } },

@@ -41,7 +41,7 @@ const snap = async (path, name, waitSel) => {
   console.log(`  → ${url}`)
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 })
   if (waitSel) await page.waitForSelector(waitSel, { timeout: 20_000 }).catch(() => {})
-  await page.waitForTimeout(1200)
+  await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
   const dest = `${SHOTS}/${name}.png`
   await page.screenshot({ path: dest })
   console.log(`    ✓ ${dest}`)

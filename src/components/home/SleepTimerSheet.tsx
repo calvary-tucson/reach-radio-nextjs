@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { BottomSheet, type BottomSheetHandle } from '@/components/global/BottomSheet'
+import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
 
 const TIMER_OPTIONS = [5, 10, 15, 30, 45, 60]
@@ -14,13 +15,17 @@ interface SleepTimerSheetProps {
 
 export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
   const sheetRef = useRef<BottomSheetHandle>(null)
-  const active = useMediaStore((s) => s.sleepTimerActive)
-  const paused = useMediaStore((s) => s.sleepTimerPaused)
-  const remainingSeconds = useMediaStore((s) => s.remainingSleepSeconds)
-  const startSleepTimer = useMediaStore((s) => s.startSleepTimer)
-  const pauseSleepTimer = useMediaStore((s) => s.pauseSleepTimer)
-  const resumeSleepTimer = useMediaStore((s) => s.resumeSleepTimer)
-  const cancelSleepTimer = useMediaStore((s) => s.cancelSleepTimer)
+  const { active, paused, remainingSeconds, startSleepTimer, pauseSleepTimer, resumeSleepTimer, cancelSleepTimer } = useMediaStore(
+    useShallow((s) => ({
+      active: s.sleepTimerActive,
+      paused: s.sleepTimerPaused,
+      remainingSeconds: s.remainingSleepSeconds,
+      startSleepTimer: s.startSleepTimer,
+      pauseSleepTimer: s.pauseSleepTimer,
+      resumeSleepTimer: s.resumeSleepTimer,
+      cancelSleepTimer: s.cancelSleepTimer,
+    }))
+  )
 
   function start(mins: number) {
     startSleepTimer(mins * 60)

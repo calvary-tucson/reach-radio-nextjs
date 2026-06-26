@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useModalStore } from '@/lib/stores/modal'
+import { cn } from '@/lib/utils'
 
 interface TeacherModalLinkProps {
   slug: string
@@ -38,7 +39,7 @@ export function TeacherModalLink({
         }
         router.push(`/teachers/${slug}`)
       }}
-      className={className}
+      className={cn('cursor-pointer', className)}
       style={style}
       aria-label={ariaLabel ?? name}
     >

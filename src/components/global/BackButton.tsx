@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
@@ -11,7 +12,11 @@ interface BackButtonProps {
 
 export function BackButton({ variant, className }: BackButtonProps) {
   const router = useRouter()
-  const isApp = typeof document !== 'undefined' && document.documentElement.classList.contains('native-app')
+  const [isApp, setIsApp] = useState(false)
+
+  useEffect(() => {
+    setIsApp(document.documentElement.classList.contains('native-app'))
+  }, [])
 
   function handleBack() {
     router.back()

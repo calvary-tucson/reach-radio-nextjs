@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { DragHandle } from '@/components/global/DragHandle'
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
+import { useShallow } from 'zustand/react/shallow'
 import { useModalStore } from '@/lib/stores/modal'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { cn } from '@/lib/utils'
@@ -64,16 +65,31 @@ function ModalSkeleton({
 
 export default function ModalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const isOpen = useModalStore((s) => s.isOpen)
-  const isClosing = useModalStore((s) => s.isClosing)
-  const title = useModalStore((s) => s.title)
-  const stackDepth = useModalStore((s) => s.stackDepth)
-  const close = useModalStore((s) => s.close)
-  const startClosing = useModalStore((s) => s.startClosing)
-  const expectingRoute = useModalStore((s) => s.expectingRoute)
-  const expectingBack = useModalStore((s) => s.expectingBack)
-  const routeArrived = useModalStore((s) => s.routeArrived)
-  const clearBack = useModalStore((s) => s.clearBack)
+  const {
+    isOpen,
+    isClosing,
+    title,
+    stackDepth,
+    close,
+    startClosing,
+    expectingRoute,
+    expectingBack,
+    routeArrived,
+    clearBack,
+  } = useModalStore(
+    useShallow((s) => ({
+      isOpen: s.isOpen,
+      isClosing: s.isClosing,
+      title: s.title,
+      stackDepth: s.stackDepth,
+      close: s.close,
+      startClosing: s.startClosing,
+      expectingRoute: s.expectingRoute,
+      expectingBack: s.expectingBack,
+      routeArrived: s.routeArrived,
+      clearBack: s.clearBack,
+    }))
+  )
   const dismissGuardRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
 

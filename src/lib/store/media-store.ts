@@ -1,6 +1,5 @@
 import { create } from 'zustand'
-
-const DEFAULT_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
+import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
 interface MediaState {
   isPlaying: boolean
@@ -42,7 +41,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   previousVolume: 100,
   title: 'Reach Radio',
   artist: '',
-  image: DEFAULT_IMAGE,
+  image: FALLBACK_OG_IMAGE,
   showMediaBar: false,
   sleepTimerActive: false,
   sleepTimerPaused: false,

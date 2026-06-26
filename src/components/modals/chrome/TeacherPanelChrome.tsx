@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react'
 import { X, ArrowLeft } from 'lucide-react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { DragHandle } from '@/components/global/DragHandle'
 import { cn } from '@/lib/utils'
 
@@ -21,33 +22,13 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
   // Focus on open
   useEffect(() => { contentRef.current?.focus() }, [])
 
-  // Focus trap
-  useEffect(() => {
-    const el = contentRef.current
-    if (!el) return
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return
-      const focusable = el.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
-      if (!focusable.length) { e.preventDefault(); return }
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus()
-      }
-    }
-    el.addEventListener('keydown', handleKeyDown)
-    return () => el.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  useFocusTrap(contentRef)
 
   const backButtonClass =
-    'flex h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white/60 light:text-gray-500 hover:bg-white/40 light:hover:bg-gray-300 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+    'flex h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white/80 light:text-gray-500 hover:bg-white/40 light:hover:bg-gray-300 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
   const closeButtonClass =
-    'flex h-11 w-11 items-center justify-center rounded-full text-white/60 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+    'flex h-11 w-11 items-center justify-center rounded-full text-white/80 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
   return (
     <div

@@ -18,7 +18,9 @@ async function SearchContent() {
 export default function TeachersSearchPage() {
   return (
     <div className="px-4 py-6 sm:px-6 space-y-4">
-      <TeacherSearchBar />
+      <Suspense fallback={null}>
+        <TeacherSearchBar />
+      </Suspense>
       <Suspense fallback={<SearchResultsSkeleton />}>
         <SearchContent />
       </Suspense>

@@ -26,6 +26,7 @@
   --color-brand-green: var(--color-green-500);
   --color-brand-purple: oklch(24% 0.05 280);
   --color-brand-gray: oklch(30% 0.02 280);
+  --color-ring: var(--color-green-400);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);

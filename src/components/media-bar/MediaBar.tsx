@@ -27,7 +27,6 @@ export function MediaBar() {
     <div
       role="region"
       aria-label="Media player"
-      aria-hidden={!showMediaBar}
       inert={!showMediaBar}
       data-web-chrome=""
       data-media-bar=""
