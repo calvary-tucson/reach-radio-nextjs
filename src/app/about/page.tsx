@@ -87,7 +87,7 @@ async function AboutContent() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Download on the App Store"
-              className="inline-block hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:rounded-sm"
+              className="inline-block hover:opacity-80 motion-safe:transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:rounded-sm"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="119.664" height="40" viewBox="0 0 119.664 40" className="h-10 w-auto" aria-hidden="true">
                 <g transform="translate(0 0)">
@@ -126,7 +126,7 @@ async function AboutContent() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Get it on Google Play"
-              className="inline-block hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:rounded-sm"
+              className="inline-block hover:opacity-80 motion-safe:transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:rounded-sm"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="135" height="40" viewBox="0 0 135 40" className="h-10 w-auto" aria-hidden="true">
                 <defs>
@@ -192,7 +192,7 @@ async function AboutContent() {
       {/* Privacy policy */}
       <Link
         href="/about/privacy-policy"
-        className="block bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-5 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 transition-colors cursor-pointer group"
+        className="block bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-5 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 motion-safe:transition-colors cursor-pointer group"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -200,7 +200,7 @@ async function AboutContent() {
             <p className="text-white/70 light:text-gray-500 text-xs mt-1">How we collect and protect your information</p>
           </div>
           <svg
-            className="w-4 h-4 text-white/40 light:text-gray-400 group-hover:text-white/70 transition-colors flex-shrink-0 ml-4"
+            className="w-4 h-4 text-white/40 light:text-gray-400 group-hover:text-white/70 motion-safe:transition-colors flex-shrink-0 ml-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

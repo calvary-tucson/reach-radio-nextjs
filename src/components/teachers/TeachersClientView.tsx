@@ -38,7 +38,7 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             aria-controls={`panel-${tab}`}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-sm md:text-sm font-semibold capitalize transition-colors cursor-pointer border-b-2 -mb-px ${
+            className={`px-4 py-2 text-sm md:text-sm font-semibold capitalize motion-safe:transition-colors cursor-pointer border-b-2 -mb-px ${
               activeTab === tab
                 ? 'text-[#84b84f] border-[#84b84f]'
                 : 'text-white/55 light:text-gray-500 border-transparent hover:text-white/75'

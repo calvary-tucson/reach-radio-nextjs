@@ -114,10 +114,10 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
                   <button
                     type="button"
                     onClick={() => { setSelectedDay(day); setSheetOpen(false) }}
-                    className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-sm font-medium cursor-pointer transition-colors hover:bg-white/5 light:hover:bg-gray-50 active:bg-white/10 light:active:bg-gray-100"
+                    className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-sm font-medium cursor-pointer motion-safe:transition-colors hover:bg-white/5 light:hover:bg-gray-50 active:bg-white/10 light:active:bg-gray-100"
                   >
                     <Check
-                      className={`h-4 w-4 shrink-0 text-[#84b84f] transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}
+                      className={`h-4 w-4 shrink-0 text-[#84b84f] motion-safe:transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}
                       aria-hidden="true"
                     />
                     <span className={selectedDay === day ? 'text-white light:text-gray-900' : 'text-white/60 light:text-gray-500'}>

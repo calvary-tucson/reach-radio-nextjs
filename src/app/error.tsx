@@ -20,7 +20,7 @@ export default function RootError({ error, reset }: ErrorProps) {
       </p>
       <button
         onClick={reset}
-        className="rounded-full bg-[#84b84f] px-6 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        className="rounded-full bg-[#84b84f] px-6 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         Try again
       </button>

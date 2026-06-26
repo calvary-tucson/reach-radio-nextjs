@@ -63,7 +63,7 @@ export function RadioPlayer() {
             width={420}
             height={256}
             sizes="(max-width: 640px) 100vw, 420px"
-            className="w-full max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 transition-opacity"
+            className="w-full max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 motion-safe:transition-opacity"
             style={{ height: 'auto' }}
             priority
           />

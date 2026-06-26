@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo, useTransition } from 'react'
-import { useSearchParams, usePathname } from 'next/navigation'
+import { useMemo, useTransition } from 'react'
+import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
@@ -32,6 +32,7 @@ export function TeacherSearchClient({
   scheduleTeachers,
 }: TeacherSearchClientProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
@@ -39,10 +40,9 @@ export function TeacherSearchClient({
   const urlDays = searchParams.get('days')?.split(',').filter(Boolean) ?? []
   const urlSort = searchParams.get('sort') ?? ''
 
-  const [activeDays, setActiveDays] = useState<string[]>(urlDays)
-  const [sort, setSort] = useState<SortOption | undefined>(
-    VALID_SORTS.has(urlSort) ? (urlSort as SortOption) : undefined
-  )
+  // Derive directly from URL — no local state; browser back syncs automatically
+  const activeDays = urlDays
+  const sort: SortOption | undefined = VALID_SORTS.has(urlSort) ? (urlSort as SortOption) : undefined
 
   const scheduleMap = useMemo(
     () => new Map<string, ScheduleDay[]>(scheduleTeachers.map((t) => [t.slug, t.schedule])),
@@ -69,32 +69,26 @@ export function TeacherSearchClient({
     if (nextDays.length) params.set('days', nextDays.join(','))
     if (nextSort) params.set('sort', nextSort)
     const search = params.toString()
-    window.history.replaceState(null, '', search ? `${pathname}?${search}` : pathname)
+    startTransition(() => router.replace(search ? `${pathname}?${search}` : pathname))
   }
 
   function toggleDay(day: string) {
     const next = activeDays.includes(day)
       ? activeDays.filter((d) => d !== day)
       : [...activeDays, day]
-    startTransition(() => setActiveDays(next))
     pushURL(next, sort)
   }
 
   function setAndPushSort(next: SortOption | undefined) {
-    startTransition(() => setSort(next))
     pushURL(activeDays, next)
   }
 
   function clearAll() {
-    startTransition(() => {
-      setSort(undefined)
-      setActiveDays([])
-    })
-    window.history.replaceState(null, '', pathname)
+    startTransition(() => router.replace(pathname))
   }
 
   const chipBase =
-    'min-h-[44px] flex items-center shrink-0 rounded-full px-3 text-xs font-medium border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
+    'min-h-[44px] flex items-center shrink-0 rounded-full px-3 text-xs font-medium border motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
   const chipActive =
     'bg-[rgba(132,184,79,0.15)] border-[rgba(132,184,79,0.3)] text-[#84b84f]'
   const chipInactive =
@@ -183,7 +177,7 @@ export function TeacherSearchClient({
                   <TeacherModalLink
                     slug={teacher.slug}
                     name={teacher.name}
-                    className="w-full rounded-xl border border-white/10 light:border-gray-200 bg-white/5 light:bg-gray-50 p-3 flex items-center gap-3 text-left transition-colors cursor-pointer can-hover:hover:bg-white/10 light:can-hover:hover:bg-gray-100 can-hover:hover:border-white/20 light:can-hover:hover:border-gray-300"
+                    className="w-full rounded-xl border border-white/10 light:border-gray-200 bg-white/5 light:bg-gray-50 p-3 flex items-center gap-3 text-left motion-safe:transition-colors cursor-pointer can-hover:hover:bg-white/10 light:can-hover:hover:bg-gray-100 can-hover:hover:border-white/20 light:can-hover:hover:border-gray-300"
                   >
                     <TeacherAvatar
                       name={teacher.name}

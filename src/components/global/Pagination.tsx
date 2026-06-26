@@ -33,7 +33,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
       {currentPage > 1 && (
         <Link
           href={href(currentPage - 1)}
-          className="rounded-lg border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-2 text-sm text-white/80 light:text-gray-700 transition-colors hover:bg-white/10 light:hover:bg-gray-100"
+          className="rounded-lg border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-2 text-sm text-white/80 light:text-gray-700 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100"
         >
           Previous
         </Link>
@@ -46,7 +46,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
             key={item}
             href={href(item)}
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-lg text-sm transition-colors',
+              'flex h-10 w-10 items-center justify-center rounded-lg text-sm motion-safe:transition-colors',
               item === currentPage
                 ? 'bg-blue-600 font-bold text-white'
                 : 'border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 text-white/70 light:text-gray-700 hover:bg-white/10 light:hover:bg-gray-100',
@@ -59,7 +59,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
       {currentPage < totalPages && (
         <Link
           href={href(currentPage + 1)}
-          className="rounded-lg border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-2 text-sm text-white/80 light:text-gray-700 transition-colors hover:bg-white/10 light:hover:bg-gray-100"
+          className="rounded-lg border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-2 text-sm text-white/80 light:text-gray-700 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100"
         >
           Next
         </Link>

@@ -10,6 +10,8 @@ export function MobileHeader() {
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    el.style.transition = 'transform 0.5s, opacity 0.5s'
     let lastY = window.scrollY
     let ticking = false
     function onScroll() {
@@ -36,8 +38,7 @@ export function MobileHeader() {
     <header
       ref={ref}
       data-web-chrome=""
-      className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200"
-      style={{ transition: 'transform 0.5s, opacity 0.5s' }}
+      className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200 will-change-transform"
     >
       <Link href="/" aria-label="Reach Radio home" className="w-[clamp(180px,40vw,250px)]">
         <Image
@@ -54,7 +55,7 @@ export function MobileHeader() {
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-8 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+          className="w-8 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">
@@ -63,7 +64,7 @@ export function MobileHeader() {
         </a>
         <Link
           href="/about#aboutGotQuestions"
-          className="flex items-center px-2 py-1 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+          className="flex items-center px-2 py-1 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
         >
           Contact
         </Link>

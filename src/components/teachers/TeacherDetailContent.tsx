@@ -83,7 +83,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={cn("bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#84b84f] focus-visible:ring-offset-2", !isOverlay && "md:hidden")}
+                className={cn("bg-[#84b84f] rounded-full px-4 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#84b84f] focus-visible:ring-offset-2", !isOverlay && "md:hidden")}
               >
                 {`${primaryLink.title} ↗`}
               </a>
@@ -119,7 +119,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-[#84b84f] rounded-full px-5 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#84b84f] focus-visible:ring-offset-2"
+                className="inline-block bg-[#84b84f] rounded-full px-5 py-2 text-sm font-bold text-[#0a1305] cursor-pointer hover:bg-[#96cc5e] motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#84b84f] focus-visible:ring-offset-2"
               >
                 {`${primaryLink.title} ↗`}
               </a>
@@ -135,7 +135,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                 >
                   {link.title}
                 </a>

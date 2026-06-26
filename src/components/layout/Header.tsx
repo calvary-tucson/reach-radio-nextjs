@@ -19,6 +19,8 @@ export function Header() {
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    el.style.transition = 'transform 0.5s, opacity 0.5s'
     let lastY = window.scrollY
     let ticking = false
     function onScroll() {
@@ -46,8 +48,8 @@ export function Header() {
       ref={ref}
       id="site-header"
       data-web-chrome=""
-      style={{ viewTransitionName: 'site-header', transition: 'transform 0.5s, opacity 0.5s' }}
-      className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6"
+      style={{ viewTransitionName: 'site-header' }}
+      className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6 will-change-transform"
     >
       <Link href="/" aria-label="Reach Radio home" className="flex items-center w-[clamp(130px,16vw,186px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded">
         <Image
@@ -91,7 +93,7 @@ export function Header() {
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">
@@ -100,7 +102,7 @@ export function Header() {
         </a>
         <Link
           href="/about#aboutGotQuestions"
-          className="flex items-center px-3 py-1.5 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+          className="flex items-center px-3 py-1.5 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
         >
           Contact
         </Link>

@@ -17,7 +17,7 @@ export function ScheduleItemLink({ slug, name, idx, children }: ScheduleItemLink
     <Link
       href={`/teachers/${slug}`}
       onClick={() => openModal(name)}
-      className="schedule-row flex items-center justify-between flex-wrap bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      className="schedule-row flex items-center justify-between flex-wrap bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 motion-safe:transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       style={{ '--stagger-i': idx } as React.CSSProperties}
     >
       <div className="flex gap-5">{children}</div>

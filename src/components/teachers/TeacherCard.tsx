@@ -39,7 +39,7 @@ export function TeacherCard({
       aria-label={teacher.title ? `${teacher.name} — ${teacher.title}` : teacher.name}
       transitionTypes={['nav-forward']}
       onNavigate={onNavigate}
-      className="teacher-card block rounded-[18px] overflow-hidden bg-[#1c2128] light:bg-white border border-white/5 light:border-gray-200 motion-safe:hover:scale-[1.03] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white light:focus-visible:ring-gray-400 cursor-pointer"
+      className="teacher-card block rounded-[18px] overflow-hidden bg-[#1c2128] light:bg-white border border-white/5 light:border-gray-200 motion-safe:hover:scale-[1.03] motion-safe:transition-all duration-200 will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white light:focus-visible:ring-gray-400 cursor-pointer"
       style={{ '--stagger-i': index } as React.CSSProperties}
     >
       {teacher.photo && !viewTransitionDisabled ? (
