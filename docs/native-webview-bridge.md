@@ -1,6 +1,6 @@
 # Native WebView Bridge
 
-> Last updated: 2026-06-25  
+> Last updated: 2026-06-25 (sleep timer bridge added)
 > Status: Web bridge complete. Native apps load Astro (`reach-radio-web.pages.dev`) — switching to `reach.radio` requires an app store update.
 
 ---
@@ -53,6 +53,7 @@ Every message is a JSON object with `"protocolVersion": 1` plus any of these fie
 | `artist` | string | Track metadata change | Lock screen / CarPlay artist |
 | `image` | string | Track metadata change | Lock screen / CarPlay artwork |
 | `offline` | boolean | Network change | Show/hide offline banner |
+| `sleepTimer` | `{ active, paused, remainingSeconds, endsAt }` | Timer start/pause/resume/cancel + structural state changes | Update native sleep timer HUD; `endsAt` is ISO 8601 string or `null`; sent on structural changes only, not per countdown tick |
 
 Example message:
 ```json
@@ -83,6 +84,11 @@ window.dispatchEvent(new CustomEvent('nativeCommand', {
 | `setPlayState` | `{ playing: boolean }` | Updates media store |
 | `setBuffering` | `{ buffering: boolean }` | Updates media store |
 | `prefetchRoutes` | `{ paths: string[] }` | `router.prefetch()` each path |
+| `startSleepTimer` | `{ seconds: number }` | Starts countdown; `seconds` must be a finite non-negative number — invalid values are silently dropped |
+| `setSleepTimer` | `{ seconds: number }` | Adjusts active/paused timer duration; same validation as `startSleepTimer` |
+| `pauseSleepTimer` | — | Pauses countdown; clears `endsAt` in store |
+| `resumeSleepTimer` | — | Resumes from `remainingSeconds`; recalculates `endsAt = now + remainingSeconds` |
+| `cancelSleepTimer` | — | Cancels and resets all timer state |
 
 **Android additionally** calls these global functions directly (registered in `BridgeInit.tsx`):
 
@@ -257,6 +263,51 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 **Why native apps can't switch without an app update**: both apps hardcode the domain allowlist. Any WebView navigation to a non-allowed domain opens in the system browser. A Cloudflare redirect won't help — the redirect target fails the allowlist check too.
 
 **Keep `reach-radio-web.pages.dev` (Astro) alive indefinitely.** It is free on Cloudflare Pages, and current native users depend on it for the WebView URL and the iOS audio stream proxy.
+
+---
+
+## Sleep Timer Bridge
+
+The sleep timer runs entirely on the web side. Native receives state updates and can send commands to control it.
+
+### Web → Native: `sleepTimer` message
+
+Sent whenever `sleepTimerActive`, `sleepTimerPaused`, or `sleepTimerEndsAt` changes in the Zustand store — on structural transitions only, never per countdown tick.
+
+```json
+{
+  "protocolVersion": 1,
+  "sleepTimer": {
+    "active": true,
+    "paused": false,
+    "remainingSeconds": 1740,
+    "endsAt": "2026-06-25T03:15:00.000Z"
+  }
+}
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `active` | boolean | Timer is running or paused |
+| `paused` | boolean | Timer is paused (countdown frozen) |
+| `remainingSeconds` | number | Seconds left (last known value; not live-updated per tick) |
+| `endsAt` | string \| null | ISO 8601 UTC; null when paused or inactive |
+
+### State Machine
+
+```
+idle ──startSleepTimer(s)──→ active  (endsAt = now+s)
+active ──pauseSleepTimer──→ paused  (endsAt = null, remainingSeconds preserved)
+paused ──resumeSleepTimer──→ active  (endsAt = now+remainingSeconds)
+active ──setSleepTimer(s)──→ active  (endsAt = now+s)
+paused ──setSleepTimer(s)──→ paused  (remainingSeconds = s, endsAt stays null)
+active/paused ──cancelSleepTimer──→ idle
+active ──countdown hits 0──→ idle + isPlaying: false sent to native
+```
+
+### Pitfall: `remainingSeconds` is not live
+
+The `sleepTimer` message is sent on state transitions, not per tick. If native needs a live countdown, calculate from `endsAt` using the device clock. If the timer is paused, `endsAt` is null — use `remainingSeconds` directly.
 
 ---
 
