@@ -14,16 +14,20 @@ export function RouteAnnouncer() {
       return
     }
 
-    const title = document.title
-    if (announcementRef.current) {
-      announcementRef.current.textContent = title
-    }
+    const raf = requestAnimationFrame(() => {
+      if (announcementRef.current) {
+        announcementRef.current.textContent = document.title
+      }
+    })
 
     const timer = setTimeout(() => {
       document.getElementById('main-content')?.focus()
     }, 100)
 
-    return () => clearTimeout(timer)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(timer)
+    }
   }, [pathname])
 
   return (

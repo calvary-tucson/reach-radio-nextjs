@@ -153,6 +153,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
 
   // Forward track metadata to native whenever it changes in the store
   useEffect(() => {
+    if (!isNativeBridgePresent()) return
     postMessageToNative({ title, artist, image })
   }, [title, artist, image])
 
@@ -160,7 +161,9 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   useEffect(() => {
     function onFocusIn(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
-      mediaBarStateBeforeFocus.current = useMediaStore.getState().showMediaBar
+      if (mediaBarStateBeforeFocus.current === null) {
+        mediaBarStateBeforeFocus.current = useMediaStore.getState().showMediaBar
+      }
       useMediaStore.getState().setShowMediaBar(false)
       postMessageToNative({ showMobileNav: false, showMediaBar: false })
     }
