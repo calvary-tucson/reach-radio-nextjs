@@ -85,6 +85,15 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+async function detectMobileApp(): Promise<boolean> {
+  const headersList = await headers()
+  const cookieHeader = headersList.get('cookie') ?? ''
+  return (
+    headersList.get('mobile-app') === 'true' ||
+    cookieHeader.split(';').some((c) => c.trim() === 'mobile-app=true')
+  )
+}
+
 function ChromeFallback() {
   return (
     <div
@@ -96,11 +105,7 @@ function ChromeFallback() {
 }
 
 async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
-  const headersList = await headers()
-  const cookieHeader = headersList.get('cookie') ?? ''
-  const isMobileApp =
-    headersList.get('mobile-app') === 'true' ||
-    cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
+  const isMobileApp = await detectMobileApp()
 
   const { radioAudioURL } = await sanityFetch<{ radioAudioURL: string }>(
     appSettingsQuery,
@@ -127,12 +132,7 @@ async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
 }
 
 async function LayoutFooter() {
-  const headersList = await headers()
-  const cookieHeader = headersList.get('cookie') ?? ''
-  const isMobileApp =
-    headersList.get('mobile-app') === 'true' ||
-    cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
-
+  const isMobileApp = await detectMobileApp()
   if (isMobileApp) return null
 
   return (
@@ -176,6 +176,7 @@ export default function RootLayout({
             <main id="main-content" aria-label="Main content" className="pt-16 focus:outline-none" tabIndex={-1}>
               {children}
             </main>
+            {/* No fallback: LayoutFooter returns null for native-app; suspending briefly is preferable to layout shift */}
             <Suspense>
               <LayoutFooter />
             </Suspense>
