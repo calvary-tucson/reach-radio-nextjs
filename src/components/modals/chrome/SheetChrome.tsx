@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils'
 interface SheetChromeProps {
   children: React.ReactNode
   title?: string
+  /** Accessible label when no visible title is rendered. */
+  ariaLabel?: string
   /** Wrap children in p-6 padding. Default true. */
   padded?: boolean
   /** Focus the first input inside the sheet instead of the dialog container. */
@@ -19,7 +21,7 @@ interface SheetChromeProps {
   className?: string
 }
 
-export function SheetChrome({ children, title, padded = true, autoFocusInput = false, className }: SheetChromeProps) {
+export function SheetChrome({ children, title, ariaLabel, padded = true, autoFocusInput = false, className }: SheetChromeProps) {
   const { onDismiss, isClosing } = useModal()
   const contentRef = useRef<HTMLDivElement>(null)
   const drag = useSheetDrag({ onDismiss, contentRef })
@@ -54,7 +56,7 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
-        {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': 'Dialog' })}
+        {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': ariaLabel ?? 'Dialog' })}
         className={cn(
           'w-full max-h-[90dvh] overflow-hidden flex flex-col border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0',
           'rounded-t-2xl rounded-b-none h-[85dvh] will-change-transform',
