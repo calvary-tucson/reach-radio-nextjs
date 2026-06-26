@@ -1,8 +1,6 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { sanityFetch } from '@/lib/sanity/client'
-import { teacherListQuery, fullScheduleQuery } from '@/lib/sanity/queries'
-import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
+import { fetchAllTeacherData } from '@/lib/sanity/teachers'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
 import { TeacherSearchBar } from '@/components/teachers/TeacherSearchBar'
 import { SearchResultsSkeleton } from '@/components/skeletons/SearchResultsSkeleton'
@@ -13,10 +11,7 @@ export const metadata: Metadata = {
 }
 
 async function SearchContent() {
-  const [teachers, scheduleTeachers] = await Promise.all([
-    sanityFetch<TeacherSummary[]>(teacherListQuery, {}, { tags: ['teachers'] }),
-    sanityFetch<TeacherWithSchedule[]>(fullScheduleQuery, {}, { tags: ['teachers'] }),
-  ])
+  const { teachers, scheduleTeachers } = await fetchAllTeacherData()
   return <TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />
 }
 
