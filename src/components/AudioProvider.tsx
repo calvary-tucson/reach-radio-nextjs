@@ -54,6 +54,7 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
   useEffect(() => {
     const el = audioRef.current
     if (!el) return
+    if (window.inNativeApp) return  // native: AVPlayer handles audio via bridge
     if (isPlaying) {
       clearReconnect()
       el.play().catch((err: unknown) => {

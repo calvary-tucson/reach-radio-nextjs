@@ -172,4 +172,14 @@ describe('AudioProvider', () => {
     expect(useMediaStore.getState().isPlaying).toBe(false)
     expect(useMediaStore.getState().isBuffering).toBe(false)
   })
+
+  it('does not call play() when window.inNativeApp is true and isPlaying becomes true', async () => {
+    vi.stubGlobal('inNativeApp', true)
+    render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+    await act(async () => {
+      useMediaStore.getState().setIsPlaying(true)
+    })
+    expect(play).not.toHaveBeenCalled()
+    vi.unstubAllGlobals()
+  })
 })
