@@ -6,15 +6,6 @@ import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
 
-function isNativeApp(): boolean {
-  if (typeof window === 'undefined') return false
-  return !!(
-    window.Android?.postMessage ||
-    window.webkit?.messageHandlers?.messageHandler?.postMessage ||
-    window.inNativeApp
-  )
-}
-
 export function useNowPlaying(): void {
   const setNowPlaying = useMediaStore((s) => s.setNowPlaying)
   const setTeachersList = useMediaStore((s) => s.setTeachersList)
@@ -32,9 +23,6 @@ export function useNowPlaying(): void {
   }, [setTeachersList])
 
   useEffect(() => {
-    // Skip SSE in native WebView — BridgeInit relays metadata from Sanity via the bridge
-    if (isNativeApp()) return
-
     let es: EventSource | null = null
     let retryTimer: ReturnType<typeof setTimeout> | null = null
     let retries = 0
