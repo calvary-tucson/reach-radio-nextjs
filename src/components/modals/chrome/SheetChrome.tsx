@@ -46,7 +46,7 @@ export function SheetChrome({ children, title, padded = true, autoFocusInput = f
   return (
     <div
       role="presentation"
-      className="fixed inset-0 flex items-end sm:items-center sm:justify-center"
+      className="fixed inset-0 flex items-end sm:items-center sm:justify-center cursor-pointer"
       onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
     >
       <div

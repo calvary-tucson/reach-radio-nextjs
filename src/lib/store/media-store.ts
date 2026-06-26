@@ -50,7 +50,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   remainingSleepSeconds: 0,
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
-  setVolume: (v) => set({ volume: v, isMuted: v === 0 }),
+  setVolume: (v) => set((s) => ({ volume: v, isMuted: v === 0, previousVolume: v === 0 ? s.volume : s.previousVolume })),
   toggleMute: () => {
     const { isMuted, volume, previousVolume } = get()
     if (isMuted) {

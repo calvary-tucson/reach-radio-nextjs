@@ -72,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: siteTitle,
       title: siteTitle,
       description,
-      url: 'https://reach.radio',
+      url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://reach.radio',
       locale: 'en_US',
       images: [{ url: FALLBACK_OG_IMAGE, width: 1024, height: 1024, alt: siteTitle }],
     },

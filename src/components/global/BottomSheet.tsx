@@ -81,7 +81,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(funct
     <>
       <div
         data-testid="bottom-sheet-backdrop"
-        className={`fixed inset-0 z-[70] bg-black/60 motion-safe:transition-opacity duration-300 [will-change:opacity] ${
+        className={`fixed inset-0 z-[70] bg-black/60 motion-safe:transition-opacity duration-300 [will-change:opacity] cursor-pointer ${
           visible ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={handleClose}

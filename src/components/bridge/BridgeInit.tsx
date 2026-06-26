@@ -68,11 +68,15 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
         case 'setPlayState': useMediaStore.getState().setIsPlaying(cmd.playing); break
         case 'setBuffering': useMediaStore.getState().setIsBuffering(cmd.buffering); break
         case 'prefetchRoutes': cmd.paths.forEach(p => router.prefetch(p)); break
-        case 'startSleepTimer': useMediaStore.getState().startSleepTimer(cmd.seconds); break
+        case 'startSleepTimer':
+          if (typeof cmd.seconds !== 'number' || !Number.isFinite(cmd.seconds) || cmd.seconds < 0) break
+          useMediaStore.getState().startSleepTimer(cmd.seconds); break
         case 'pauseSleepTimer': useMediaStore.getState().pauseSleepTimer(); break
         case 'resumeSleepTimer': useMediaStore.getState().resumeSleepTimer(); break
         case 'cancelSleepTimer': useMediaStore.getState().cancelSleepTimer(); break
-        case 'setSleepTimer': useMediaStore.getState().setSleepTimer(cmd.seconds); break
+        case 'setSleepTimer':
+          if (typeof cmd.seconds !== 'number' || !Number.isFinite(cmd.seconds) || cmd.seconds < 0) break
+          useMediaStore.getState().setSleepTimer(cmd.seconds); break
       }
     }
     window.addEventListener('nativeCommand', handler)
@@ -125,9 +129,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   // On route change: send location + showMediaBar + nav visibility
   useEffect(() => {
     const isDetail = isTeacherDetailPath(pathname)
-    postMessageToNative({ location: pathname })
-    postMessageToNative({ showMediaBar: pathname !== '/' && !isDetail })
-    postMessageToNative({ showMobileNav: !isDetail })
+    postMessageToNative({ location: pathname, showMediaBar: pathname !== '/' && !isDetail, showMobileNav: !isDetail })
   }, [pathname])
 
   // Forward track metadata to native whenever it changes in the store
