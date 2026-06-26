@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
@@ -8,23 +7,14 @@ interface BackButtonProps {
   /** "mobile" = fixed green circle (hidden on md+), "desktop" = inline glass pill (hidden below md) */
   variant: 'mobile' | 'desktop'
   className?: string
-  fallbackHref?: string
 }
 
-export function BackButton({ variant, className, fallbackHref }: BackButtonProps) {
+export function BackButton({ variant, className }: BackButtonProps) {
   const router = useRouter()
-  const [isApp, setIsApp] = useState(false)
-
-  useEffect(() => {
-    setIsApp(document.body.getAttribute('data-app') === 'true')
-  }, [])
+  const isApp = typeof document !== 'undefined' && document.documentElement.classList.contains('native-app')
 
   function handleBack() {
-    if (fallbackHref && window.history.length <= 1) {
-      router.replace(fallbackHref)
-    } else {
-      router.back()
-    }
+    router.back()
   }
 
   if (variant === 'mobile') {
@@ -52,7 +42,7 @@ export function BackButton({ variant, className, fallbackHref }: BackButtonProps
       onClick={handleBack}
       aria-label="Go back"
       className={cn(
-        'hidden h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white light:text-gray-900 transition-all duration-300 hover:bg-white/40 light:hover:bg-gray-300 md:flex cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+        'hidden h-11 w-11 items-center justify-center rounded-full bg-white/50 text-gray-900 light:bg-gray-200 light:text-gray-900 transition-all duration-300 hover:bg-white/65 light:hover:bg-gray-300 md:flex cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
         className,
       )}
     >

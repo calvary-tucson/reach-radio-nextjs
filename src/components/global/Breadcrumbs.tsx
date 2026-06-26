@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import React from 'react'
+import { Fragment } from 'react'
 
 import { BackButton } from '@/components/global/BackButton'
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
@@ -34,19 +34,18 @@ export default function Breadcrumbs({
   if (items.length < 2) return null
 
   const ancestors = items.slice(0, -1)
-  const current = items[items.length - 1]
+  const current = items.at(-1)!
 
   return (
     <div
       className={cn(
-        variant === 'standalone' && 'relative px-[clamp(10px,3vw,30px)] pt-8 pb-4',
+        variant === 'standalone' && 'relative px-[clamp(10px,3vw,30px)] md:pt-8 pb-4',
         className,
       )}
     >
       <BreadcrumbJsonLd items={items} />
 
-      {/* Mobile back button — inline for standalone so it sits above the page title, not over it */}
-      {variant === 'standalone' && <BackButton variant="mobile" className="relative top-0 left-0" />}
+      {variant === 'standalone' && <BackButton variant="mobile" />}
 
       {/* Desktop breadcrumb trail */}
       <Breadcrumb className="hidden md:block">
@@ -55,14 +54,14 @@ export default function Breadcrumbs({
             <BackButton variant="desktop" />
           </BreadcrumbItem>
           {ancestors.map((crumb) => (
-            <React.Fragment key={crumb.url}>
+            <Fragment key={crumb.url}>
               <BreadcrumbItem>
-                <BreadcrumbLink asChild className="text-white/80 light:text-gray-600 underline-offset-4 hover:text-white light:hover:text-gray-900 hover:underline cursor-pointer">
+                <BreadcrumbLink asChild className="text-white light:text-gray-600 underline-offset-4 hover:text-white light:hover:text-gray-900 hover:underline cursor-pointer">
                   <Link href={crumb.url}>{crumb.name}</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white/60 light:text-gray-400" />
-            </React.Fragment>
+              <BreadcrumbSeparator aria-hidden="true" className="text-white/60 light:text-gray-400" />
+            </Fragment>
           ))}
           <BreadcrumbItem>
             <BreadcrumbPage className="text-white light:text-gray-900">{current.name}</BreadcrumbPage>
