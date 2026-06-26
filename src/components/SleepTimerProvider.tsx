@@ -19,16 +19,18 @@ export function SleepTimerProvider() {
       return
     }
     intervalRef.current = setInterval(() => {
-      const next = useMediaStore.getState().remainingSleepSeconds - 1
-      if (next <= 0) {
+      const { sleepTimerEndsAt: endTime } = useMediaStore.getState()
+      if (!endTime) return
+      const remainingMs = endTime - Date.now()
+      if (remainingMs <= 0) {
         setRemainingSleepSeconds(0)
         setIsPlaying(false)
         setSleepTimerActive(false)
         postMessageToNative({ isPlaying: false })
       } else {
-        setRemainingSleepSeconds(next)
+        setRemainingSleepSeconds(Math.ceil(remainingMs / 1000))
       }
-    }, 1000)
+    }, 500)
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
