@@ -13,6 +13,8 @@ interface MediaState {
   image: string
   showMediaBar: boolean
   sleepTimerActive: boolean
+  sleepTimerPaused: boolean
+  sleepTimerEndsAt: number | null
   remainingSleepSeconds: number
   setIsPlaying: (v: boolean) => void
   setIsBuffering: (v: boolean) => void
@@ -24,7 +26,10 @@ interface MediaState {
   setSleepTimerActive: (active: boolean) => void
   setRemainingSleepSeconds: (s: number) => void
   startSleepTimer: (seconds: number) => void
+  pauseSleepTimer: () => void
+  resumeSleepTimer: () => void
   cancelSleepTimer: () => void
+  setSleepTimer: (seconds: number) => void
   teachersList: { name: string; photo: string }[]
   setTeachersList: (list: { name: string; photo: string }[]) => void
 }
@@ -40,6 +45,8 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   image: DEFAULT_IMAGE,
   showMediaBar: false,
   sleepTimerActive: false,
+  sleepTimerPaused: false,
+  sleepTimerEndsAt: null,
   remainingSleepSeconds: 0,
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
@@ -64,8 +71,25 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   setShowMediaBar: (v) => set({ showMediaBar: v }),
   setSleepTimerActive: (active) => set({ sleepTimerActive: active }),
   setRemainingSleepSeconds: (s) => set({ remainingSleepSeconds: s }),
-  startSleepTimer: (seconds) => set({ remainingSleepSeconds: seconds, sleepTimerActive: true }),
-  cancelSleepTimer: () => set({ sleepTimerActive: false, remainingSleepSeconds: 0 }),
+  startSleepTimer: (seconds) => set({
+    remainingSleepSeconds: seconds,
+    sleepTimerActive: true,
+    sleepTimerPaused: false,
+    sleepTimerEndsAt: Date.now() + seconds * 1000,
+  }),
+  pauseSleepTimer: () => set({ sleepTimerPaused: true, sleepTimerEndsAt: null }),
+  resumeSleepTimer: () => {
+    const { remainingSleepSeconds } = get()
+    set({ sleepTimerPaused: false, sleepTimerEndsAt: Date.now() + remainingSleepSeconds * 1000 })
+  },
+  cancelSleepTimer: () => set({ sleepTimerActive: false, sleepTimerPaused: false, remainingSleepSeconds: 0, sleepTimerEndsAt: null }),
+  setSleepTimer: (seconds) => {
+    const { sleepTimerActive, sleepTimerPaused } = get()
+    set({
+      remainingSleepSeconds: seconds,
+      sleepTimerEndsAt: sleepTimerActive && !sleepTimerPaused ? Date.now() + seconds * 1000 : null,
+    })
+  },
   teachersList: [],
   setTeachersList: (list) => set({ teachersList: list }),
 }))

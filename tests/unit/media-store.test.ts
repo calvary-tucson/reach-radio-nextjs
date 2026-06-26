@@ -13,7 +13,9 @@ describe('useMediaStore', () => {
       image: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg',
       showMediaBar: false,
       sleepTimerActive: false,
+      sleepTimerPaused: false,
       remainingSleepSeconds: 0,
+      sleepTimerEndsAt: null,
     })
   })
 
@@ -51,6 +53,73 @@ describe('useMediaStore', () => {
     useMediaStore.getState().startSleepTimer(0)
     expect(useMediaStore.getState().sleepTimerActive).toBe(true)
     expect(useMediaStore.getState().remainingSleepSeconds).toBe(0)
+  })
+
+  it('startSleepTimer sets sleepTimerPaused=false and endsAt', () => {
+    const before = Date.now()
+    useMediaStore.getState().startSleepTimer(300)
+    const { sleepTimerPaused, sleepTimerEndsAt } = useMediaStore.getState()
+    expect(sleepTimerPaused).toBe(false)
+    expect(sleepTimerEndsAt).toBeGreaterThanOrEqual(before + 300000 - 50)
+    expect(sleepTimerEndsAt).toBeLessThanOrEqual(Date.now() + 300000 + 50)
+  })
+
+  it('cancelSleepTimer resets paused and endsAt', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    useMediaStore.getState().cancelSleepTimer()
+    const { sleepTimerActive, sleepTimerPaused, remainingSleepSeconds, sleepTimerEndsAt } = useMediaStore.getState()
+    expect(sleepTimerActive).toBe(false)
+    expect(sleepTimerPaused).toBe(false)
+    expect(remainingSleepSeconds).toBe(0)
+    expect(sleepTimerEndsAt).toBeNull()
+  })
+
+  it('pauseSleepTimer sets paused=true and endsAt=null while leaving active=true', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    useMediaStore.getState().pauseSleepTimer()
+    const { sleepTimerPaused, sleepTimerEndsAt, sleepTimerActive } = useMediaStore.getState()
+    expect(sleepTimerPaused).toBe(true)
+    expect(sleepTimerEndsAt).toBeNull()
+    expect(sleepTimerActive).toBe(true)
+  })
+
+  it('resumeSleepTimer sets paused=false and recalculates endsAt', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    useMediaStore.getState().pauseSleepTimer()
+    const before = Date.now()
+    useMediaStore.getState().resumeSleepTimer()
+    const { sleepTimerPaused, sleepTimerEndsAt } = useMediaStore.getState()
+    expect(sleepTimerPaused).toBe(false)
+    expect(sleepTimerEndsAt).toBeGreaterThanOrEqual(before + 300000 - 50)
+    expect(sleepTimerEndsAt).toBeLessThanOrEqual(Date.now() + 300000 + 50)
+  })
+
+  it('setSleepTimer updates remainingSleepSeconds', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    useMediaStore.getState().setSleepTimer(60)
+    expect(useMediaStore.getState().remainingSleepSeconds).toBe(60)
+  })
+
+  it('setSleepTimer recalculates endsAt when active and not paused', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    const before = Date.now()
+    useMediaStore.getState().setSleepTimer(60)
+    const { sleepTimerEndsAt } = useMediaStore.getState()
+    expect(sleepTimerEndsAt).toBeGreaterThanOrEqual(before + 60000 - 50)
+    expect(sleepTimerEndsAt).toBeLessThanOrEqual(Date.now() + 60000 + 50)
+  })
+
+  it('setSleepTimer sets endsAt=null when paused', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    useMediaStore.getState().pauseSleepTimer()
+    useMediaStore.getState().setSleepTimer(60)
+    expect(useMediaStore.getState().sleepTimerEndsAt).toBeNull()
+  })
+
+  it('setSleepTimer sets endsAt=null and leaves active=false when inactive', () => {
+    useMediaStore.getState().setSleepTimer(60)
+    expect(useMediaStore.getState().sleepTimerActive).toBe(false)
+    expect(useMediaStore.getState().sleepTimerEndsAt).toBeNull()
   })
 
   it('setTeachersList updates teachersList', () => {
