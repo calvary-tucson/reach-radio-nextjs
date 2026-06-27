@@ -17,6 +17,7 @@ export function RadioPlayer() {
   const artist = useMediaStore((s) => s.artist)
   const isPlaying = useMediaStore((s) => s.isPlaying)
   const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
+  const setIsBuffering = useMediaStore((s) => s.setIsBuffering)
   const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -45,6 +46,7 @@ export function RadioPlayer() {
   function togglePlay() {
     const next = !isPlaying
     setIsPlaying(next)
+    if (next) setIsBuffering(true)
     postMessageToNative({ isPlaying: next })
   }
 
