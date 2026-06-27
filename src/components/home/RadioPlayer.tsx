@@ -81,7 +81,7 @@ export function RadioPlayer() {
             {title || 'Now Playing'}
           </h2>
           {artist && (
-            <p className="md:font-bold font-medium md:text-lg uppercase text-white/80 light:text-gray-700 truncate w-full md:text-left text-center">
+            <p className="md:font-bold font-medium md:text-lg uppercase text-white/90 light:text-gray-700 truncate w-full md:text-left text-center">
               {artist}
             </p>
           )}

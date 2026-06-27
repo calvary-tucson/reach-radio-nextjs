@@ -8,6 +8,7 @@ describe('useMediaStore', () => {
       isBuffering: false,
       isMuted: false,
       volume: 100,
+      previousVolume: 100,
       title: 'Reach Radio',
       artist: '',
       image: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg',
@@ -123,6 +124,71 @@ describe('useMediaStore', () => {
     expect(sleepTimerActive).toBe(true)
     expect(sleepTimerEndsAt).toBeGreaterThanOrEqual(before + 60000 - 50)
     expect(sleepTimerEndsAt).toBeLessThanOrEqual(Date.now() + 60000 + 50)
+  })
+
+  it('setVolume clamps values above 100', () => {
+    useMediaStore.getState().setVolume(150)
+    expect(useMediaStore.getState().volume).toBe(100)
+  })
+
+  it('setVolume clamps values below 0', () => {
+    useMediaStore.getState().setVolume(-10)
+    expect(useMediaStore.getState().volume).toBe(0)
+  })
+
+  it('setVolume auto-mutes when set to 0', () => {
+    useMediaStore.getState().setVolume(0)
+    expect(useMediaStore.getState().isMuted).toBe(true)
+    expect(useMediaStore.getState().volume).toBe(0)
+  })
+
+  it('setVolume auto-unmutes when set above 0 while muted', () => {
+    useMediaStore.getState().setVolume(0)
+    useMediaStore.getState().setVolume(50)
+    expect(useMediaStore.getState().isMuted).toBe(false)
+    expect(useMediaStore.getState().volume).toBe(50)
+  })
+
+  it('toggleMute saves previousVolume and mutes', () => {
+    useMediaStore.setState({ volume: 80, isMuted: false })
+    useMediaStore.getState().toggleMute()
+    const { isMuted, volume, previousVolume } = useMediaStore.getState()
+    expect(isMuted).toBe(true)
+    expect(volume).toBe(0)
+    expect(previousVolume).toBe(80)
+  })
+
+  it('toggleMute restores previousVolume on unmute', () => {
+    useMediaStore.setState({ volume: 80, isMuted: false })
+    useMediaStore.getState().toggleMute()
+    useMediaStore.getState().toggleMute()
+    const { isMuted, volume } = useMediaStore.getState()
+    expect(isMuted).toBe(false)
+    expect(volume).toBe(80)
+  })
+
+  it('setMuted(true) saves previousVolume and zeroes volume', () => {
+    useMediaStore.setState({ volume: 60, isMuted: false })
+    useMediaStore.getState().setMuted(true)
+    const { isMuted, volume, previousVolume } = useMediaStore.getState()
+    expect(isMuted).toBe(true)
+    expect(volume).toBe(0)
+    expect(previousVolume).toBe(60)
+  })
+
+  it('setMuted(false) restores previousVolume', () => {
+    useMediaStore.setState({ volume: 60, isMuted: false })
+    useMediaStore.getState().setMuted(true)
+    useMediaStore.getState().setMuted(false)
+    expect(useMediaStore.getState().isMuted).toBe(false)
+    expect(useMediaStore.getState().volume).toBe(60)
+  })
+
+  it('setMuted is idempotent when already in target state', () => {
+    useMediaStore.setState({ volume: 60, isMuted: false })
+    useMediaStore.getState().setMuted(false)
+    expect(useMediaStore.getState().volume).toBe(60)
+    expect(useMediaStore.getState().isMuted).toBe(false)
   })
 
 })

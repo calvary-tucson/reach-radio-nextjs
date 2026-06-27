@@ -72,7 +72,7 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
       reconnectAttempts.current = 0
       el.pause()
     }
-  }, [isPlaying, setIsPlaying, clearReconnect, streamUrl])
+  }, [isPlaying, setIsPlaying, clearReconnect])
 
   useEffect(() => {
     if (!audioRef.current) return

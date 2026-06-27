@@ -3,6 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { useNowPlaying } from '@/hooks/useNowPlaying'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
+import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
 class MockEventSource {
   static OPEN = 1
@@ -20,14 +21,17 @@ class MockEventSource {
 
 let mockES: MockEventSource
 
-vi.stubGlobal('EventSource', vi.fn(function (url: string) {
-  mockES = new MockEventSource(url)
-  return mockES
-}))
-
 describe('useNowPlaying', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    vi.stubGlobal('EventSource', vi.fn(function (url: string) {
+      mockES = new MockEventSource(url)
+      return mockES
+    }))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
+    }))
     useMediaStore.setState({
       title: 'Reach Radio',
       artist: '',
@@ -38,6 +42,7 @@ describe('useNowPlaying', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.unstubAllGlobals()
     vi.useRealTimers()
   })
 
@@ -81,7 +86,7 @@ describe('useNowPlaying', () => {
     expect(EventSource).toHaveBeenCalledTimes(2)
   })
 
-  it('closes permanently after max retries exhausted', async () => {
+  it('does not reconnect within remaining backoff window after exhausting short delays', async () => {
     renderHook(() => useNowPlaying())
     const EventSourceSpy = vi.mocked(EventSource)
 
@@ -93,10 +98,80 @@ describe('useNowPlaying', () => {
 
     const callsAfterExhaustion = EventSourceSpy.mock.calls.length
 
-    // One more error after exhaustion should not create new EventSource
+    // One more error after exhaustion should not create new EventSource within 32s
+    // (60s cap not yet elapsed)
     act(() => { mockES.simulateError() })
     act(() => { vi.advanceTimersByTime(32_000) })
 
     expect(EventSourceSpy.mock.calls.length).toBe(callsAfterExhaustion)
+  })
+
+  describe('teacher photo resolution', () => {
+    it('resolves image on exact name match', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }]),
+      } as Response)
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'John Doe' }))
+      })
+
+      const { image, artist } = useMediaStore.getState()
+      expect(image).toContain('cdn.sanity.io/teacher.jpg')
+      expect(artist).toBe('John Doe')
+    })
+
+    it('resolves image on partial name match', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }]),
+      } as Response)
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'Pastor John Doe' }))
+      })
+
+      expect(useMediaStore.getState().image).toContain('cdn.sanity.io/teacher.jpg')
+    })
+
+    it('falls back to FALLBACK_OG_IMAGE when no teacher match', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ name: 'Jane Smith', photo: 'https://cdn.sanity.io/jane.jpg' }]),
+      } as Response)
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'Unknown Artist' }))
+      })
+
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+    })
+
+    it('uses FALLBACK_OG_IMAGE when teacher fetch fails', async () => {
+      vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'))
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'John Doe' }))
+      })
+
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+    })
   })
 })

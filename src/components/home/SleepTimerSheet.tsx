@@ -56,7 +56,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
         <button
           type="button"
           onClick={() => sheetRef.current?.close()}
-          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/90 light:text-gray-500 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           aria-label="Close sleep timer"
         >
           <X className="h-5 w-5" aria-hidden="true" />
@@ -75,7 +75,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
             <p className="text-white light:text-gray-900 text-5xl font-mono mb-2" aria-hidden="true">
               {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </p>
-            <p className="text-white/70 light:text-gray-500 text-sm mb-8" aria-hidden="true">
+            <p className="text-white/90 light:text-gray-500 text-sm mb-8" aria-hidden="true">
               {paused ? 'Timer paused' : `Radio stops in ${minutes}m ${secs}s`}
             </p>
             <div className="flex flex-col gap-3">

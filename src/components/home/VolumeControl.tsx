@@ -21,6 +21,7 @@ export function VolumeControl() {
     <>
       {/* Mobile: mute button only */}
       <button
+        type="button"
         onClick={toggleMute}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
         className="md:hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-full cursor-pointer"
@@ -31,6 +32,7 @@ export function VolumeControl() {
       {/* Desktop: slider + mute button */}
       <div className="hidden md:flex items-center gap-2 w-28">
         <button
+          type="button"
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
           className="w-11 h-11 flex-shrink-0 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded cursor-pointer"

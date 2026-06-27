@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
+import type { TeacherListEntry } from '@/lib/store/teachers-store'
 import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
@@ -14,8 +15,11 @@ export function useNowPlaying(): void {
   // Fetch teacher list once — used to resolve artist → photo
   useEffect(() => {
     fetch('/api/teachers-list')
-      .then((r) => r.json())
-      .then((data: { name: string; photo: string }[]) => {
+      .then((r) => {
+        if (!r.ok) throw new Error(r.statusText)
+        return r.json()
+      })
+      .then((data: TeacherListEntry[]) => {
         setTeachersList(data)
       })
       .catch(() => {

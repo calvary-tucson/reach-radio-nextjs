@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useShallow } from 'zustand/react/shallow'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { useMediaStore } from '@/lib/store/media-store'
 import { isTeacherDetailPath } from '@/lib/routes'
@@ -50,11 +51,15 @@ function clearMobileAppCookie() {
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const title = useMediaStore((s) => s.title)
-  const artist = useMediaStore((s) => s.artist)
-  const image = useMediaStore((s) => s.image)
-  const isMuted = useMediaStore((s) => s.isMuted)
-  const volume = useMediaStore((s) => s.volume)
+  const { title, artist, image, isMuted, volume } = useMediaStore(
+    useShallow((s) => ({
+      title: s.title,
+      artist: s.artist,
+      image: s.image,
+      isMuted: s.isMuted,
+      volume: s.volume,
+    }))
+  )
   const mediaBarStateBeforeFocus = useRef<boolean | null>(null)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
