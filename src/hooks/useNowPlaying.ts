@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
+import { useTeachersStore } from '@/lib/store/teachers-store'
 import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
 
 export function useNowPlaying(): void {
   const setNowPlaying = useMediaStore((s) => s.setNowPlaying)
-  const setTeachersList = useMediaStore((s) => s.setTeachersList)
+  const setTeachersList = useTeachersStore((s) => s.setTeachersList)
 
   // Fetch teacher list once — used to resolve artist → photo
   useEffect(() => {
@@ -39,7 +40,7 @@ export function useNowPlaying(): void {
           if (typeof raw !== 'object' || raw === null) return
           const data = raw as { title?: string; artist?: string }
 
-          const { teachersList } = useMediaStore.getState()
+          const { teachersList } = useTeachersStore.getState()
 
           let image = FALLBACK_OG_IMAGE
           let resolvedArtist = data.artist ?? useMediaStore.getState().artist

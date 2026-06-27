@@ -125,12 +125,4 @@ describe('useMediaStore', () => {
     expect(sleepTimerEndsAt).toBeLessThanOrEqual(Date.now() + 60000 + 50)
   })
 
-  it('setTeachersList updates teachersList', () => {
-    const list = [
-      { name: 'Alice', photo: 'https://example.com/alice.jpg' },
-      { name: 'Bob', photo: 'https://example.com/bob.jpg' },
-    ]
-    useMediaStore.getState().setTeachersList(list)
-    expect(useMediaStore.getState().teachersList).toEqual(list)
-  })
 })

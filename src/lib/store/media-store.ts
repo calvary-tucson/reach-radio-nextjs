@@ -1,11 +1,6 @@
 import { create } from 'zustand'
 import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
-interface TeacherListEntry {
-  name: string
-  photo: string
-}
-
 interface MediaState {
   isPlaying: boolean
   isBuffering: boolean
@@ -34,8 +29,6 @@ interface MediaState {
   resumeSleepTimer: () => void
   cancelSleepTimer: () => void
   setSleepTimer: (seconds: number) => void
-  teachersList: TeacherListEntry[]
-  setTeachersList: (list: TeacherListEntry[]) => void
 }
 
 export const useMediaStore = create<MediaState>((set, get) => ({
@@ -101,6 +94,4 @@ export const useMediaStore = create<MediaState>((set, get) => ({
       set({ remainingSleepSeconds: seconds, sleepTimerEndsAt: !sleepTimerPaused ? Date.now() + seconds * 1000 : null })
     }
   },
-  teachersList: [],
-  setTeachersList: (list) => set({ teachersList: list }),
 }))

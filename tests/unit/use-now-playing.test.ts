@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useNowPlaying } from '@/hooks/useNowPlaying'
 import { useMediaStore } from '@/lib/store/media-store'
+import { useTeachersStore } from '@/lib/store/teachers-store'
 
 class MockEventSource {
   static OPEN = 1
@@ -32,6 +33,7 @@ describe('useNowPlaying', () => {
       artist: '',
       image: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg',
     })
+    useTeachersStore.setState({ teachersList: [] })
   })
 
   afterEach(() => {
