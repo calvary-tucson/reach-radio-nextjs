@@ -75,12 +75,10 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
   }, [isPlaying, setIsPlaying, clearReconnect, streamUrl])
 
   useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = volume / 100
-  }, [volume])
-
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.muted = isMuted
-  }, [isMuted])
+    if (!audioRef.current) return
+    audioRef.current.volume = volume / 100
+    audioRef.current.muted = isMuted
+  }, [volume, isMuted])
 
   // Cleanup reconnect timer on unmount
   useEffect(() => () => clearReconnect(), [clearReconnect])
