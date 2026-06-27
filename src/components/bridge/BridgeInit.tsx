@@ -53,6 +53,8 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const title = useMediaStore((s) => s.title)
   const artist = useMediaStore((s) => s.artist)
   const image = useMediaStore((s) => s.image)
+  const isMuted = useMediaStore((s) => s.isMuted)
+  const volume = useMediaStore((s) => s.volume)
   const mediaBarStateBeforeFocus = useRef<boolean | null>(null)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
@@ -158,6 +160,12 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     if (!isNativeBridgePresent()) return
     postMessageToNative({ title, artist, image })
   }, [title, artist, image])
+
+  // Forward mute/volume to native so AVPlayer can apply them
+  useEffect(() => {
+    if (!isNativeBridgePresent()) return
+    postMessageToNative({ isMuted, volume })
+  }, [isMuted, volume])
 
   // Input focus/blur: hide bars when keyboard appears (native + web), restore after
   useEffect(() => {
