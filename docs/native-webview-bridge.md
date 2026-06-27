@@ -1,6 +1,6 @@
 # Native WebView Bridge
 
-> Last updated: 2026-06-26 (setViewportInsets added)
+> Last updated: 2026-06-26 (isMuted/volume forwarding added; isBuffering doc error corrected)
 > Status: Web bridge complete. Native apps load Astro (`reach-radio-web.pages.dev`) — switching to `reach.radio` requires an app store update.
 
 ---
@@ -48,7 +48,8 @@ Every message is a JSON object with `"protocolVersion": 1` plus any of these fie
 | `showMediaBar` | boolean | Route change, keyboard focus | Show/hide native media bar |
 | `showMobileNav` | boolean | Route change, keyboard focus | Show/hide native bottom nav |
 | `isPlaying` | boolean | Play state change | Sync play button |
-| `isBuffering` | boolean | Buffering state change | Show/hide loading indicator |
+| `isMuted` | boolean | Mute state change | Mute/unmute AVPlayer / ExoPlayer |
+| `volume` | number (0–100) | Volume change | Set AVPlayer/ExoPlayer volume (divide by 100) |
 | `title` | string | Track metadata change | Lock screen / CarPlay title |
 | `artist` | string | Track metadata change | Lock screen / CarPlay artist |
 | `image` | string | Track metadata change | Lock screen / CarPlay artwork |
@@ -218,6 +219,8 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 
 **Handles these web → native messages**:
 - `isPlaying` → AudioStreamingManager play/stop
+- `isMuted` → mute/unmute AVPlayer
+- `volume` → set AVPlayer volume (0–100 → 0.0–1.0)
 - `title`, `artist`, `image` → NowPlayingInfoCenter (lock screen / CarPlay)
 - `location` → active tab highlight
 - `showMediaBar` / `showMobileNav` → native chrome visibility
@@ -232,6 +235,8 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 | `refresh` | User triggers pull-to-refresh |
 | `setPlayState` | Lock screen / CarPlay play or pause |
 | `setViewportInsets` | On WebView mount and whenever glass overlay height changes (media bar shown/hidden); iOS-only |
+
+**Required native-side additions (Gaps 2 & 3):** iOS must send `setPlayState: { playing: false }` when AVPlayer pauses due to interruption (phone call, Bluetooth disconnect, audio focus loss) or exhausts stream retries. Without this, the web play button stays active when audio is dead. Also send `setBuffering: { buffering: false }` on fatal error if `playing: false` alone isn't enough to clear the spinner.
 
 ---
 
@@ -251,13 +256,16 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 **Handles these web → native messages**:
 - `loaded` → dismiss splash + skeleton (critical — without this, splash never goes away)
 - `isPlaying` → audio play/pause (with `ignoreWebViewPlayState` race guard)
-- `isBuffering` → buffering indicator
+- `isMuted` → mute/unmute ExoPlayer
+- `volume` → set ExoPlayer volume (0–100 → 0.0–1.0)
 - `title`, `artist`, `image` → media bar + notification metadata
 - `location` → active tab highlight
 - `showMediaBar` / `showMobileNav` → native chrome visibility
 - `offline` → received but currently ignored
 
 **Does** push state back to web via `window.globalState.mediaBarState.isPlaying.set()` and `.isBuffering.set()` — so web play button stays in sync with native audio.
+
+**Required native-side additions (Gaps 2 & 3):** Android must send `setPlayState: { playing: false }` (via `nativeCommand` CustomEvent) when ExoPlayer pauses due to interruption or exhausts retries — same as the iOS requirement above.
 
 **Native → Web**: dispatches `CustomEvent('nativeCommand')` and also calls `window.globalActions.*` directly.
 
@@ -521,6 +529,10 @@ Test in debug mode. Android: `chrome://inspect`. iOS: Safari DevTools (already i
 | 21 | `isMobileApp=true` → web chrome hidden | Both | Server layout check via header + cookie |
 | 22 | Regular browser — web chrome visible | Web | No bridge objects → BridgeInit clears stale cookie |
 | 23 | Scroll content clears glass overlay | iOS | `setViewportInsets` fires → `--native-bottom-inset` set → body bottom padding correct; no content hidden behind glass bar |
+| 24 | Mute from web UI → native audio mutes | Both | `isMuted: true` sent → AVPlayer/ExoPlayer muted |
+| 25 | Volume slider → native audio volume changes | Both | `volume: N` sent → native player applies N/100 |
+| 26 | Phone call interruption → web shows paused | Both | Native sends `setPlayState: { playing: false }` on interruption |
+| 27 | AVPlayer/ExoPlayer fatal error → web shows stopped | Both | Native sends `setPlayState: { playing: false }` after exhausted retries |
 
 ### Group 3 — Web Launch (Vercel + Cloudflare DNS)
 
