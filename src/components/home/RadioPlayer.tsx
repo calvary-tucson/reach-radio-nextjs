@@ -1,23 +1,28 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
+import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { PlayPauseButton } from '@/components/media-bar/PlayPauseButton'
 import { VolumeControl } from './VolumeControl'
 import { SleepTimerButton } from './SleepTimerButton'
 import { SleepTimerOverlay } from './SleepTimerOverlay'
 
-const FALLBACK_IMAGE = 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg'
-
 export function RadioPlayer() {
-  const image = useMediaStore((s) => s.image)
-  const title = useMediaStore((s) => s.title)
-  const artist = useMediaStore((s) => s.artist)
-  const isPlaying = useMediaStore((s) => s.isPlaying)
-  const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
-  const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
+  const { image, title, artist, isPlaying, setIsPlaying, setIsBuffering, setShowMediaBar } = useMediaStore(
+    useShallow((s) => ({
+      image: s.image,
+      title: s.title,
+      artist: s.artist,
+      isPlaying: s.isPlaying,
+      setIsPlaying: s.setIsPlaying,
+      setIsBuffering: s.setIsBuffering,
+      setShowMediaBar: s.setShowMediaBar,
+    }))
+  )
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -42,11 +47,12 @@ export function RadioPlayer() {
     }
   }, [setShowMediaBar])
 
-  function togglePlay() {
+  const togglePlay = useCallback(() => {
     const next = !isPlaying
     setIsPlaying(next)
+    if (next) setIsBuffering(true)
     postMessageToNative({ isPlaying: next })
-  }
+  }, [isPlaying, setIsPlaying, setIsBuffering])
 
   return (
     <div ref={containerRef} role="region" aria-label="Radio player" className="p-2 pb-5 md:p-5 bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px]">
@@ -55,10 +61,10 @@ export function RadioPlayer() {
         <button
           onClick={togglePlay}
           aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
-          className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-white rounded cursor-pointer"
+          className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded cursor-pointer"
         >
           <Image
-            src={image || FALLBACK_IMAGE}
+            src={image || FALLBACK_OG_IMAGE}
             alt=""
             width={420}
             height={256}
@@ -70,10 +76,10 @@ export function RadioPlayer() {
         </button>
       </div>
       <div className="flex md:flex-row flex-col items-center justify-between md:gap-0 gap-8 mt-5">
-        <div className="flex flex-col md:items-start items-center md:gap-3 gap-1 w-full md:w-[calc(100%_-_276px)] px-2">
-          <p className="md:text-4xl text-2xl font-normal leading-tight text-white light:text-gray-900 truncate w-full md:text-left text-center">
-            {title}
-          </p>
+        <div className="flex flex-col md:items-start items-center md:gap-3 gap-1 w-full flex-1 px-2">
+          <h2 className="md:text-4xl text-2xl font-normal leading-tight text-white light:text-gray-900 truncate w-full md:text-left text-center">
+            {title || 'Now Playing'}
+          </h2>
           {artist && (
             <p className="md:font-bold font-medium md:text-lg uppercase text-white/80 light:text-gray-700 truncate w-full md:text-left text-center">
               {artist}

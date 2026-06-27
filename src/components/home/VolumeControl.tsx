@@ -1,14 +1,19 @@
 'use client'
 
 import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
 import { Slider } from '@/components/ui/slider'
 
 export function VolumeControl() {
-  const volume = useMediaStore((s) => s.volume)
-  const isMuted = useMediaStore((s) => s.isMuted)
-  const setVolume = useMediaStore((s) => s.setVolume)
-  const toggleMute = useMediaStore((s) => s.toggleMute)
+  const { volume, isMuted, setVolume, toggleMute } = useMediaStore(
+    useShallow((s) => ({
+      volume: s.volume,
+      isMuted: s.isMuted,
+      setVolume: s.setVolume,
+      toggleMute: s.toggleMute,
+    }))
+  )
 
   const effectiveVolume = isMuted ? 0 : volume
 
@@ -18,9 +23,7 @@ export function VolumeControl() {
       <button
         onClick={toggleMute}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
-        tabIndex={-1}
-        aria-hidden="true"
-        className="hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white rounded-full cursor-pointer"
+        className="md:hidden w-11 h-11 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-full cursor-pointer"
       >
         <VolumeIcon volume={effectiveVolume} />
       </button>
@@ -30,7 +33,7 @@ export function VolumeControl() {
         <button
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
-          className="flex-shrink-0 focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
+          className="w-11 h-11 flex-shrink-0 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded cursor-pointer"
         >
           <VolumeIcon volume={effectiveVolume} />
         </button>

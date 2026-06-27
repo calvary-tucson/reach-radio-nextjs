@@ -1,6 +1,7 @@
 'use client'
 
 import { Pause, Play } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 
@@ -9,13 +10,19 @@ interface PlayPauseButtonProps {
 }
 
 export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
-  const isPlaying = useMediaStore((s) => s.isPlaying)
-  const isBuffering = useMediaStore((s) => s.isBuffering)
-  const setIsPlaying = useMediaStore((s) => s.setIsPlaying)
+  const { isPlaying, isBuffering, setIsPlaying, setIsBuffering } = useMediaStore(
+    useShallow((s) => ({
+      isPlaying: s.isPlaying,
+      isBuffering: s.isBuffering,
+      setIsPlaying: s.setIsPlaying,
+      setIsBuffering: s.setIsBuffering,
+    }))
+  )
 
   function toggle() {
     const next = !isPlaying
     setIsPlaying(next)
+    if (next) setIsBuffering(true)
     postMessageToNative({ isPlaying: next })
   }
 
@@ -27,7 +34,7 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
       type="button"
       onClick={toggle}
       aria-label={isPlaying ? 'Pause' : 'Play'}
-      className={`${btnSize} rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2`}
+      className={`${btnSize} rounded-full bg-[var(--color-brand-green)] flex items-center justify-center flex-shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none`}
     >
       {isBuffering ? (
         <span
