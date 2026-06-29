@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
@@ -13,6 +13,7 @@ import { ScheduleCardList } from './ScheduleCardList'
 import { ScheduleWeekCards } from './ScheduleWeekCards'
 import { BottomSheet } from '@/components/global/BottomSheet'
 import { useModalStore } from '@/lib/stores/modal'
+import { postMessageToNative } from '@/lib/bridge/post-message'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 dayjs.extend(utc)
@@ -50,6 +51,12 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
     () => buildDaySlots(scheduleTeachers, selectedDay),
     [scheduleTeachers, selectedDay]
   )
+
+  useEffect(() => {
+    if (!sheetOpen) return
+    postMessageToNative({ showMobileNav: false, showMediaBar: false })
+    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: true }) }
+  }, [sheetOpen])
 
   const handleSelect = useCallback(
     (teacher: TeacherWithSchedule) => {
