@@ -28,19 +28,50 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   const titleId = useId()
 
   // Focus into panel on mount so VoiceOver enters dialog mode.
-  // When autoFocusInput is true, focus the first input instead of the container.
-  // Delay 250ms: iOS blocks programmatic focus() outside a user gesture callstack;
-  // waiting past the 200ms enter animation gives WKWebView enough slack to allow it.
+  // When autoFocusInput is true, focus the first input/textarea via MutationObserver
+  // so focus fires as soon as the element enters the DOM (handles Suspense boundaries).
+  // Otherwise focus the dialog container directly after the 250ms enter animation.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (autoFocusInput) {
-        const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
-        ;(input ?? contentRef.current)?.focus()
-      } else {
+    if (!autoFocusInput) {
+      const timer = setTimeout(() => {
         contentRef.current?.focus()
+      }, 250)
+      return () => clearTimeout(timer)
+    }
+
+    let observer: MutationObserver | null = null
+    let fallbackTimer: ReturnType<typeof setTimeout>
+
+    function tryFocus() {
+      const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
+      if (input) {
+        observer?.disconnect()
+        clearTimeout(fallbackTimer)
+        input.focus()
       }
-    }, 250)
-    return () => clearTimeout(timer)
+    }
+
+    // Input may already be in the DOM (e.g., no Suspense delay)
+    const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
+    if (immediate) {
+      immediate.focus()
+    } else {
+      // Watch for input to be inserted by a Suspense boundary resolving
+      observer = new MutationObserver(tryFocus)
+      if (contentRef.current) {
+        observer.observe(contentRef.current, { childList: true, subtree: true })
+      }
+      // Fallback: focus dialog container if no input appears within 2s
+      fallbackTimer = setTimeout(() => {
+        observer?.disconnect()
+        contentRef.current?.focus()
+      }, 2000)
+    }
+
+    return () => {
+      observer?.disconnect()
+      clearTimeout(fallbackTimer)
+    }
   }, [autoFocusInput])
 
   useFocusTrap(contentRef)
