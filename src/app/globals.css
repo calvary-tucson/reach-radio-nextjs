@@ -33,6 +33,10 @@
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
+.light {
+  --color-ring: var(--color-green-700);
+}
+
 /* === Native app chrome suppression ===
    .native-app class is set synchronously in <head> (before paint) when
    window.inNativeApp or mobile-app cookie is detected. Hides web chrome
