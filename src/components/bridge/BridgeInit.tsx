@@ -184,12 +184,14 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
     function onFocusOut(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
-      if (mediaBarStateBeforeFocus.current !== null) {
-        useMediaStore.getState().setShowMediaBar(mediaBarStateBeforeFocus.current)
+      const restoredMediaBar = mediaBarStateBeforeFocus.current
+      if (restoredMediaBar !== null) {
+        useMediaStore.getState().setShowMediaBar(restoredMediaBar)
         mediaBarStateBeforeFocus.current = null
       }
       const isDetail = isTeacherDetailPath(pathname)
-      postMessageToNative({ showMobileNav: !isDetail, showMediaBar: pathname !== '/' && !isDetail })
+      const showMediaBar = restoredMediaBar !== null ? restoredMediaBar : (pathname !== '/' && !isDetail)
+      postMessageToNative({ showMobileNav: !isDetail, showMediaBar })
     }
     document.addEventListener('focusin', onFocusIn)
     document.addEventListener('focusout', onFocusOut)

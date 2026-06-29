@@ -35,8 +35,10 @@ export function RadioPlayer() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setShowMediaBar(false)
+          postMessageToNative({ showMediaBar: false })
         } else if (entry.boundingClientRect.top < 0) {
           setShowMediaBar(true)
+          postMessageToNative({ showMediaBar: true })
         }
       },
       { threshold: 0.1 }
