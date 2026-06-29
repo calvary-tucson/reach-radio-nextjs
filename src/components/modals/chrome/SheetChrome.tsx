@@ -58,8 +58,8 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
         tabIndex={-1}
         {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': ariaLabel ?? 'Dialog' })}
         className={cn(
-          'w-full max-h-[90dvh] overflow-hidden flex flex-col border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0',
-          'rounded-t-2xl rounded-b-none h-[85dvh] will-change-transform',
+          'w-full overflow-hidden flex flex-col border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0',
+          'rounded-t-2xl rounded-b-none h-[100dvh] will-change-transform',
           isClosing ? MODAL_EXIT_ANIMATION : MODAL_ENTER_ANIMATION,
           'sm:inset-auto sm:h-auto sm:max-h-[90dvh] sm:max-w-2xl sm:w-[95vw] sm:rounded-2xl',
           className
