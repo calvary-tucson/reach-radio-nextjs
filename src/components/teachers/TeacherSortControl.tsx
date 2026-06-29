@@ -63,7 +63,7 @@ export function TeacherSortControl() {
       type="button"
       onClick={cycleSort}
       className={`${baseClass} gap-1.5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white/70 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white/80 light:can-hover:hover:border-gray-300`}
-      aria-label={sort ? `Sort: ${sortLabel}. Press to change.` : 'Sort'}
+      aria-label="Sort"
     >
       {!sort && <ArrowUpDown className="h-3.5 w-3.5" aria-hidden="true" />}
       {sortLabel}

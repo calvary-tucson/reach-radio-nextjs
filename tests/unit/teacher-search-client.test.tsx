@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { useSearchParams } from 'next/navigation'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
 import type { TeacherSummary, TeacherWithSchedule } from '@/lib/sanity/types'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
   usePathname: () => '/teachers/search',
 }))
 
@@ -53,5 +54,19 @@ describe('TeacherSearchClient', () => {
       <TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />
     )
     expect(screen.getByText(/3 teachers found/i)).toBeInTheDocument()
+  })
+
+  it('filters teachers by name from URL query', () => {
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('q=begg') as ReturnType<typeof useSearchParams>)
+    render(<TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />)
+    expect(screen.getByText('Alistair Begg')).toBeInTheDocument()
+    expect(screen.queryByText('Jack Hibbs')).not.toBeInTheDocument()
+    expect(screen.queryByText('John MacArthur')).not.toBeInTheDocument()
+  })
+
+  it('shows empty state when no results match URL query', () => {
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('q=zzznomatch') as ReturnType<typeof useSearchParams>)
+    render(<TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />)
+    expect(screen.getByText(/no teachers found/i)).toBeInTheDocument()
   })
 })
