@@ -41,7 +41,7 @@ export function MobileNav() {
       id="site-nav"
       data-web-chrome=""
       aria-label="Main navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around w-full px-1 text-white light:text-gray-900 bg-black light:bg-white border-t border-t-green-500 light:border-t-green-600"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around w-full px-1 text-white light:text-gray-900 bg-black light:bg-white border-t border-t-green-700 light:border-t-green-800"
     >
       {navItems.map((item) => {
         const isActive = item.href === '/'
@@ -55,7 +55,10 @@ export function MobileNav() {
             className="relative flex flex-col items-center pb-5 pt-4 px-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
           >
             {isActive && (
-              <div className="absolute top-0 w-full h-[6px] bg-green-500 rounded-b-md" />
+              <>
+                <div className="absolute top-0 w-full h-[6px] bg-green-500 rounded-b-md z-10" />
+                <div className="absolute inset-0 -top-4 bg-green-500 blur-2xl opacity-60 pointer-events-none" />
+              </>
             )}
             <div className="flex flex-col items-center gap-0.5">
               <svg className="w-5 h-5 fill-white light:fill-gray-900" viewBox="0 -960 960 960" aria-hidden="true">
