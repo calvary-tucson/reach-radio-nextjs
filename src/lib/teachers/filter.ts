@@ -44,7 +44,7 @@ export function filterTeachers(
   } else if (sort === 'most-on-air' && hoursMap) {
     result.sort((a, b) => (hoursMap.get(b.slug) ?? 0) - (hoursMap.get(a.slug) ?? 0))
   } else {
-    // default: A–Z (covers sort === undefined and sort === 'name-asc' for URL backward compat)
+    // default: A–Z
     result.sort((a, b) => a.name.localeCompare(b.name))
   }
 

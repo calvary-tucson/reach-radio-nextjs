@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: "Privacy Policy for Reach Radio Tucson's website and mobile applications.",
   alternates: { canonical: '/about/privacy-policy' },
+  openGraph: {
+    title: 'Privacy Policy — Reach Radio',
+    description: "Privacy Policy for Reach Radio Tucson's website and mobile applications.",
+  },
 }
 
 export default function PrivacyPolicyPage() {

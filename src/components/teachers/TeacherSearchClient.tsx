@@ -1,13 +1,13 @@
 'use client'
 
 import { useMemo, useTransition } from 'react'
-import { useSearchParams, usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
-import { filterTeachers, VALID_SORTS } from '@/lib/teachers/filter'
+import { filterTeachers } from '@/lib/teachers/filter'
 import { computeWeeklyMinutes } from '@/lib/utils/time'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 import { TeacherModalLink } from '@/components/teachers/TeacherModalLink'
-import type { SortOption } from '@/lib/teachers/filter'
+import { useTeacherSearchParams } from '@/lib/hooks/useTeacherSearchParams'
 import type { TeacherSummary, TeacherWithSchedule, ScheduleDay } from '@/lib/sanity/types'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -27,14 +27,8 @@ export function TeacherSearchClient({
 }: TeacherSearchClientProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-
-  const urlQ = searchParams.get('q') ?? ''
-  const urlDays = searchParams.get('days')?.split(',').filter(Boolean) ?? []
-  const urlSort = searchParams.get('sort') ?? ''
-  const activeDays = urlDays
-  const sort: SortOption | undefined = VALID_SORTS.has(urlSort) ? (urlSort as SortOption) : undefined
+  const { urlQ, urlDays, sort } = useTeacherSearchParams()
 
   const scheduleMap = useMemo(
     () => new Map<string, ScheduleDay[]>(scheduleTeachers.map((t) => [t.slug, t.schedule])),
@@ -49,14 +43,14 @@ export function TeacherSearchClient({
   )
 
   const results = useMemo(
-    () => filterTeachers(teachers, urlQ, { sort, days: activeDays, scheduleMap, hoursMap }),
-    [teachers, urlQ, sort, activeDays, scheduleMap, hoursMap]
+    () => filterTeachers(teachers, urlQ, { sort, days: urlDays, scheduleMap, hoursMap }),
+    [teachers, urlQ, sort, urlDays, scheduleMap, hoursMap]
   )
 
   function toggleDay(day: string) {
-    const next = activeDays.includes(day)
-      ? activeDays.filter((d) => d !== day)
-      : [...activeDays, day]
+    const next = urlDays.includes(day)
+      ? urlDays.filter((d) => d !== day)
+      : [...urlDays, day]
     const params = new URLSearchParams()
     if (urlQ.trim()) params.set('q', urlQ.trim())
     if (next.length) params.set('days', next.join(','))
@@ -66,11 +60,11 @@ export function TeacherSearchClient({
   }
 
   const chipBase =
-    'min-h-[44px] flex items-center shrink-0 rounded-full px-3 text-xs font-medium border motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
+    'min-h-[44px] flex items-center shrink-0 rounded-full px-3 text-xs font-medium border motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
   const chipActive =
     'bg-[rgba(132,184,79,0.15)] border-[rgba(132,184,79,0.3)] text-[#84b84f]'
   const chipInactive =
-    'bg-white/5 light:bg-gray-50 border-white/10 light:border-gray-200 text-white/60 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white/80 light:can-hover:hover:border-gray-300'
+    'bg-white/5 light:bg-gray-50 border-white/10 light:border-gray-200 text-white/90 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white light:can-hover:hover:border-gray-300'
 
   return (
     <div className="max-w-screen-xl mx-auto space-y-3">
@@ -86,9 +80,9 @@ export function TeacherSearchClient({
             <button
               key={day}
               type="button"
-              aria-pressed={activeDays.includes(day)}
+              aria-pressed={urlDays.includes(day)}
               onClick={() => toggleDay(day)}
-              className={`${chipBase} ${activeDays.includes(day) ? chipActive : chipInactive}`}
+              className={`${chipBase} ${urlDays.includes(day) ? chipActive : chipInactive}`}
             >
               {DAY_LABELS[day]}
             </button>
@@ -100,7 +94,7 @@ export function TeacherSearchClient({
       {/* Results */}
       <div>
         <p
-          className="text-sm text-white/60 light:text-gray-500 mb-3"
+          className="text-sm text-white/90 light:text-gray-500 mb-3"
           aria-live="polite"
           aria-atomic="true"
         >
@@ -120,7 +114,7 @@ export function TeacherSearchClient({
                 <TeacherModalLink
                   slug={teacher.slug}
                   name={teacher.name}
-                  className="w-full rounded-xl border border-white/10 light:border-gray-200 bg-white/5 light:bg-gray-50 p-3 flex items-center gap-3 text-left motion-safe:transition-colors cursor-pointer can-hover:hover:bg-white/10 light:can-hover:hover:bg-gray-100 can-hover:hover:border-white/20 light:can-hover:hover:border-gray-300"
+                  className="w-full rounded-xl border border-white/10 light:border-gray-200 bg-white/5 light:bg-gray-50 p-3 flex items-center gap-3 text-left motion-safe:transition-colors cursor-pointer can-hover:hover:bg-white/10 light:can-hover:hover:bg-gray-100 can-hover:hover:border-white/20 light:can-hover:hover:border-gray-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 >
                   <TeacherAvatar
                     name={teacher.name}
@@ -135,10 +129,10 @@ export function TeacherSearchClient({
                       {teacher.name}
                     </p>
                     {teacher.title && (
-                      <p className="text-xs text-white/60 light:text-gray-500 truncate">{teacher.title}</p>
+                      <p className="text-xs text-white/90 light:text-gray-500 truncate">{teacher.title}</p>
                     )}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-white/18 shrink-0" aria-hidden="true" />
+                  <ChevronRight className="h-4 w-4 text-white/20 shrink-0" aria-hidden="true" />
                 </TeacherModalLink>
               </li>
             ))}

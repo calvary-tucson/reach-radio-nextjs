@@ -1,20 +1,16 @@
 'use client'
 
 import { useTransition } from 'react'
-import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-import { SORT_OPTIONS, VALID_SORTS } from '@/lib/teachers/filter'
-import type { SortOption } from '@/lib/teachers/filter'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { SORT_OPTIONS } from '@/lib/teachers/filter'
+import { useTeacherSearchParams } from '@/lib/hooks/useTeacherSearchParams'
 
 export function TeacherSortControl() {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
-
-  const urlSort = searchParams.get('sort') ?? ''
-  const urlQ = searchParams.get('q') ?? ''
-  const urlDays = searchParams.get('days')?.split(',').filter(Boolean) ?? []
-  const sort: SortOption | undefined = VALID_SORTS.has(urlSort) ? (urlSort as SortOption) : undefined
+  const { urlQ, urlDays, sort } = useTeacherSearchParams()
 
   const hasFilter = urlQ.trim().length > 0 || urlDays.length > 0
 
@@ -49,7 +45,7 @@ export function TeacherSortControl() {
       <button
         type="button"
         onClick={clearAll}
-        className={`${baseClass} text-white/70 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900`}
+        className={`${baseClass} text-white/90 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900`}
         aria-label="Clear all filters"
       >
         Clear all
@@ -61,7 +57,7 @@ export function TeacherSortControl() {
     <button
       type="button"
       onClick={cycleSort}
-      className={`${baseClass} gap-1.5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white/70 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white/80 light:can-hover:hover:border-gray-300`}
+      className={`${baseClass} gap-1.5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white/90 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white light:can-hover:hover:border-gray-300`}
       aria-label={`Sort: ${sortLabel}. Press to cycle.`}
     >
       {sortLabel}
