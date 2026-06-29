@@ -12,7 +12,7 @@ import { SleepTimerButton } from './SleepTimerButton'
 import { SleepTimerOverlay } from './SleepTimerOverlay'
 
 export function RadioPlayer() {
-  const { image, title, artist, isPlaying, setIsPlaying, setIsBuffering, setShowMediaBar } = useMediaStore(
+  const { image, title, artist, isPlaying, setIsPlaying, setIsBuffering } = useMediaStore(
     useShallow((s) => ({
       image: s.image,
       title: s.title,
@@ -20,24 +20,20 @@ export function RadioPlayer() {
       isPlaying: s.isPlaying,
       setIsPlaying: s.setIsPlaying,
       setIsBuffering: s.setIsBuffering,
-      setShowMediaBar: s.setShowMediaBar,
     }))
   )
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setShowMediaBar(false)
-  }, [setShowMediaBar])
-
-  useEffect(() => {
     if (!containerRef.current) return
     const observer = new IntersectionObserver(
       ([entry]) => {
+        // 0–10% visible: fire at the scroll boundary before player fully exits viewport
         if (entry.isIntersecting) {
-          setShowMediaBar(false)
+          useMediaStore.getState().setShowMediaBar(false)
           postMessageToNative({ showMediaBar: false })
         } else if (entry.boundingClientRect.top < 0) {
-          setShowMediaBar(true)
+          useMediaStore.getState().setShowMediaBar(true)
           postMessageToNative({ showMediaBar: true })
         }
       },
@@ -47,7 +43,7 @@ export function RadioPlayer() {
     return () => {
       observer.disconnect()
     }
-  }, [setShowMediaBar])
+  }, [])
 
   const togglePlay = useCallback(() => {
     const next = !isPlaying

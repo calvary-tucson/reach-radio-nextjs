@@ -30,6 +30,10 @@ declare global {
   }
 }
 
+function safeParseJSON(str: string): unknown {
+  try { return JSON.parse(str) } catch { return null }
+}
+
 function isNativeBridgePresent(): boolean {
   return !!(
     window.Android?.postMessage ||
@@ -71,7 +75,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     const handler = (e: CustomEvent<NativeCommand>) => {
       // Defensive: native may accidentally JSON.stringify the detail object
       const raw: unknown = typeof e.detail === 'string'
-        ? (() => { try { return JSON.parse(e.detail) } catch { return null } })()
+        ? safeParseJSON(e.detail)
         : e.detail
       if (!raw || typeof (raw as { type?: unknown }).type !== 'string') return
       const cmd = raw as NativeCommand

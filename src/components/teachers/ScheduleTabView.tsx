@@ -14,6 +14,7 @@ import { ScheduleWeekCards } from './ScheduleWeekCards'
 import { BottomSheet } from '@/components/global/BottomSheet'
 import { useModalStore } from '@/lib/stores/modal'
 import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useMediaStore } from '@/lib/store/media-store'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 dayjs.extend(utc)
@@ -21,14 +22,19 @@ dayjs.extend(timezone)
 
 const TZ = 'America/Phoenix'
 
-interface Props {
+interface ScheduleTabViewProps {
   scheduleTeachers: TeacherWithSchedule[]
 }
 
-export function ScheduleTabView({ scheduleTeachers }: Props) {
-  const now = dayjs().tz(TZ)
-  const today = now.format('dddd')
-  const currentTime = now.hour() * 60 + now.minute()
+export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
+  const [nowDayjs, setNowDayjs] = useState(() => dayjs().tz(TZ))
+  const today = nowDayjs.format('dddd')
+  const currentTime = nowDayjs.hour() * 60 + nowDayjs.minute()
+
+  useEffect(() => {
+    const id = setInterval(() => setNowDayjs(dayjs().tz(TZ)), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   const router = useRouter()
   const openModal = useModalStore((s) => s.openModal)
@@ -55,7 +61,7 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
   useEffect(() => {
     if (!sheetOpen) return
     postMessageToNative({ showMobileNav: false, showMediaBar: false })
-    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: true }) }
+    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: useMediaStore.getState().showMediaBar }) }
   }, [sheetOpen])
 
   const handleSelect = useCallback(
@@ -115,13 +121,23 @@ export function ScheduleTabView({ scheduleTeachers }: Props) {
             <p className="text-xs font-semibold uppercase tracking-wider text-white/40 light:text-gray-400 mb-3">
               Pick a day
             </p>
-            <ul role="listbox" aria-label="Day">
+            <ul
+              role="listbox"
+              aria-label="Day"
+              onKeyDown={(e) => {
+                const idx = DAYS_ORDER.indexOf(selectedDay)
+                if (e.key === 'ArrowDown') { e.preventDefault(); setSelectedDay(DAYS_ORDER[(idx + 1) % DAYS_ORDER.length]) }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); setSelectedDay(DAYS_ORDER[(idx - 1 + DAYS_ORDER.length) % DAYS_ORDER.length]) }
+              }}
+            >
               {DAYS_ORDER.map((day) => (
-                <li key={day} role="option" aria-selected={selectedDay === day}>
+                <li key={day} role="presentation">
                   <button
                     type="button"
+                    role="option"
+                    aria-selected={selectedDay === day}
                     onClick={() => { setSelectedDay(day); setSheetOpen(false) }}
-                    className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-sm font-medium cursor-pointer motion-safe:transition-colors hover:bg-white/5 light:hover:bg-gray-50 active:bg-white/10 light:active:bg-gray-100"
+                    className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-sm font-medium cursor-pointer motion-safe:transition-colors hover:bg-white/5 light:hover:bg-gray-50 active:bg-white/10 light:active:bg-gray-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   >
                     <Check
                       className={`h-4 w-4 shrink-0 text-[#84b84f] motion-safe:transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}

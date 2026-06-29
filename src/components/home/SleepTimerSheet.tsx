@@ -31,7 +31,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
   useEffect(() => {
     if (!open) return
     postMessageToNative({ showMobileNav: false, showMediaBar: false })
-    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: true }) }
+    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: useMediaStore.getState().showMediaBar }) }
   }, [open])
 
   function start(mins: number) {
