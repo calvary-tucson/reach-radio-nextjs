@@ -39,7 +39,7 @@ export default function Breadcrumbs({
   return (
     <div
       className={cn(
-        variant === 'standalone' && 'relative px-[clamp(10px,3vw,30px)] md:pt-8 pb-4',
+        variant === 'standalone' && 'relative px-[clamp(10px,3vw,30px)] pt-3 md:pt-8 pb-4',
         className,
       )}
     >

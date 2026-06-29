@@ -30,9 +30,10 @@ export function BackButton({ variant, className }: BackButtonProps) {
         aria-label="Go back"
         className={cn(
           'fixed left-3 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-green-700 p-2 pr-2.5 md:hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
-          isApp ? 'top-4' : 'top-[72px]',
+          !isApp && 'top-[72px]',
           className,
         )}
+        style={isApp ? { top: 'calc(var(--native-top-inset, 0px) + 0.5rem)' } : undefined}
       >
         <svg className="h-7 w-7 fill-white" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
