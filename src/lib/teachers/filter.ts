@@ -2,6 +2,14 @@ import type { TeacherSummary, ScheduleDay } from '@/lib/sanity/types'
 
 export type SortOption = 'name-asc' | 'name-desc' | 'most-on-air'
 
+export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'name-asc', label: 'A–Z' },
+  { value: 'name-desc', label: 'Z–A' },
+  { value: 'most-on-air', label: 'Most on air' },
+]
+
+export const VALID_SORTS = new Set<string>(SORT_OPTIONS.map((o) => o.value))
+
 export interface FilterOptions {
   sort?: SortOption
   days?: string[]
