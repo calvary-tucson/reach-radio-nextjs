@@ -1,9 +1,8 @@
 import type { TeacherSummary, ScheduleDay } from '@/lib/sanity/types'
 
-export type SortOption = 'name-asc' | 'name-desc' | 'most-on-air'
+export type SortOption = 'name-desc' | 'most-on-air'
 
 export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'name-asc', label: 'A–Z' },
   { value: 'name-desc', label: 'Z–A' },
   { value: 'most-on-air', label: 'Most on air' },
 ]
@@ -40,12 +39,13 @@ export function filterTeachers(
     })
   }
 
-  if (sort === 'name-asc') {
-    result.sort((a, b) => a.name.localeCompare(b.name))
-  } else if (sort === 'name-desc') {
+  if (sort === 'name-desc') {
     result.sort((a, b) => b.name.localeCompare(a.name))
   } else if (sort === 'most-on-air' && hoursMap) {
     result.sort((a, b) => (hoursMap.get(b.slug) ?? 0) - (hoursMap.get(a.slug) ?? 0))
+  } else {
+    // default: A–Z (covers sort === undefined and sort === 'name-asc' for URL backward compat)
+    result.sort((a, b) => a.name.localeCompare(b.name))
   }
 
   return result

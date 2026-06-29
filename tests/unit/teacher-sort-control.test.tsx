@@ -18,27 +18,28 @@ describe('TeacherSortControl', () => {
     vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams() as ReturnType<typeof useSearchParams>)
   })
 
-  it('renders Sort button when no filters active', () => {
+  it('renders A–Z button when no filters active (default state)', () => {
     render(<TeacherSortControl />)
     expect(screen.getByRole('button', { name: /sort/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sort/i })).toHaveAccessibleName('Sort: A–Z. Press to cycle.')
   })
 
-  it('clicking Sort calls router.replace with sort=name-asc', async () => {
-    const user = userEvent.setup()
-    render(<TeacherSortControl />)
-    await user.click(screen.getByRole('button', { name: /sort/i }))
-    expect(mockReplace).toHaveBeenCalledWith('/teachers/search?sort=name-asc')
-  })
-
-  it('clicking Sort a second time (sort=name-asc) calls router.replace with sort=name-desc', async () => {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('sort=name-asc') as ReturnType<typeof useSearchParams>)
+  it('first click (no sort) calls router.replace with sort=name-desc', async () => {
     const user = userEvent.setup()
     render(<TeacherSortControl />)
     await user.click(screen.getByRole('button', { name: /sort/i }))
     expect(mockReplace).toHaveBeenCalledWith('/teachers/search?sort=name-desc')
   })
 
-  it('clicking Sort on the last option (sort=most-on-air) calls router.replace with no sort param', async () => {
+  it('second click (sort=name-desc) calls router.replace with sort=most-on-air', async () => {
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('sort=name-desc') as ReturnType<typeof useSearchParams>)
+    const user = userEvent.setup()
+    render(<TeacherSortControl />)
+    await user.click(screen.getByRole('button', { name: /sort/i }))
+    expect(mockReplace).toHaveBeenCalledWith('/teachers/search?sort=most-on-air')
+  })
+
+  it('third click (sort=most-on-air) calls router.replace with no sort param (back to A–Z)', async () => {
     vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('sort=most-on-air') as ReturnType<typeof useSearchParams>)
     const user = userEvent.setup()
     render(<TeacherSortControl />)
@@ -46,7 +47,7 @@ describe('TeacherSortControl', () => {
     expect(mockReplace).toHaveBeenCalledWith('/teachers/search')
   })
 
-  it('Clear all button renders when days filter is active (no sort needed)', () => {
+  it('Clear all button renders when days filter is active', () => {
     vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('days=Monday') as ReturnType<typeof useSearchParams>)
     render(<TeacherSortControl />)
     expect(screen.getByRole('button', { name: /clear all/i })).toBeInTheDocument()
