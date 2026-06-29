@@ -17,7 +17,7 @@ export function TeacherSortControl() {
   const urlDays = searchParams.get('days')?.split(',').filter(Boolean) ?? []
   const sort: SortOption | undefined = VALID_SORTS.has(urlSort) ? (urlSort as SortOption) : undefined
 
-  const hasFilter = urlQ.trim().length > 0 || !!sort || urlDays.length > 0
+  const hasFilter = urlQ.trim().length > 0 || urlDays.length > 0
 
   function clearAll() {
     startTransition(() => router.replace(pathname))

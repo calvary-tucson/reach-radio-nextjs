@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { useSearchParams } from 'next/navigation'
 import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
@@ -32,6 +32,8 @@ const scheduleTeachers: TeacherWithSchedule[] = teachers.map((t) => ({
 }))
 
 describe('TeacherSearchClient', () => {
+  beforeEach(() => vi.clearAllMocks())
+
   it('shows all teachers initially', () => {
     render(
       <TeacherSearchClient teachers={teachers} scheduleTeachers={scheduleTeachers} />

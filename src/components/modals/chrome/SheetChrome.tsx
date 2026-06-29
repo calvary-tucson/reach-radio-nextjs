@@ -40,7 +40,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     }
 
     let observer: MutationObserver | null = null
-    let fallbackTimer: ReturnType<typeof setTimeout>
+    let fallbackTimer: ReturnType<typeof setTimeout> | undefined
 
     function tryFocus() {
       const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')

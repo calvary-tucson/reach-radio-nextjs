@@ -55,22 +55,6 @@ function WrapperWithDelayedInput({ onDismiss = vi.fn() } = {}) {
   )
 }
 
-it('focuses first input when autoFocusInput is true (synchronous)', async () => {
-  const { container } = render(<WrapperWithInput />)
-  const input = container.querySelector('input')
-  await waitFor(() => {
-    expect(document.activeElement).toBe(input)
-  })
-})
-
-it('focuses input that appears after mount (MutationObserver path)', async () => {
-  const { container } = render(<WrapperWithDelayedInput />)
-  await waitFor(
-    () => expect(document.activeElement).toBe(container.querySelector('input')),
-    { timeout: 500 }
-  )
-})
-
 describe('SheetChrome', () => {
   it('renders children', () => {
     render(<Wrapper />)
@@ -97,5 +81,21 @@ describe('SheetChrome', () => {
     const closeButtons = screen.getAllByRole('button', { name: /close/i })
     const xButton = closeButtons[closeButtons.length - 1]
     expect(xButton.className).toContain('cursor-pointer')
+  })
+
+  it('focuses first input when autoFocusInput is true (synchronous)', async () => {
+    const { container } = render(<WrapperWithInput />)
+    const input = container.querySelector('input')
+    await waitFor(() => {
+      expect(document.activeElement).toBe(input)
+    })
+  })
+
+  it('focuses input that appears after mount (MutationObserver path)', async () => {
+    const { container } = render(<WrapperWithDelayedInput />)
+    await waitFor(
+      () => expect(document.activeElement).toBe(container.querySelector('input')),
+      { timeout: 500 }
+    )
   })
 })
