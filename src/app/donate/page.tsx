@@ -133,7 +133,7 @@ export default function DonatePage() {
             onLoad={handleLoad}
             onError={handleError}
             sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
-            className={`w-full min-h-[1300px] md:min-h-[1200px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${loaded ? 'block' : 'hidden'}`}
+            className={`w-full min-h-[1300px] md:min-h-[1200px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${loaded ? 'block' : 'hidden'}`}
           />
         </>
       )}

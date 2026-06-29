@@ -87,7 +87,7 @@ async function AboutContent() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Download on the App Store"
-              className="inline-block hover:opacity-80 motion-safe:transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:rounded-sm"
+              className="inline-block hover:opacity-80 motion-safe:transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-sm"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="119.664" height="40" viewBox="0 0 119.664 40" className="h-10 w-auto" aria-hidden="true">
                 <g transform="translate(0 0)">
@@ -126,7 +126,7 @@ async function AboutContent() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Get it on Google Play"
-              className="inline-block hover:opacity-80 motion-safe:transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:rounded-sm"
+              className="inline-block hover:opacity-80 motion-safe:transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-sm"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="135" height="40" viewBox="0 0 135 40" className="h-10 w-auto" aria-hidden="true">
                 <defs>

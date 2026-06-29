@@ -28,7 +28,7 @@ export async function RecommendedTeachers() {
               key={teacher.slug}
               slug={teacher.slug}
               name={teacher.name}
-              className="flex flex-col items-center gap-[5px] md:gap-2 flex-shrink-0 w-[72px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
+              className="flex flex-col items-center gap-[5px] md:gap-2 flex-shrink-0 w-[72px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
               style={{ '--stagger-i': index } as React.CSSProperties}
             >
               <div className="teacher-card">

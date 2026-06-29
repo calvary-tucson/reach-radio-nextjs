@@ -51,7 +51,7 @@ export function Header() {
       style={{ viewTransitionName: 'site-header' }}
       className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6 will-change-transform"
     >
-      <Link href="/" aria-label="Reach Radio home" className="flex items-center w-[clamp(130px,16vw,186px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded">
+      <Link href="/" aria-label="Reach Radio home" className="flex items-center w-[clamp(130px,16vw,186px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
         <Image
           src="/reach_radio_logo.svg"
           alt=""
@@ -72,7 +72,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
-              className="relative flex flex-col items-center justify-center h-16 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+              className="relative flex flex-col items-center justify-center h-16 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
             >
               {isActive && (
                 <>
@@ -93,7 +93,7 @@ export function Header() {
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded"
+          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">

@@ -135,7 +135,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  className="bg-white/10 light:bg-gray-100 border border-white/20 light:border-gray-300 rounded-full px-4 py-2 text-sm font-semibold text-white/80 light:text-gray-700 hover:bg-white/15 light:hover:bg-gray-200 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {link.title}
                 </a>
@@ -188,7 +188,7 @@ export function TeacherDetailContent({ teacher, relatedTeachers = [], headingLev
                   key={t.slug}
                   slug={t.slug}
                   name={t.name}
-                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[72px] md:w-[72px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded cursor-pointer"
+                  className="flex flex-col items-center gap-[4px] md:gap-2 flex-shrink-0 w-[72px] md:w-[72px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded cursor-pointer"
                 >
                   <TeacherAvatar
                     name={t.name}
