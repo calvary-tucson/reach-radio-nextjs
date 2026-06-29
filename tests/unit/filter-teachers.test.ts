@@ -22,7 +22,7 @@ describe('filterTeachers', () => {
   it('filters by name, case-insensitive', () => {
     const result = filterTeachers(teachers, 'jack')
     expect(result).toHaveLength(2)
-    expect(result.map((t) => t.slug)).toEqual(['jack-hibbs', 'jack-graham'])
+    expect(result.map((t) => t.slug)).toEqual(['jack-graham', 'jack-hibbs'])
   })
 
   it('filters by title, case-insensitive', () => {
@@ -70,16 +70,6 @@ const hoursMap = new Map<string, number>([
 ])
 
 describe('filterTeachers with sort', () => {
-  it('sorts by name-asc', () => {
-    const result = filterTeachers(teachers, '', { sort: 'name-asc' })
-    expect(result.map((t) => t.slug)).toEqual([
-      'alistair-begg',
-      'jack-graham',
-      'jack-hibbs',
-      'john-macarthur',
-    ])
-  })
-
   it('sorts by name-desc', () => {
     const result = filterTeachers(teachers, '', { sort: 'name-desc' })
     expect(result.map((t) => t.slug)).toEqual([
@@ -100,12 +90,12 @@ describe('filterTeachers with sort', () => {
     ])
   })
 
-  it('preserves server order when no sort specified', () => {
+  it('sorts A-Z by default when no sort specified', () => {
     const result = filterTeachers(teachers, '')
     expect(result.map((t) => t.slug)).toEqual([
-      'jack-hibbs',
-      'jack-graham',
       'alistair-begg',
+      'jack-graham',
+      'jack-hibbs',
       'john-macarthur',
     ])
   })
