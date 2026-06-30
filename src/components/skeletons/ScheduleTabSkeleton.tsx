@@ -1,5 +1,5 @@
 function Sk({ className }: { className: string }) {
-  return <div className={`bg-[#252b32] motion-safe:animate-pulse rounded ${className}`} />
+  return <div className={`bg-[#252b32] light:bg-gray-200 motion-safe:animate-pulse rounded ${className}`} />
 }
 
 export function ScheduleTabSkeleton() {
