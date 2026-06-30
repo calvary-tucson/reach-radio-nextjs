@@ -5,7 +5,7 @@ export default function AboutError({ error, reset }: { error: Error & { digest?:
     <div role="alert" className="px-4 py-12 text-center">
       <p className="text-white/80 light:text-gray-700 mb-3">Unable to load this page. Please try again.</p>
       {error.digest && (
-        <p className="text-xs text-white/40 light:text-gray-400 mb-3 font-mono">{error.digest}</p>
+        <p className="text-xs text-white/40 light:text-gray-500 mb-3 font-mono">{error.digest}</p>
       )}
       <button onClick={reset} className="text-sm text-white light:text-gray-900 underline cursor-pointer">
         Retry
