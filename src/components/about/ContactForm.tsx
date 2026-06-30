@@ -4,9 +4,13 @@ import { useActionState, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { submitContact, type ContactState } from '@/actions/contact'
 
+interface ContactFormProps {
+  onSuccess?: () => void
+}
+
 const initial: ContactState = { success: false }
 
-export function ContactForm() {
+export function ContactForm({ onSuccess }: ContactFormProps) {
   const [state, action, isPending] = useActionState(submitContact, initial)
   const formRef = useRef<HTMLFormElement>(null)
   const timestampRef = useRef(Date.now().toString())
@@ -15,15 +19,16 @@ export function ContactForm() {
     if (state.success) {
       formRef.current?.reset()
       toast.success("Message sent! We'll be in touch.")
+      onSuccess?.()
     }
-  }, [state.success])
+  }, [state.success, onSuccess])
 
   useEffect(() => {
     if (state.error) toast.error(state.error)
   }, [state.error])
 
   return (
-    <form ref={formRef} action={action} className="space-y-4 max-w-lg" aria-describedby={state.error ? 'form-error' : undefined}>
+    <form ref={formRef} action={action} className="space-y-4" aria-describedby={state.error ? 'form-error' : undefined}>
       {/* Honeypot fields */}
       <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />

@@ -182,7 +182,9 @@ async function AboutContent() {
       <div className="bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-5">
         <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 light:text-gray-600 mb-2">Got Questions?</h2>
         <p className="text-white/60 light:text-gray-500 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
-        <ContactForm />
+        <div className="max-w-lg">
+          <ContactForm />
+        </div>
       </div>
 
       {/* Privacy policy */}
