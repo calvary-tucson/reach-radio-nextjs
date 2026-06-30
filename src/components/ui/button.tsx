@@ -12,7 +12,7 @@ const buttonVariants = cva(
       variant: {
         primary: 'bg-[var(--color-brand-green)] text-white hover:opacity-90',
         secondary: 'bg-gray-700 text-white hover:bg-gray-600',
-        ghost: 'text-white hover:bg-white/10',
+        ghost: 'text-white light:text-gray-900 hover:bg-white/10 light:hover:bg-black/5',
         destructive: 'bg-red-600 text-white hover:bg-red-700',
       },
       size: {
