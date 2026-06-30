@@ -1,11 +1,14 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useScrollHide } from '@/lib/hooks/useScrollHide'
+import { ContactSheet } from '@/components/about/ContactSheet'
 
 export function MobileHeader() {
   const ref = useScrollHide<HTMLElement>()
+  const [contactOpen, setContactOpen] = useState(false)
 
   return (
     <header
@@ -35,12 +38,14 @@ export function MobileHeader() {
             <path d="M36.002 18.11a18 18 0 10-20.816 17.891V23.345h-4.567v-5.233h4.571v-3.993c0-4.538 2.688-7.044 6.8-7.044a27.53 27.53 0 014.029.353v4.454h-2.27a2.61 2.61 0 00-2.931 2.83v3.4h4.984l-.8 5.233h-4.2v12.656a18.081 18.081 0 0015.2-17.891z" fill="inherit" />
           </svg>
         </a>
-        <Link
-          href="/about#aboutGotQuestions"
-          className="flex items-center px-2 py-1 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        <button
+          type="button"
+          onClick={() => setContactOpen(true)}
+          className="flex items-center px-2 py-1 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           Contact
-        </Link>
+        </button>
+        <ContactSheet open={contactOpen} onClose={() => setContactOpen(false)} />
       </div>
     </header>
   )
