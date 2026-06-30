@@ -77,7 +77,7 @@ export async function TodaySchedule() {
       <div className="flex items-center gap-5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 text-white light:text-gray-900">
         <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
           <Image
-            src={MUSIC_IMAGE + '?w=420&fm=webp'}
+            src={MUSIC_IMAGE}
             alt="Music"
             fill
             className="object-cover rounded-lg"
@@ -118,7 +118,7 @@ export async function TodaySchedule() {
   return (
     <div className="flex flex-col gap-y-2 text-white light:text-gray-900">
       {withBreaks.map((item, idx) => {
-        const photoSrc = (item.photo || MUSIC_IMAGE) + '?w=420&fm=webp'
+        const photoSrc = item.photo || MUSIC_IMAGE
         const content = (
           <>
             <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
