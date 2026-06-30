@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
         ]}
       />
       <div className="px-4 md:px-8 pt-10 md:pt-6 pb-8">
-      <div className="prose prose-invert max-w-none">
+      <div className="prose dark:prose-invert max-w-none">
         <h1>Privacy Policy</h1>
         <p><strong>Last updated:</strong> March 17, 2026</p>
         <p>
