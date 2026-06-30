@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { headers } from 'next/headers'
 import { Suspense } from 'react'
 import { MediaBar } from '@/components/media-bar/MediaBar'
 import { BridgeInit } from '@/components/bridge/BridgeInit'
@@ -18,6 +17,7 @@ import { WebSiteSchema } from '@/components/seo/WebSiteSchema'
 import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { FALLBACK_STREAM_URL, FALLBACK_OG_IMAGE } from '@/lib/constants'
+import { detectMobileApp } from '@/lib/utils/mobile-app'
 import { RouteAnnouncer } from '@/components/bridge/RouteAnnouncer'
 import './globals.css'
 
@@ -83,15 +83,6 @@ export async function generateMetadata(): Promise<Metadata> {
       ...(twitterHandle ? { site: twitterHandle, creator: twitterHandle } : {}),
     },
   }
-}
-
-async function detectMobileApp(): Promise<boolean> {
-  const headersList = await headers()
-  const cookieHeader = headersList.get('cookie') ?? ''
-  return (
-    headersList.get('mobile-app') === 'true' ||
-    cookieHeader.split(';').some((c) => c.trim() === 'mobile-app=true')
-  )
 }
 
 function ChromeFallback() {

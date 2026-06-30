@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-type Theme = 'light' | 'dark' | 'system'
+export type Theme = 'light' | 'dark' | 'system'
 
 interface ThemeContextValue {
   theme: Theme

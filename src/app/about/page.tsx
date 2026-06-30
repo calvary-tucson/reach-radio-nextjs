@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
 import Link from 'next/link'
+import { detectMobileApp } from '@/lib/utils/mobile-app'
 import { ContactForm } from '@/components/about/ContactForm'
 import { sanityFetch } from '@/lib/sanity/client'
 import { siteSettingsQuery } from '@/lib/sanity/queries'
@@ -25,11 +25,7 @@ export const metadata: Metadata = {
 }
 
 async function AboutContent() {
-  const headersList = await headers()
-  const cookieHeader = headersList.get('cookie') ?? ''
-  const isMobileApp =
-    headersList.get('mobile-app') === 'true' ||
-    cookieHeader.split(';').some(c => c.trim() === 'mobile-app=true')
+  const isMobileApp = await detectMobileApp()
 
   const siteSettings = await sanityFetch<{
     siteTitle: string

@@ -1,6 +1,4 @@
-function Sk({ className }: { className: string }) {
-  return <div className={`bg-[#252b32] light:bg-gray-200 motion-safe:animate-pulse rounded ${className}`} />
-}
+import { SkeletonBlock as Sk } from '@/components/skeletons/SkeletonBlock'
 
 export function RecommendedTeachersSkeleton() {
   return (
