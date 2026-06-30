@@ -82,14 +82,14 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
               <button
                 type="button"
                 onClick={paused ? resumeSleepTimer : pauseSleepTimer}
-                className="w-full bg-white/5 border border-white/10 text-white light:text-gray-900 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
+                className="w-full bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white light:text-gray-900 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 light:hover:bg-gray-100 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
               >
                 {paused ? 'Resume' : 'Pause'}
               </button>
               <button
                 type="button"
                 onClick={cancel}
-                className="w-full bg-white/5 border border-red-500/30 text-red-400 py-4 rounded-xl font-semibold text-lg hover:bg-red-500/10 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
+                className="w-full bg-white/5 light:bg-red-50 border border-red-500/30 text-red-400 light:text-red-600 py-4 rounded-xl font-semibold text-lg hover:bg-red-500/10 light:hover:bg-red-100 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
               >
                 Cancel Timer
               </button>
@@ -102,7 +102,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
                 type="button"
                 key={mins}
                 onClick={() => start(mins)}
-                className="bg-white/5 border border-white/10 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-white/10 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
+                className="bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white light:text-gray-900 py-5 rounded-xl font-semibold text-lg hover:bg-white/10 light:hover:bg-gray-100 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
               >
                 {mins}m
               </button>

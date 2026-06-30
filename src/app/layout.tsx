@@ -98,7 +98,7 @@ function ChromeFallback() {
   return (
     <div
       data-web-chrome=""
-      className="fixed top-0 left-0 right-0 h-16 bg-[var(--color-brand-purple)] border-b border-white/10 z-40"
+      className="fixed top-0 left-0 right-0 h-16 bg-[var(--color-brand-purple)] light:bg-white border-b border-white/10 light:border-gray-200 z-40"
       aria-hidden="true"
     />
   )

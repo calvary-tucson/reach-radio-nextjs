@@ -64,7 +64,7 @@ export function MobileHeader() {
         </a>
         <Link
           href="/about#aboutGotQuestions"
-          className="flex items-center px-2 py-1 bg-white rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+          className="flex items-center px-2 py-1 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
         >
           Contact
         </Link>

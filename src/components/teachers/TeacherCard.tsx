@@ -20,7 +20,7 @@ export function TeacherCard({
   onNavigate,
 }: TeacherCardProps) {
   const avatarEl = (
-    <div className="relative aspect-square bg-gradient-to-br from-[#253520] to-[#131b0d]">
+    <div className="relative aspect-square bg-gradient-to-br from-[#253520] to-[#131b0d] light:from-gray-100 light:to-gray-200">
       <TeacherAvatar
         name={teacher.name}
         photo={teacher.photo}
@@ -56,8 +56,8 @@ export function TeacherCard({
         )}
         {scheduleDays && (
           <div className="flex items-center gap-[3px] mt-[5px]">
-            <CalendarDays className="h-[13px] w-[13px] md:h-[13px] md:w-[13px] text-[#a3d46a] shrink-0" aria-hidden="true" />
-            <span className="text-[10px] md:text-[10px] text-[#a3d46a] font-medium leading-none uppercase tracking-wide">
+            <CalendarDays className="h-[13px] w-[13px] md:h-[13px] md:w-[13px] text-[#a3d46a] light:text-green-700 shrink-0" aria-hidden="true" />
+            <span className="text-[10px] md:text-[10px] text-[#a3d46a] light:text-green-700 font-medium leading-none uppercase tracking-wide">
               {scheduleDays}
             </span>
           </div>
