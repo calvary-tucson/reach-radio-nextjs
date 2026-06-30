@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 
 const mockFetch = vi.fn()
@@ -18,6 +18,12 @@ describe('sanityFetch', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.resetModules()
+    vi.stubEnv('SANITY_PROJECT_ID', 'test-project')
+    vi.stubEnv('SANITY_DATASET', 'production')
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it('calls cacheLife with "days"', async () => {

@@ -55,7 +55,7 @@ function ThemeInit({ children }: { children: React.ReactNode }) {
       return
     }
 
-    const effectiveTheme: Theme = cookie ?? 'dark'
+    const effectiveTheme: Theme = cookie ?? 'system'
     setThemeState(effectiveTheme)
 
     if (effectiveTheme !== 'system') {

@@ -24,6 +24,22 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), prefetch: vi.fn() }),
+}))
+
+vi.mock('@/lib/stores/modal', () => {
+  const mockOpenModal = vi.fn()
+  const mockPushModal = vi.fn()
+  const useModalStore = Object.assign(
+    vi.fn((selector: (s: { openModal: typeof mockOpenModal; isOpen: boolean; pushModal: typeof mockPushModal }) => unknown) =>
+      selector({ openModal: mockOpenModal, isOpen: false, pushModal: mockPushModal })
+    ),
+    { getState: vi.fn(() => ({ isOpen: false, openModal: mockOpenModal, pushModal: mockPushModal })) }
+  )
+  return { useModalStore }
+})
+
 describe('RecommendedTeachers', () => {
   it('renders the Recommended label', async () => {
     const Component = await RecommendedTeachers()
