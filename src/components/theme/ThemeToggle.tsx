@@ -2,9 +2,8 @@
 
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { useTheme } from '@/components/theme/ThemeProvider'
+import type { Theme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
-
-type Theme = 'light' | 'dark' | 'system'
 
 const OPTIONS: { value: Theme; label: string; Icon: React.FC<{ className?: string }> }[] = [
   { value: 'light', label: 'Light', Icon: Sun },
@@ -24,7 +23,7 @@ export function ThemeToggle() {
           onClick={() => setTheme(value)}
           aria-pressed={theme === value}
           className={cn(
-            'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium motion-safe:transition-colors cursor-pointer',
+            'flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 rounded-md text-xs font-medium motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             theme === value
               ? 'bg-[#84b84f] text-[#0a1305]'
               : 'text-white/60 hover:text-white/90 light:text-gray-500 light:hover:text-gray-900'

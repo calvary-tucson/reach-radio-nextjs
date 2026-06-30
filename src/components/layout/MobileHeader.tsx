@@ -2,37 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useScrollHide } from '@/lib/hooks/useScrollHide'
 
 export function MobileHeader() {
-  const ref = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    el.style.transition = 'transform 0.5s, opacity 0.5s'
-    let lastY = window.scrollY
-    let ticking = false
-    function onScroll() {
-      if (ticking) return
-      ticking = true
-      requestAnimationFrame(() => {
-        const y = window.scrollY
-        if (y > lastY) {
-          el!.style.transform = 'translateY(-100%)'
-          el!.style.opacity = '0'
-        } else {
-          el!.style.transform = 'translateY(0)'
-          el!.style.opacity = '1'
-        }
-        lastY = y <= 0 ? 0 : y
-        ticking = false
-      })
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const ref = useScrollHide<HTMLElement>()
 
   return (
     <header
@@ -43,7 +16,7 @@ export function MobileHeader() {
       <Link href="/" aria-label="Reach Radio home" className="w-[clamp(180px,40vw,250px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
         <Image
           src="/reach_radio_logo.svg"
-          alt="Reach Radio"
+          alt=""
           width={248}
           height={58}
           className="h-8 w-auto"
@@ -64,7 +37,7 @@ export function MobileHeader() {
         </a>
         <Link
           href="/about#aboutGotQuestions"
-          className="flex items-center px-2 py-1 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+          className="flex items-center px-2 py-1 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Contact
         </Link>
