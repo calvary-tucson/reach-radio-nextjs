@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { NextRequest } from 'next/server'
-import { middleware } from '@/middleware'
+import { proxy as middleware } from '@/proxy'
 
 function makeRequest(path: string, headers: Record<string, string> = {}): NextRequest {
   const url = new URL(`http://localhost${path}`)
