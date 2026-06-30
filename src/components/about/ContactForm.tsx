@@ -37,21 +37,21 @@ export function ContactForm() {
         <label htmlFor="name" className="text-white/80 light:text-gray-700 text-sm block mb-1">Name *</label>
         <input
           id="name" name="name" type="text" required minLength={2} maxLength={100}
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         />
       </div>
       <div>
         <label htmlFor="email" className="text-white/80 light:text-gray-700 text-sm block mb-1">Email *</label>
         <input
           id="email" name="email" type="email" required
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         />
       </div>
       <div>
         <label htmlFor="message" className="text-white/80 light:text-gray-700 text-sm block mb-1">Message *</label>
         <textarea
           id="message" name="message" required rows={5} minLength={10} maxLength={2000}
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus:ring-1 focus:ring-white light:focus:ring-gray-400 resize-none"
+          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none resize-none"
         />
       </div>
 
@@ -64,7 +64,7 @@ export function ContactForm() {
 
       <button
         type="submit" disabled={isPending}
-        className="bg-[var(--color-brand-green)] text-white px-6 py-2 rounded font-medium text-sm disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+        className="bg-[var(--color-brand-green)] text-[#0a1305] px-6 py-3 min-h-[44px] rounded font-medium text-sm disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         {isPending ? 'Sending...' : 'Send Message'}
       </button>

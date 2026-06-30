@@ -40,13 +40,13 @@ export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
         <span
           role="status"
           aria-label="Buffering"
-          className={`border-2 border-white border-t-transparent rounded-full motion-safe:animate-spin`}
+          className={`border-2 border-[#0a1305] border-t-transparent rounded-full motion-safe:animate-spin`}
           style={{ width: iconSize, height: iconSize }}
         />
       ) : isPlaying ? (
-        <Pause size={iconSize} className="fill-white" strokeWidth={0} />
+        <Pause size={iconSize} className="fill-[#0a1305]" strokeWidth={0} />
       ) : (
-        <Play size={iconSize} className="fill-white" strokeWidth={0} />
+        <Play size={iconSize} className="fill-[#0a1305]" strokeWidth={0} />
       )}
     </button>
   )
