@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+vi.mock('@/lib/teacherCache', () => ({
+  resolveArtist: vi.fn().mockResolvedValue({ imageUrl: null, resolvedArtist: null }),
+}))
+
 describe('GET /api/stream-info-sse', () => {
   beforeEach(() => {
-    vi.resetAllMocks()
+    vi.clearAllMocks()
     vi.resetModules()
   })
 
@@ -49,6 +53,8 @@ describe('GET /api/stream-info-sse', () => {
     const text = new TextDecoder().decode(value)
     expect(text).toContain('"title":"Morning Devotions"')
     expect(text).toContain('"artist":"Chuck Smith"')
+    expect(text).toContain('"imageUrl":null')
+    expect(text).toContain('"resolvedArtist":null')
   })
 
   it('falls back to Reach Radio on upstream fetch failure', async () => {
