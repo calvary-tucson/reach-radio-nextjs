@@ -71,17 +71,21 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
           ? 'motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
           : 'motion-safe:animate-[fade-in_0.2s_ease-out_both]'
       }`}
+      onClick={handleDismiss}
     >
-      <ModalProvider
-        onDismiss={handleDismiss}
-        onBack={handleDismiss}
-        isClosing={isClosing}
-        stackDepth={0}
-      >
-        <SheetChrome title="Contact Us" autoFocusInput>
-          <ContactForm onSuccess={handleDismiss} />
-        </SheetChrome>
-      </ModalProvider>
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div onClick={(e) => e.stopPropagation()}>
+        <ModalProvider
+          onDismiss={handleDismiss}
+          onBack={handleDismiss}
+          isClosing={isClosing}
+          stackDepth={0}
+        >
+          <SheetChrome title="Contact Us" autoFocusInput>
+            <ContactForm onSuccess={handleDismiss} />
+          </SheetChrome>
+        </ModalProvider>
+      </div>
     </div>,
     document.body
   )
