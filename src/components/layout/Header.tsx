@@ -69,7 +69,7 @@ export function Header() {
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
+          className="w-7 fill-slate-300 light:fill-gray-500 hover:fill-white light:hover:fill-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded cursor-pointer"
           aria-label="Reach Radio on Facebook"
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">
@@ -80,6 +80,7 @@ export function Header() {
           type="button"
           onClick={() => setContactOpen(true)}
           aria-expanded={contactOpen}
+          aria-controls="contact-sheet"
           className="flex items-center px-3 py-1.5 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           Contact
