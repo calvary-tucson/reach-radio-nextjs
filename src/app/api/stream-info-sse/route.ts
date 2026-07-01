@@ -1,5 +1,6 @@
 import { createRateLimiter } from '@/lib/rate-limit'
 import { RADIOJAR_URL } from '@/lib/constants'
+import { resolveArtist } from '@/lib/teacherCache'
 
 const limiter = createRateLimiter({ windowMs: 60_000, max: 10 })
 
@@ -44,20 +45,21 @@ export async function GET(request: Request): Promise<Response> {
             ]),
           })
           const text = await res.text()
-          // Robust JSONP strip — handles named callback and whitespace variations
           const stripped = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '')
           const json = JSON.parse(stripped) as { title?: string; artist?: string }
           const title = json.title || 'Reach Radio'
           const artist = json.artist || ''
+          const { imageUrl, resolvedArtist } = await resolveArtist(artist)
           consecutiveFailures = 0
           if (!cancelled) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ title, artist })}\n\n`))
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ title, artist, imageUrl, resolvedArtist })}\n\n`)
+            )
           }
           schedulePoll(30_000)
         } catch {
           if (!cancelled) {
             consecutiveFailures++
-            // Back off exponentially from 30s up to 5 min on repeated upstream failures
             const delay = Math.min(30_000 * Math.pow(2, consecutiveFailures - 1), MAX_POLL_BACKOFF_MS)
             schedulePoll(delay)
           }
