@@ -51,18 +51,19 @@ export function useNowPlaying(): void {
 
           const { teachersList } = useTeachersStore.getState()
 
+          const rawArtist = data.artist ?? useMediaStore.getState().artist
           let image = FALLBACK_OG_IMAGE
-          let resolvedArtist = data.artist ?? useMediaStore.getState().artist
+          let resolvedArtist: string | null = null
 
           if (data.imageUrl && data.resolvedArtist) {
             // Server resolved both — use directly, skip redundant client match
             image = data.imageUrl
             resolvedArtist = data.resolvedArtist
-          } else if (resolvedArtist && teachersList.length > 0) {
+          } else if (rawArtist && teachersList.length > 0) {
             // Fallback: client-side match (music gaps, null imageUrl, unmatched artist)
             const match = teachersList.find((t) =>
-              t.name.toLowerCase().includes(resolvedArtist.toLowerCase()) ||
-              resolvedArtist.toLowerCase().includes(t.name.toLowerCase())
+              t.name.toLowerCase().includes(rawArtist.toLowerCase()) ||
+              rawArtist.toLowerCase().includes(t.name.toLowerCase())
             )
             if (match) {
               image = match.photo.includes('?')
@@ -74,6 +75,7 @@ export function useNowPlaying(): void {
 
           setNowPlaying(
             data.title ?? useMediaStore.getState().title,
+            rawArtist,
             resolvedArtist,
             image
           )

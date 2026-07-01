@@ -9,6 +9,7 @@ interface MediaState {
   previousVolume: number
   title: string
   artist: string
+  resolvedArtist: string | null
   image: string
   showMediaBar: boolean
   sleepTimerActive: boolean
@@ -20,7 +21,7 @@ interface MediaState {
   setVolume: (v: number) => void
   toggleMute: () => void
   setMuted: (v: boolean) => void
-  setNowPlaying: (title: string, artist: string, image: string) => void
+  setNowPlaying: (title: string, artist: string, resolvedArtist: string | null, image: string) => void
   setShowMediaBar: (v: boolean) => void
   setSleepTimerActive: (active: boolean) => void
   setRemainingSleepSeconds: (s: number) => void
@@ -39,6 +40,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   previousVolume: 100,
   title: 'Reach Radio',
   artist: '',
+  resolvedArtist: null,
   image: FALLBACK_OG_IMAGE,
   showMediaBar: false,
   sleepTimerActive: false,
@@ -64,7 +66,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
       set({ isMuted: false, volume: previousVolume > 0 ? previousVolume : 100 })
     }
   },
-  setNowPlaying: (title, artist, image) => set({ title, artist, image }),
+  setNowPlaying: (title, artist, resolvedArtist, image) => set({ title, artist, resolvedArtist, image }),
   setShowMediaBar: (v) => set({ showMediaBar: v }),
   setSleepTimerActive: (active) => set({ sleepTimerActive: active }),
   setRemainingSleepSeconds: (s) => set({ remainingSleepSeconds: s }),

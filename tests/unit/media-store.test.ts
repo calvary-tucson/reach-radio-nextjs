@@ -11,6 +11,7 @@ describe('useMediaStore', () => {
       previousVolume: 100,
       title: 'Reach Radio',
       artist: '',
+      resolvedArtist: null,
       image: 'https://cdn.sanity.io/images/bk05c6rl/production/5891a2050443dc125c47c8607419caf3afaa21a5-1024x1024.jpg',
       showMediaBar: false,
       sleepTimerActive: false,
@@ -30,12 +31,18 @@ describe('useMediaStore', () => {
     expect(useMediaStore.getState().isBuffering).toBe(true)
   })
 
-  it('setNowPlaying updates title, artist, image', () => {
-    useMediaStore.getState().setNowPlaying('Test Title', 'Test Artist', 'https://example.com/img.jpg')
-    const { title, artist, image } = useMediaStore.getState()
+  it('setNowPlaying updates title, artist, resolvedArtist, image', () => {
+    useMediaStore.getState().setNowPlaying('Test Title', 'Grace To You', 'John MacArthur', 'https://example.com/img.jpg')
+    const { title, artist, resolvedArtist, image } = useMediaStore.getState()
     expect(title).toBe('Test Title')
-    expect(artist).toBe('Test Artist')
+    expect(artist).toBe('Grace To You')
+    expect(resolvedArtist).toBe('John MacArthur')
     expect(image).toBe('https://example.com/img.jpg')
+  })
+
+  it('setNowPlaying accepts null resolvedArtist for music gaps', () => {
+    useMediaStore.getState().setNowPlaying('Music', 'Unknown Artist', null, 'https://example.com/img.jpg')
+    expect(useMediaStore.getState().resolvedArtist).toBeNull()
   })
 
   it('setShowMediaBar updates showMediaBar', () => {

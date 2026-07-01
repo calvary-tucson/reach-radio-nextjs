@@ -55,10 +55,11 @@ function clearMobileAppCookie() {
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { title, artist, image, isMuted, volume } = useMediaStore(
+  const { title, artist, resolvedArtist, image, isMuted, volume } = useMediaStore(
     useShallow((s) => ({
       title: s.title,
       artist: s.artist,
+      resolvedArtist: s.resolvedArtist,
       image: s.image,
       isMuted: s.isMuted,
       volume: s.volume,
@@ -167,8 +168,8 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   // Forward track metadata to native whenever it changes in the store
   useEffect(() => {
     if (!isNativeBridgePresent()) return
-    postMessageToNative({ title, artist, image })
-  }, [title, artist, image])
+    postMessageToNative({ title, artist, resolvedArtist, image })
+  }, [title, artist, resolvedArtist, image])
 
   // Forward mute/volume to native so AVPlayer can apply them
   useEffect(() => {
