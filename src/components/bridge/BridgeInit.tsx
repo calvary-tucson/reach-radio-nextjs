@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useShallow } from 'zustand/react/shallow'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { useMediaStore } from '@/lib/store/media-store'
+import { useModalStore } from '@/lib/stores/modal'
 import { isTeacherDetailPath } from '@/lib/routes'
 
 interface BridgeInitProps {
@@ -177,10 +178,15 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     postMessageToNative({ isMuted, volume })
   }, [isMuted, volume])
 
-  // Input focus/blur: hide bars when keyboard appears (native + web), restore after
+  // Input focus/blur: hide bars when keyboard appears (native + web), restore after.
+  // Skipped while a modal is open — ModalLayout owns bar visibility there, and Radix's
+  // focus-scope re-triggers focus/blur on the autofocused input as it manages focus
+  // trapping, which would otherwise race this ref-based capture/restore and leave the
+  // media bar incorrectly restored to visible mid-sheet.
   useEffect(() => {
     function onFocusIn(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
+      if (useModalStore.getState().isOpen) return
       if (mediaBarStateBeforeFocus.current === null) {
         mediaBarStateBeforeFocus.current = useMediaStore.getState().showMediaBar
       }
@@ -189,6 +195,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
     function onFocusOut(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
+      if (useModalStore.getState().isOpen) return
       const restoredMediaBar = mediaBarStateBeforeFocus.current
       if (restoredMediaBar !== null) {
         useMediaStore.getState().setShowMediaBar(restoredMediaBar)

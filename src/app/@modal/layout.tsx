@@ -11,6 +11,7 @@ import { DragHandle } from '@/components/global/DragHandle'
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { useShallow } from 'zustand/react/shallow'
 import { useModalStore } from '@/lib/stores/modal'
+import { useMediaStore } from '@/lib/store/media-store'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { cn } from '@/lib/utils'
 
@@ -99,8 +100,13 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!isOpen) return
-    postMessageToNative({ showMobileNav: false })
-    return () => { postMessageToNative({ showMobileNav: true }) }
+    const prevShowMediaBar = useMediaStore.getState().showMediaBar
+    useMediaStore.getState().setShowMediaBar(false)
+    postMessageToNative({ showMobileNav: false, showMediaBar: false })
+    return () => {
+      useMediaStore.getState().setShowMediaBar(prevShowMediaBar)
+      postMessageToNative({ showMobileNav: true, showMediaBar: prevShowMediaBar })
+    }
   }, [isOpen])
 
   const pathname = usePathname()
