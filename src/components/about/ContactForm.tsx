@@ -1,33 +1,23 @@
 'use client'
 
 import { startTransition, useActionState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { submitContact, type ContactState } from '@/actions/contact'
-
-declare global {
-  interface Window {
-    grecaptcha: {
-      ready: (cb: () => void) => void
-      execute: (siteKey: string, options: { action: string }) => Promise<string>
-    }
-  }
-}
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
 interface ContactFormProps {
   onSuccess?: () => void
+  dryRun?: boolean
 }
 
 const initial: ContactState = { success: false }
 
-export function ContactForm({ onSuccess }: ContactFormProps) {
+export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
   const [state, formAction, isPending] = useActionState(submitContact, initial)
   const formRef = useRef<HTMLFormElement>(null)
   const timestampRef = useRef(Date.now().toString())
-  const searchParams = useSearchParams()
-  const dryRun = searchParams.has('contact-dry-run')
+  const prevStateRef = useRef(state)
 
   useEffect(() => {
     if (!RECAPTCHA_SITE_KEY) return
@@ -40,12 +30,13 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
   }, [])
 
   useEffect(() => {
-    if (state.success) {
+    if (state !== prevStateRef.current && state.success) {
       formRef.current?.reset()
       toast.success("Message sent! We'll be in touch.")
       onSuccess?.()
     }
-  }, [state.success, onSuccess])
+    prevStateRef.current = state
+  }, [state, onSuccess])
 
   useEffect(() => {
     if (state.error) toast.error(state.error)
@@ -56,18 +47,17 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
     const formData = new FormData(e.currentTarget)
 
     if (RECAPTCHA_SITE_KEY) {
-      await new Promise<void>((resolve, reject) => {
-        const start = Date.now()
-        const poll = () => {
-          if (typeof window !== 'undefined' && window.grecaptcha) resolve()
-          else if (Date.now() - start > 10_000) reject(new Error('grecaptcha load timeout'))
-          else setTimeout(poll, 50)
-        }
-        poll()
-      })
-      await new Promise<void>((resolve) => window.grecaptcha.ready(resolve))
-      const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'contact' })
-      formData.set('recaptchaToken', token)
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const t = setTimeout(() => reject(new Error('timeout')), 5000)
+          window.grecaptcha.ready(() => { clearTimeout(t); resolve() })
+        })
+        const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'contact' })
+        formData.set('recaptchaToken', token)
+      } catch {
+        toast.error('Security check failed. Please try again.')
+        return
+      }
     }
 
     startTransition(() => formAction(formData))
@@ -89,14 +79,14 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
         <label htmlFor="name" className="text-white/90 light:text-gray-700 text-sm block mb-1">Name *</label>
         <input
           id="name" name="name" type="text" required minLength={2} maxLength={100}
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="w-full h-11 bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         />
       </div>
       <div>
         <label htmlFor="email" className="text-white/90 light:text-gray-700 text-sm block mb-1">Email *</label>
         <input
           id="email" name="email" type="email" required
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="w-full h-11 bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         />
       </div>
       <div>

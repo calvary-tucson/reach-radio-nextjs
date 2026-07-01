@@ -24,7 +24,9 @@ export const metadata: Metadata = {
   },
 }
 
-async function AboutContent() {
+async function AboutContent({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams
+  const dryRun = 'contact-dry-run' in params
   const isMobileApp = await detectMobileApp()
 
   const siteSettings = await sanityFetch<{
@@ -181,9 +183,9 @@ async function AboutContent() {
       {/* Contact form */}
       <div className="bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-5">
         <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 light:text-gray-600 mb-2">Got Questions?</h2>
-        <p className="text-white/60 light:text-gray-500 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
+        <p className="text-white/90 light:text-gray-500 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
         <div className="max-w-lg">
-          <ContactForm />
+          <ContactForm dryRun={dryRun} />
         </div>
       </div>
 
@@ -195,7 +197,7 @@ async function AboutContent() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-white light:text-gray-900 font-semibold text-sm">Privacy Policy</p>
-            <p className="text-white/70 light:text-gray-500 text-xs mt-1">How we collect and protect your information</p>
+            <p className="text-white/90 light:text-gray-500 text-xs mt-1">How we collect and protect your information</p>
           </div>
           <svg
             className="w-4 h-4 text-white/40 light:text-gray-400 group-hover:text-white/70 motion-safe:transition-colors flex-shrink-0 ml-4"
@@ -212,11 +214,15 @@ async function AboutContent() {
   )
 }
 
-export default function AboutPage() {
+interface AboutPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default function AboutPage({ searchParams }: AboutPageProps) {
   return (
     <div className="page-enter px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-6">
       <Suspense fallback={<AboutPageSkeleton />}>
-        <AboutContent />
+        <AboutContent searchParams={searchParams} />
       </Suspense>
     </div>
   )

@@ -65,16 +65,16 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
 
   return createPortal(
     <div
+      id="contact-sheet"
       data-testid="contact-sheet-backdrop"
-      className={`fixed inset-0 z-[70] bg-black/80 [will-change:opacity] ${
+      className={`fixed inset-0 z-[70] bg-black/80 [will-change:opacity] cursor-pointer ${
         isClosing
           ? 'motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
           : 'motion-safe:animate-[fade-in_0.2s_ease-out_both]'
       }`}
       onClick={handleDismiss}
     >
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-      <div onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" aria-label="Contact Us" onClick={(e) => e.stopPropagation()}>
         <ModalProvider
           onDismiss={handleDismiss}
           onBack={handleDismiss}
