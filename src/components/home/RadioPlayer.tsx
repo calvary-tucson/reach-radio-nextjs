@@ -61,7 +61,7 @@ export function RadioPlayer() {
           aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
           className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-xl cursor-pointer w-full max-w-[420px]"
         >
-          <div className="relative w-full h-64 overflow-hidden rounded-xl">
+          <div className="relative w-full aspect-square overflow-hidden rounded-xl">
             <div
               aria-hidden="true"
               className="absolute inset-0 scale-110 blur-md"
