@@ -59,18 +59,27 @@ export function RadioPlayer() {
         <button
           onClick={togglePlay}
           aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
-          className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded cursor-pointer"
+          className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-xl cursor-pointer w-full max-w-[420px]"
         >
-          <Image
-            src={image || FALLBACK_OG_IMAGE}
-            alt=""
-            width={420}
-            height={256}
-            sizes="(max-width: 640px) 100vw, 420px"
-            className="w-full max-w-[420px] max-h-64 rounded-xl object-contain hover:opacity-90 motion-safe:transition-opacity"
-            style={{ height: 'auto' }}
-            priority
-          />
+          <div className="relative w-full h-64 overflow-hidden rounded-xl">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 scale-110 blur-md"
+              style={{
+                backgroundImage: `url(${(image || FALLBACK_OG_IMAGE).replace('w=420', 'w=48')})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+            <Image
+              src={image || FALLBACK_OG_IMAGE}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, 420px"
+              className="object-contain z-10 hover:opacity-90 motion-safe:transition-opacity"
+              priority
+            />
+          </div>
         </button>
       </div>
       <div className="flex md:flex-row flex-col items-center justify-between md:gap-0 gap-8 mt-5">

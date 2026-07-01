@@ -75,12 +75,17 @@ export async function TodaySchedule() {
   if (slots.length === 0) {
     return (
       <div className="flex items-center gap-5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-2 text-white light:text-gray-900">
-        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
+        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-lg flex-shrink-0 overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 scale-110 blur-md"
+            style={{ backgroundImage: `url(${MUSIC_IMAGE})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+          />
           <Image
             src={MUSIC_IMAGE}
             alt="Music"
             fill
-            className="object-cover rounded-lg"
+            className="object-contain z-10"
             sizes="(max-width: 768px) 64px, 80px"
           />
         </div>
@@ -121,12 +126,17 @@ export async function TodaySchedule() {
         const photoSrc = item.photo || MUSIC_IMAGE
         const content = (
           <>
-            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded flex-shrink-0 overflow-hidden">
+            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-lg flex-shrink-0 overflow-hidden">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 scale-110 blur-md"
+                style={{ backgroundImage: `url(${photoSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+              />
               <Image
                 src={photoSrc}
                 alt={item.isMusic ? 'Music' : item.name}
                 fill
-                className="object-cover rounded-lg"
+                className="object-contain z-10"
                 sizes="(max-width: 768px) 64px, 80px"
               />
             </div>
