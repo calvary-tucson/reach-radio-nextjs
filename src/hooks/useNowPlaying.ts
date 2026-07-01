@@ -42,14 +42,24 @@ export function useNowPlaying(): void {
         try {
           const raw = JSON.parse(event.data)
           if (typeof raw !== 'object' || raw === null) return
-          const data = raw as { title?: string; artist?: string }
+          const data = raw as {
+            title?: string
+            artist?: string
+            imageUrl?: string | null
+            resolvedArtist?: string | null
+          }
 
           const { teachersList } = useTeachersStore.getState()
 
           let image = FALLBACK_OG_IMAGE
           let resolvedArtist = data.artist ?? useMediaStore.getState().artist
 
-          if (resolvedArtist && teachersList.length > 0) {
+          if (data.imageUrl && data.resolvedArtist) {
+            // Server resolved both — use directly, skip redundant client match
+            image = data.imageUrl
+            resolvedArtist = data.resolvedArtist
+          } else if (resolvedArtist && teachersList.length > 0) {
+            // Fallback: client-side match (music gaps, null imageUrl, unmatched artist)
             const match = teachersList.find((t) =>
               t.name.toLowerCase().includes(resolvedArtist.toLowerCase()) ||
               resolvedArtist.toLowerCase().includes(t.name.toLowerCase())
