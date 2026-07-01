@@ -8,6 +8,9 @@ vi.mock('react', async () => {
   return { ...actual, useActionState: vi.fn() }
 })
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+}))
 vi.mock('@/actions/contact', () => ({
   submitContact: vi.fn(),
 }))
