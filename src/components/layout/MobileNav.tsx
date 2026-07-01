@@ -54,12 +54,14 @@ export function MobileNav() {
             aria-current={isActive ? 'page' : undefined}
             className="relative flex flex-col items-center pb-5 pt-4 px-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
           >
-            {isActive && (
-              <>
-                <div className="absolute top-0 w-full h-[6px] bg-green-500 rounded-b-md z-10" />
-                <div className="absolute inset-0 -top-4 bg-green-500 blur-2xl opacity-60 pointer-events-none" />
-              </>
-            )}
+            <div
+              className={`absolute top-0 w-full h-[6px] bg-green-500 rounded-b-md z-10 motion-safe:transition-opacity motion-safe:duration-150 ${isActive ? 'opacity-100' : 'opacity-0'}`}
+              aria-hidden="true"
+            />
+            <div
+              className={`absolute inset-0 -top-4 bg-green-500 blur-2xl pointer-events-none motion-safe:transition-opacity motion-safe:duration-150 ${isActive ? 'opacity-60' : 'opacity-0'}`}
+              aria-hidden="true"
+            />
             <div className="flex flex-col items-center gap-0.5">
               <svg className="w-5 h-5 fill-white light:fill-gray-900" viewBox="0 -960 960 960" aria-hidden="true">
                 <path d={isActive ? item.filledPath : item.outlinePath} />
