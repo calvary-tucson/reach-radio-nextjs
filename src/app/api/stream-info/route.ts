@@ -1,5 +1,6 @@
 import { createRateLimiter } from '@/lib/rate-limit'
 import { RADIOJAR_URL } from '@/lib/constants'
+import { resolveArtist } from '@/lib/teacherCache'
 
 const limiter = createRateLimiter({ windowMs: 60_000, max: 30 })
 
@@ -28,11 +29,12 @@ export async function GET(request: Request): Promise<Response> {
 
     const title = json.title || 'Reach Radio'
     const artist = json.artist || ''
+    const { imageUrl, resolvedArtist } = await resolveArtist(artist)
 
-    return Response.json({ title, artist, streamTitle: title, streamArtist: artist })
+    return Response.json({ title, artist, streamTitle: title, streamArtist: artist, imageUrl, resolvedArtist })
   } catch {
     return Response.json(
-      { title: 'Reach Radio', artist: '', streamTitle: 'Reach Radio', streamArtist: '' },
+      { title: 'Reach Radio', artist: '', streamTitle: 'Reach Radio', streamArtist: '', imageUrl: null, resolvedArtist: null },
       { status: 200 }
     )
   }
