@@ -45,7 +45,7 @@ const nextConfig: NextConfig = {
               "connect-src 'self' https://api.sanity.io https://cdn.sanity.io https://*.radiojar.com https://formspree.io https://www.google.com",
               "font-src 'self'",
               "object-src 'none'",
-              "frame-src https://forms.ministryforms.net",
+              "frame-src https://forms.ministryforms.net https://www.google.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self' https://formspree.io",
