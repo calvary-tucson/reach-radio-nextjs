@@ -1,6 +1,6 @@
 # Native WebView Bridge
 
-> Last updated: 2026-06-30 (resolvedArtist added to track metadata payload)
+> Last updated: 2026-07-01 (refreshComplete ack added for pull-to-refresh)
 > Status: Web bridge complete. Native apps load Astro (`reach-radio-web.pages.dev`) — switching to `reach.radio` requires an app store update.
 
 ---
@@ -56,6 +56,7 @@ Every message is a JSON object with `"protocolVersion": 1` plus any of these fie
 | `image` | string | Track metadata change | Lock screen / CarPlay artwork |
 | `offline` | boolean | Network change | Show/hide offline banner |
 | `sleepTimer` | `{ active, paused, remainingSeconds, endsAt }` | Timer start/pause/resume/cancel + structural state changes | Update native sleep timer HUD; `endsAt` is ISO 8601 string or `null`; sent on structural changes only, not per countdown tick |
+| `refreshComplete` | `true` | RSC refresh from a native `refresh` command finishes | End pull-to-refresh spinner precisely on this ack instead of dismissing optimistically |
 
 Example message:
 ```json
@@ -94,7 +95,7 @@ window.dispatchEvent(new CustomEvent('nativeCommand', {
 | `detail.type` | Payload | Web action |
 |---|---|---|
 | `navigate` | `{ path: string }` | `router.push(path)` |
-| `refresh` | — | `router.refresh()` |
+| `refresh` | — | `router.refresh()` inside `startTransition`; posts `{ refreshComplete: true }` back to native when the RSC refresh finishes (`isPending` false→true→false) |
 | `setPlayState` | `{ playing: boolean }` | Updates media store |
 | `setBuffering` | `{ buffering: boolean }` | Updates media store |
 | `prefetchRoutes` | `{ paths: string[] }` | `router.prefetch()` each path |
@@ -229,7 +230,7 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 | Audio stream | `https://reach-radio-web.pages.dev/api/audio-stream` (hardcoded) |
 | Splash dismiss | 2-second timer (not message-driven) |
 | Skeleton dismiss | `webView:didFinishNavigation` |
-| Pull-to-refresh | `up.reload()` via evaluateJavaScript |
+| Pull-to-refresh | `up.reload()` via evaluateJavaScript; end spinner on `refreshComplete: true` ack, not optimistically |
 | Path tracking | Reads `up.history.location` in `didFinishNavigation`; also from `location` messages |
 | External domains | `forms.ministryforms.net`, `login.ministryid.com` stay in WebView |
 | Debug | `webView.isInspectable = true` — Safari DevTools connects in debug builds |
@@ -265,7 +266,7 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 | JavaScript interface | `window.Android.postMessage(msg)` → `WebAppInterface` → `MainViewModel` |
 | Splash dismiss | On `{ loaded: true }` message |
 | Skeleton dismiss | `onPageFinished` AND `{ loaded: true }` |
-| Pull-to-refresh | SwipeRefreshLayout → `up.reload()` |
+| Pull-to-refresh | SwipeRefreshLayout → `up.reload()`; end spinner on `refreshComplete: true` ack, not optimistically |
 | Path tracking | Reads `up.history.location` in `onPageFinished`; also from `location` messages |
 | Back navigation | `webView.goBack()` first, then `window.globalActions.goBack()` |
 | External domains | `forms.ministryforms.net`, `login.ministryid.com` stay in WebView |
@@ -394,6 +395,10 @@ window.dispatchEvent(new CustomEvent('nativeCommand', { detail: JSON.stringify({
 Web attaches the `nativeCommand` listener **before** sending `{ loaded: true }`, so there is no race on the web side — by the time native's `isBridgeReady` gate opens, the listener is already live.
 
 However, if a CarPlay picker or other native surface dispatches `setSleepTimer` / `startSleepTimer` before `isBridgeReady = true` (e.g. the user taps a CarPlay button before the first page load completes), the command is dropped silently. There is no queue on the web side. Native should add a queue-and-flush that drains into `evaluateJavaScript` once `isBridgeReady` is true, or disallow sleep timer UI in CarPlay until the bridge is ready.
+
+### `refresh` completion is signaled, not assumed
+
+`router.refresh()` is fire-and-forget from React's perspective — it re-fetches RSC payload and re-renders, but nothing tells the caller when it's done. `BridgeInit` wraps the call in `startTransition` and watches `isPending` flip `true → false` (via `useTransition`) to know the refresh actually finished, then sends `{ refreshComplete: true }`. Native should end its pull-to-refresh spinner on this ack, not on `up.reload()` returning or a fixed timeout — the RSC fetch can take longer than either assumes.
 
 ### `window.addEventListener('message', ...)` in BridgeInit is dead code
 
@@ -527,6 +532,7 @@ Test in debug mode. Android: `chrome://inspect`. iOS: Safari DevTools (already i
 | 2 | Cold open — skeleton hides | Android | `loaded: true` → `isWebViewLoading = false` |
 | 3 | Cold open — splash dismisses | iOS | 2s timer fires |
 | 4 | Pull-to-refresh | Both | Page reloads, `loaded: true` re-sent, splash doesn't re-show |
+| 4b | Pull-to-refresh ack | Both | `refreshComplete: true` received; native ends spinner on ack, not optimistically |
 | 5 | Native bottom nav → page changes | Both | `goToPage()` / `nativeCommand:navigate` |
 | 6 | Media bar shows on non-home route | Both | `showMediaBar: true` |
 | 7 | Media bar hides on `/` | Both | `showMediaBar: false` |

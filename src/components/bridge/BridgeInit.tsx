@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useTransition } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useShallow } from 'zustand/react/shallow'
 import { postMessageToNative } from '@/lib/bridge/post-message'
@@ -67,6 +67,8 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }))
   )
   const mediaBarStateBeforeFocus = useRef<boolean | null>(null)
+  const [isRefreshPending, startRefreshTransition] = useTransition()
+  const wasRefreshPendingRef = useRef(false)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
   // Fix: gate on isNativeBridgePresent() (both platforms) not window.inNativeApp (iOS only)
@@ -86,7 +88,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
           // Validate path to prevent open redirect via router.push('https://...')
           if (typeof cmd.path !== 'string' || !cmd.path.startsWith('/')) break
           router.push(cmd.path); break
-        case 'refresh': router.refresh(); break
+        case 'refresh': startRefreshTransition(() => router.refresh()); break
         case 'setPlayState': useMediaStore.getState().setIsPlaying(cmd.playing); break
         case 'setBuffering': useMediaStore.getState().setIsBuffering(cmd.buffering); break
         case 'prefetchRoutes':
@@ -147,6 +149,14 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
 
     return () => window.removeEventListener('nativeCommand', handler)
   }, [])
+
+  // native 'refresh' command completion → ack so native ends pull-to-refresh spinner
+  useEffect(() => {
+    if (wasRefreshPendingRef.current && !isRefreshPending) {
+      postMessageToNative({ refreshComplete: true })
+    }
+    wasRefreshPendingRef.current = isRefreshPending
+  }, [isRefreshPending])
 
   // Online/offline → notify native
   useEffect(() => {
