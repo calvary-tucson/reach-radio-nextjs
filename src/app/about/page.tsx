@@ -64,7 +64,7 @@ async function AboutContent() {
           <div className="border-l-4 pl-3 font-bold text-sm mb-3 border-l-[#84b84f] uppercase text-white light:text-gray-900 tracking-wide">
             Providing Solid Bible Teachings and Uplifting Worship 24/7
           </div>
-          <p className="text-white/70 light:text-gray-600 text-sm leading-relaxed">
+          <p className="text-white/90 light:text-gray-600 text-sm leading-relaxed">
             Reach Radio first went online in February 2016, and on the air in February 2017.
             Our goal is simple, to bring the life-saving message and hope of the gospel to
             as many as can hear via the Tucson radio airwaves.
