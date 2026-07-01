@@ -81,7 +81,7 @@ export function Header() {
           onClick={() => setContactOpen(true)}
           aria-expanded={contactOpen}
           aria-controls="contact-sheet"
-          className="flex items-center px-3 py-1.5 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          className="flex items-center min-h-[44px] px-3 py-1.5 bg-white light:border light:border-gray-800 rounded text-black font-bold text-sm hover:bg-gray-100 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           Contact
         </button>

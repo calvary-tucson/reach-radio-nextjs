@@ -192,7 +192,7 @@ async function AboutContent({ searchParams }: { searchParams: Promise<Record<str
       {/* Privacy policy */}
       <Link
         href="/about/privacy-policy"
-        className="block bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-5 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 motion-safe:transition-colors cursor-pointer group"
+        className="block bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 rounded-xl p-5 hover:bg-white/10 light:hover:bg-gray-100 hover:border-white/20 light:hover:border-gray-300 motion-safe:transition-colors cursor-pointer group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         <div className="flex items-center justify-between">
           <div>

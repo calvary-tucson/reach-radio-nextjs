@@ -98,7 +98,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
       </div>
 
       <label className="flex gap-3 cursor-pointer items-start">
-        <input type="checkbox" name="gdprConsent" required className="mt-1" />
+        <input type="checkbox" name="gdprConsent" required className="mt-1 h-6 w-6 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none" />
         <span className="text-white light:text-gray-900 text-sm leading-relaxed">
           I consent to having my submitted information stored for the purpose of responding to my inquiry. *
         </span>
