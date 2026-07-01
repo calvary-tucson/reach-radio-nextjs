@@ -1,6 +1,6 @@
 # Native WebView Bridge
 
-> Last updated: 2026-06-26 (isMuted/volume forwarding added; isBuffering doc error corrected)
+> Last updated: 2026-06-30 (resolvedArtist added to track metadata payload)
 > Status: Web bridge complete. Native apps load Astro (`reach-radio-web.pages.dev`) — switching to `reach.radio` requires an app store update.
 
 ---
@@ -51,7 +51,8 @@ Every message is a JSON object with `"protocolVersion": 1` plus any of these fie
 | `isMuted` | boolean | Mute state change | Mute/unmute AVPlayer / ExoPlayer |
 | `volume` | number (0–100) | Volume change | Set AVPlayer/ExoPlayer volume (divide by 100) |
 | `title` | string | Track metadata change | Lock screen / CarPlay title |
-| `artist` | string | Track metadata change | Lock screen / CarPlay artist |
+| `artist` | string | Track metadata change | Raw Radiojar artist string — use as fallback display name |
+| `resolvedArtist` | `string \| null` | Track metadata change | Canonical Sanity teacher name; `null` during music gaps or unmatched artist — use for CarPlay / Watch / lock screen when non-null |
 | `image` | string | Track metadata change | Lock screen / CarPlay artwork |
 | `offline` | boolean | Network change | Show/hide offline banner |
 | `sleepTimer` | `{ active, paused, remainingSeconds, endsAt }` | Timer start/pause/resume/cancel + structural state changes | Update native sleep timer HUD; `endsAt` is ISO 8601 string or `null`; sent on structural changes only, not per countdown tick |
@@ -61,9 +62,21 @@ Example message:
 {
   "protocolVersion": 1,
   "isPlaying": true,
-  "title": "Morning Devotional",
-  "artist": "Alistair Begg",
-  "image": "https://cdn.sanity.io/..."
+  "title": "Truth For Life",
+  "artist": "Truth For Life",
+  "resolvedArtist": "Alistair Begg",
+  "image": "https://cdn.sanity.io/images/.../teacher.jpg?w=420&fm=jpg"
+}
+```
+
+During a music gap:
+```json
+{
+  "protocolVersion": 1,
+  "title": "Reach Radio",
+  "artist": "Reach Radio",
+  "resolvedArtist": null,
+  "image": "https://cdn.sanity.io/images/.../fallback.jpg"
 }
 ```
 
@@ -140,17 +153,21 @@ Understanding this flow prevents a common bug (see Pitfalls):
 ```
 /api/stream-info-sse
   polls radiojar JSONP every 30s
+  resolves raw artist → canonical Sanity teacher name + photo
   ↓
 useNowPlaying hook  ← runs in ALL contexts, including native WebView
-  resolves artist name → teacher photo from /api/teachers-list
+  artist = raw Radiojar string (unchanged)
+  resolvedArtist = canonical teacher name | null (null = music gap or no match)
+  image = Sanity teacher photo URL
   ↓
-Zustand media store  (title, artist, image)
+Zustand media store  (title, artist, resolvedArtist, image)
   ↓
 BridgeInit useEffect  ← watches store, fires on every change
   ↓
-postMessageToNative({ title, artist, image })
+postMessageToNative({ title, artist, resolvedArtist, image })
   ↓
-native: lock screen · CarPlay · media bar
+native: lock screen · CarPlay · Watch · media bar
+  use resolvedArtist when non-null; fall back to artist
 ```
 
 `BridgeInit` is a **pure store relay** — it does not fetch metadata independently. The SSE must run to populate the store.
@@ -221,7 +238,7 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 - `isPlaying` → AudioStreamingManager play/stop
 - `isMuted` → mute/unmute AVPlayer
 - `volume` → set AVPlayer volume (0–100 → 0.0–1.0)
-- `title`, `artist`, `image` → NowPlayingInfoCenter (lock screen / CarPlay)
+- `title`, `artist`, `resolvedArtist`, `image` → NowPlayingInfoCenter (lock screen / CarPlay / Watch); use `resolvedArtist` when non-null, fall back to `artist`
 - `location` → active tab highlight
 - `showMediaBar` / `showMobileNav` → native chrome visibility
 
@@ -258,7 +275,7 @@ iOS WKWebView: messages go to `messageHandlers.messageHandler` — the handler n
 - `isPlaying` → audio play/pause (with `ignoreWebViewPlayState` race guard)
 - `isMuted` → mute/unmute ExoPlayer
 - `volume` → set ExoPlayer volume (0–100 → 0.0–1.0)
-- `title`, `artist`, `image` → media bar + notification metadata
+- `title`, `artist`, `resolvedArtist`, `image` → media bar + notification metadata; use `resolvedArtist` when non-null, fall back to `artist`
 - `location` → active tab highlight
 - `showMediaBar` / `showMobileNav` → native chrome visibility
 - `offline` → received but currently ignored
@@ -524,7 +541,7 @@ Test in debug mode. Android: `chrome://inspect`. iOS: Safari DevTools (already i
 | 16 | `forms.ministryforms.net` stays in WebView | Both | Allowlist passes it |
 | 17 | `login.ministryid.com` stays in WebView | Both | Allowlist passes it |
 | 18 | iOS audio stream plays | iOS | AVPlayer hits audio-stream proxy |
-| 19 | iOS lock screen / CarPlay metadata | iOS | `title`, `artist`, `image` → NowPlayingInfoCenter |
+| 19 | iOS lock screen / CarPlay metadata | iOS | `title`, `resolvedArtist` (or `artist` fallback), `image` → NowPlayingInfoCenter |
 | 20 | Android notification + play/pause | Android | Media notification reflects state |
 | 21 | `isMobileApp=true` → web chrome hidden | Both | Server layout check via header + cookie |
 | 22 | Regular browser — web chrome visible | Web | No bridge objects → BridgeInit clears stale cookie |
