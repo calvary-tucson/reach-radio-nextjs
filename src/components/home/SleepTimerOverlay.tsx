@@ -55,6 +55,8 @@ export function SleepTimerOverlay() {
     >
       <p
         className="text-white text-4xl font-mono"
+        aria-live="polite"
+        aria-atomic="true"
         aria-label={`${minutes} minute${minutes !== 1 ? 's' : ''} ${secs} seconds remaining`}
       >
         {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}

@@ -1,28 +1,33 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
 import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useTogglePlay } from '@/lib/hooks/use-toggle-play'
 import { PlayPauseButton } from '@/components/media-bar/PlayPauseButton'
 import { VolumeControl } from './VolumeControl'
 import { SleepTimerButton } from './SleepTimerButton'
 import { SleepTimerOverlay } from './SleepTimerOverlay'
 
 export function RadioPlayer() {
-  const { image, title, artist, isPlaying, setIsPlaying, setIsBuffering } = useMediaStore(
+  const { image, title, artist, isPlaying } = useMediaStore(
     useShallow((s) => ({
       image: s.image,
       title: s.title,
       artist: s.artist,
       isPlaying: s.isPlaying,
-      setIsPlaying: s.setIsPlaying,
-      setIsBuffering: s.setIsBuffering,
     }))
   )
   const containerRef = useRef<HTMLDivElement>(null)
+  const togglePlay = useTogglePlay()
+  const [imgSrc, setImgSrc] = useState(image || FALLBACK_OG_IMAGE)
+
+  useEffect(() => {
+    setImgSrc(image || FALLBACK_OG_IMAGE)
+  }, [image])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -45,18 +50,17 @@ export function RadioPlayer() {
     }
   }, [])
 
-  const togglePlay = useCallback(() => {
-    const next = !isPlaying
-    setIsPlaying(next)
-    if (next) setIsBuffering(true)
-    postMessageToNative({ isPlaying: next })
-  }, [isPlaying, setIsPlaying, setIsBuffering])
+  // Dual-request blur pattern: w=48 for the blurred backdrop, w=420 for the sharp image.
+  // Intentional — the low-res request is ~50× smaller and handles the FALLBACK_OG_IMAGE case
+  // (no w= param) safely: the regex is a no-op when the param is absent.
+  const blurSrc = imgSrc.replace(/([?&])w=\d+/, '$1w=48')
 
   return (
     <div ref={containerRef} role="region" aria-label="Radio player" className="p-2 pb-5 md:p-5 bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px]">
       <div className="relative flex items-center justify-center w-full">
         <SleepTimerOverlay />
         <button
+          type="button"
           onClick={togglePlay}
           aria-label={isPlaying ? 'Pause radio' : 'Play radio'}
           className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-xl cursor-pointer w-full max-w-[420px]"
@@ -66,18 +70,21 @@ export function RadioPlayer() {
               aria-hidden="true"
               className="absolute inset-0 scale-110 blur-md"
               style={{
-                backgroundImage: `url(${(image || FALLBACK_OG_IMAGE).replace('w=420', 'w=48')})`,
+                backgroundImage: `url(${blurSrc})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
             />
             <Image
-              src={image || FALLBACK_OG_IMAGE}
+              src={imgSrc}
               alt=""
               fill
               sizes="(max-width: 640px) 100vw, 420px"
               className="object-contain z-10 hover:opacity-90 motion-safe:transition-opacity"
               priority
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+              onError={() => setImgSrc(FALLBACK_OG_IMAGE)}
             />
           </div>
         </button>

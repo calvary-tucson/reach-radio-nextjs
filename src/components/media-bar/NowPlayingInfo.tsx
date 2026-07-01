@@ -16,7 +16,7 @@ export function NowPlayingInfo() {
         <div
           aria-hidden="true"
           className="absolute inset-0 scale-110 blur-md"
-          style={{ backgroundImage: `url(${image.replace('w=420', 'w=48')})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+          style={{ backgroundImage: `url(${image.replace(/([?&])w=\d+/, '$1w=48')})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
         />
         {/* Sharp image centered, object-contain so faces are never cropped.
             `fill` injects position:absolute — `relative` would be redundant, omit it. */}

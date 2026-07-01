@@ -3,28 +3,20 @@
 import { Pause, Play } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
-import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useTogglePlay } from '@/lib/hooks/use-toggle-play'
 
 interface PlayPauseButtonProps {
   size?: 'sm' | 'lg'
 }
 
 export function PlayPauseButton({ size = 'sm' }: PlayPauseButtonProps) {
-  const { isPlaying, isBuffering, setIsPlaying, setIsBuffering } = useMediaStore(
+  const { isPlaying, isBuffering } = useMediaStore(
     useShallow((s) => ({
       isPlaying: s.isPlaying,
       isBuffering: s.isBuffering,
-      setIsPlaying: s.setIsPlaying,
-      setIsBuffering: s.setIsBuffering,
     }))
   )
-
-  function toggle() {
-    const next = !isPlaying
-    setIsPlaying(next)
-    if (next) setIsBuffering(true)
-    postMessageToNative({ isPlaying: next })
-  }
+  const toggle = useTogglePlay()
 
   const btnSize = size === 'lg' ? 'md:w-16 md:h-16 w-14 h-14' : 'w-11 h-11'
   const iconSize = size === 'lg' ? 28 : 20
