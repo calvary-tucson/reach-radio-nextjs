@@ -40,4 +40,61 @@ describe('submitContact Server Action', () => {
     expect(result.success).toBe(false)
     expect(result.error).toContain('verification')
   })
+
+  it('silently succeeds when honeypot field is filled', async () => {
+    const { submitContact } = await import('@/actions/contact')
+    const formData = new FormData()
+    formData.set('name', 'Bot')
+    formData.set('email', 'bot@example.com')
+    formData.set('message', 'This is spam with more than ten characters')
+    formData.set('gdprConsent', 'on')
+    formData.set('website', 'http://spam.com') // honeypot filled
+    formData.set('timestamp', String(Date.now() - 10_000))
+    formData.set('recaptchaToken', 'valid-token')
+    const result = await submitContact({ success: false }, formData)
+    expect(result.success).toBe(true) // silent success to confuse bots
+  })
+
+  it('blocks submission with more than 3 links', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, score: 0.9 }),
+    }))
+    const { submitContact } = await import('@/actions/contact')
+    const formData = new FormData()
+    formData.set('name', 'Alice')
+    formData.set('email', 'alice@gmail.com')
+    formData.set('message', 'Check http://a.com http://b.com http://c.com http://d.com for deals!')
+    formData.set('gdprConsent', 'on')
+    formData.set('timestamp', String(Date.now() - 10_000))
+    formData.set('recaptchaToken', 'valid-token')
+    const result = await submitContact({ success: false }, formData)
+    expect(result.success).toBe(false)
+    expect(result.error).toMatch(/submission|processed|try again/i)
+  })
+
+  it('returns error when rate limit exceeded', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, score: 0.9 }),
+    }))
+    const { submitContact } = await import('@/actions/contact')
+    const makeSubmission = async () => {
+      const formData = new FormData()
+      formData.set('name', 'Alice')
+      formData.set('email', 'alice@gmail.com')
+      formData.set('message', 'Hello from Reach Radio fan, this is a nice message!')
+      formData.set('gdprConsent', 'on')
+      formData.set('timestamp', String(Date.now() - 10_000))
+      formData.set('recaptchaToken', 'valid-token')
+      return submitContact({ success: false }, formData)
+    }
+    // First 3 succeed (or hit Formspree mock); 4th is rate-limited
+    await makeSubmission()
+    await makeSubmission()
+    await makeSubmission()
+    const result = await makeSubmission()
+    expect(result.success).toBe(false)
+    expect(result.error).toMatch(/too many|try again/i)
+  })
 })
