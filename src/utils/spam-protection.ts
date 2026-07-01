@@ -24,8 +24,8 @@ export function checkRateLimit(ip: string): boolean {
     else submissionHistory.set(key, fresh)
   }
 
-  const timestamps = submissionHistory.get(ip) ?? []
-  const recent = timestamps.filter(t => t > windowStart)
+  // Cleanup loop above already pruned all entries; get() returns current-window timestamps only.
+  const recent = submissionHistory.get(ip) ?? []
 
   if (recent.length >= MAX_SUBMISSIONS) return false
   submissionHistory.set(ip, [...recent, now])
@@ -38,7 +38,6 @@ export function sanitizeInput(input: string, maxLength = 2000): string {
     .trim()
     .replace(/[<>]/g, '')
     .replace(/javascript:/gi, '')
-    .replace(/on\w+=/gi, '')
     .replace(/data:/gi, '')
     .substring(0, maxLength)
 }

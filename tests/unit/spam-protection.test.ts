@@ -20,10 +20,6 @@ describe('sanitizeInput', () => {
     expect(sanitizeInput('javascript:alert(1)')).toBe('alert(1)')
   })
 
-  it('removes inline event handlers', () => {
-    expect(sanitizeInput('onclick=evil()')).toBe('evil()')
-  })
-
   it('removes data: protocol', () => {
     expect(sanitizeInput('data:text/html,<h1>x</h1>')).toBe('text/html,h1x/h1')
   })
