@@ -97,4 +97,20 @@ describe('submitContact Server Action', () => {
     expect(result.success).toBe(false)
     expect(result.error).toMatch(/too many|try again/i)
   })
+
+  it('skips reCAPTCHA when key is unset in non-production', async () => {
+    delete process.env.RECAPTCHA_SECRET_KEY
+    const { submitContact } = await import('@/actions/contact')
+    const formData = new FormData()
+    formData.set('name', 'Alice')
+    formData.set('email', 'alice@gmail.com')
+    formData.set('message', 'Hello from Reach Radio fan, this is a nice message!')
+    formData.set('gdprConsent', 'on')
+    formData.set('timestamp', String(Date.now() - 10_000))
+    formData.set('dryRun', '1')
+    const result = await submitContact({ success: false }, formData)
+    // If reCAPTCHA were NOT skipped, it would return error 'reCAPTCHA verification required.'
+    // because no recaptchaToken is set. success=true proves the skip path fired.
+    expect(result.success).toBe(true)
+  })
 })
