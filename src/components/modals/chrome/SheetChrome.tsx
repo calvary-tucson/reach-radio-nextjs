@@ -9,6 +9,42 @@ import { DragHandle } from '@/components/global/DragHandle'
 import { ENTER_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { cn } from '@/lib/utils'
 
+// Dev-only defense in depth: React StrictMode's mount/cleanup/remount
+// double-invoke races Radix FocusScope's cleanup, which can restore focus to
+// whatever was focused before the sheet opened (the trigger element). Radix's
+// own FocusScope has focus-trap-restore logic for exactly this, but it never
+// captures our input as lastFocusedElementRef: its 'focusin' listener (a
+// parent effect) attaches AFTER our synchronous focus call (a child effect
+// fires first), so it misses the one event it needed to record.
+// (Our own RouteAnnouncer component used to be a second, production-hitting
+// focus thief here -- fixed at the source in
+// src/components/bridge/RouteAnnouncer.tsx instead of reacting to it, since
+// reclaiming focus after an iOS blur can't reopen the soft keyboard even
+// when it successfully restores document.activeElement.)
+function guardFocus(input: HTMLElement, container: HTMLElement | null) {
+  function onFocusIn() {
+    const active = document.activeElement
+    if (active === input) return
+    if (!container || !container.contains(active)) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[modal-debug][v2-routeannouncer-guard] guardFocus reclaiming', {
+          stolenByTag: active?.tagName,
+          stolenById: (active as HTMLElement | null)?.id,
+        })
+      }
+      input.focus()
+    }
+  }
+  document.addEventListener('focusin', onFocusIn)
+  const stopTimer = setTimeout(() => {
+    document.removeEventListener('focusin', onFocusIn)
+  }, 3000)
+  return () => {
+    document.removeEventListener('focusin', onFocusIn)
+    clearTimeout(stopTimer)
+  }
+}
+
 interface SheetChromeProps {
   children: React.ReactNode
   title?: string
@@ -51,6 +87,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
 
     let observer: MutationObserver | null = null
     let fallbackTimer: ReturnType<typeof setTimeout> | undefined
+    let unguard: (() => void) | undefined
 
     function tryFocus() {
       const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
@@ -58,6 +95,10 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
         observer?.disconnect()
         clearTimeout(fallbackTimer)
         input.focus()
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[modal-debug][v2-routeannouncer-guard] tryFocus (MutationObserver) focused input')
+        }
+        unguard = guardFocus(input, contentRef.current)
       }
     }
 
@@ -65,6 +106,10 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
     if (immediate) {
       immediate.focus()
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[modal-debug][v2-routeannouncer-guard] immediate branch focused input')
+      }
+      unguard = guardFocus(immediate, contentRef.current)
     } else {
       // Watch for input to be inserted by a Suspense boundary resolving
       observer = new MutationObserver(tryFocus)
@@ -81,6 +126,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     return () => {
       observer?.disconnect()
       clearTimeout(fallbackTimer)
+      unguard?.()
     }
   }, [autoFocusInput])
 
@@ -89,6 +135,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   return (
     <div
       role="presentation"
+      data-sheet-wrapper
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center cursor-pointer"
       onClick={(e) => {
         if (justMountedRef.current) return
@@ -130,7 +177,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div data-sheet-scroll className="flex-1 overflow-y-auto">
           {padded ? <div className="p-6">{children}</div> : children}
         </div>
       </div>

@@ -8,6 +8,7 @@ import { ModalProvider } from '@/components/modals/ModalContext'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { DragHandle } from '@/components/global/DragHandle'
+import { SectionErrorBoundary } from '@/components/global/SectionErrorBoundary'
 import { TeacherSearchSheetContent } from '@/components/teachers/TeacherSearchSheetContent'
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { useShallow } from 'zustand/react/shallow'
@@ -97,9 +98,20 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   const dismissGuardRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
 
+  // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[modal-debug] render', { isOpen, rootSheet, stackDepth, expectingRoute, expectingBack })
+  }
+
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[modal-debug] ModalLayout mounted')
+    }
     return () => {
       if (dismissTimer.current) clearTimeout(dismissTimer.current)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[modal-debug] ModalLayout UNMOUNTED')
+      }
     }
   }, [])
 
@@ -191,7 +203,15 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
             stackDepth={stackDepth}
           >
             {rootSheet === 'search' && stackDepth === 0 ? (
-              <TeacherSearchSheetContent />
+              <SectionErrorBoundary
+                fallback={
+                  <div className="p-6 text-white/90">
+                    [modal-debug] TeacherSearchSheetContent threw — check console
+                  </div>
+                }
+              >
+                <TeacherSearchSheetContent />
+              </SectionErrorBoundary>
             ) : (
               <Suspense
                 fallback={
