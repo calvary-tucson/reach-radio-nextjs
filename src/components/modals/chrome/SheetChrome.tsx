@@ -85,7 +85,11 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     <div
       role="presentation"
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center cursor-pointer"
-      onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
+      onClick={(e) => {
+        const isBackdrop = e.target === e.currentTarget
+        console.log('[focus-debug] SheetChrome backdrop onClick fired, target:', (e.target as HTMLElement)?.tagName, 'isBackdrop:', isBackdrop, 'clientX/Y:', e.clientX, e.clientY)
+        if (isBackdrop) onDismiss()
+      }}
     >
       <div
         ref={contentRef}

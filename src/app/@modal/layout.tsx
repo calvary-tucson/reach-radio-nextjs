@@ -152,6 +152,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   // Pops all stacked history entries (depth + 1) in one go via window.history.go
   // so the user lands on the page they had before the modal was opened.
   const handleClose = useCallback(() => {
+    console.log('[focus-debug] handleClose entered, caller stack:', new Error().stack?.split('\n').slice(1, 5).join(' | '))
     if (dismissGuardRef.current) return
     dismissGuardRef.current = true
     startClosing()
@@ -191,6 +192,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
           className="fixed inset-0 z-[70] outline-none"
           onOpenAutoFocus={(e) => {
             console.log('[focus-debug] onOpenAutoFocus fired, activeElement before:', document.activeElement)
+            e.preventDefault()
           }}
           onCloseAutoFocus={(e) => {
             console.log('[focus-debug] onCloseAutoFocus fired')
