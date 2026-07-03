@@ -283,6 +283,24 @@ onCloseAutoFocus fired
 
 **Status: awaiting a 4th device trace to confirm both fixes (2.A + the backdrop guard) together resolve the bug fully** — keyboard shows and stays, sheet stays open. Debug logging is still in place (removal is a Phase 4 cleanup task) so a recurrence would still be caught.
 
+## Superseded: Phase 3 executed, differently than originally drafted (2026-07-02)
+
+The 4th trace showed both 2.A and the backdrop guard working (sheet stayed open, no dismiss fingerprint), but revealed the deeper issue directly: even with focus handoff succeeding at the DOM level (`match: true` in the logs), the keyboard still didn't reliably show, and was confirmed **tap-position-dependent** — taps landing above/below the old proxy `<input>`'s own (shorter than the 44px bar) box missed it entirely and hit the wrapping `<a>`, which had no navigate handler.
+
+This, plus direct user pushback on the two-input design ("the first input on the teachers page is meaningless because we won't be using it"), led to implementing the architectural pivot — but a corrected version of the one flagged as broken above, not the original draft:
+
+- Added `rootSheet: 'search' | 'detail' | null` to the store (fixed for the stack's lifetime, untouched by `pushModal`/`prepareBack`) — solves the `TeacherModalLink` stacking break the earlier review caught.
+- `ModalLayout` renders `TeacherSearchSheetContent` directly (bypassing `{children}`/Suspense) when `rootSheet === 'search' && stackDepth === 0` — same single Dialog host, same backdrop/animation/escape-key/dismiss-guard/focus-restore machinery every sheet gets, no second parallel Dialog system. Solves the missing-backdrop/animation blockers.
+- `TeacherSearchSheetContent` fetches results client-side via a new `GET /api/teachers/search-data` route, so nothing blocks the input's own mount.
+- `PassiveSearchBar` no longer renders a second, throwaway `<input>`. It's a plain `<button>` that calls `flushSync(() => openSearchSheet(title))` — forcing React to synchronously commit the real search input into the DOM before the tap handler returns — then focuses that real input directly, still inside the trusted `pointerdown` gesture. `router.push` after is URL/history sync only, no longer gating the input's existence.
+- `q=`/`days=` URL params, deep-linking to `/teachers/search?...`, and detail-sheet stacking (search → teacher detail → back → search) are all unaffected — confirmed by design: `TeacherSearchBar`'s existing `router.replace`-based param syncing doesn't change, the standalone fallback page for hard navigation doesn't change, and `TeacherModalLink`'s `isOpen`-based stacking logic doesn't change.
+- Neutered `@modal/(...)teachers/search/page.tsx` to `return null` (still exists for Next's URL bookkeeping; the overlay owns rendering).
+- Removed all `[focus-debug]` logging.
+
+Typecheck clean, lint clean (no new errors — verified pre-existing warnings are unchanged from `HEAD`), full test suite: 312 passing, same 2 pre-existing unrelated failures as before (`contact-sheet.test.tsx`, `contact-form-on-success.test.tsx`).
+
+**Awaiting device confirmation of this final version** — keyboard shows and stays, sheet stays open regardless of tap position, search → detail → back stacking still works, URL params still work.
+
 ### Task 2.A: Prevent Radix's default open-auto-focus from stealing focus
 
 **Files:**
