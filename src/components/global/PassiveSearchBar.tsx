@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { flushSync } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useModalStore } from '@/lib/stores/modal'
 import { useNavigationStore } from '@/lib/stores/navigation-store'
@@ -21,44 +22,43 @@ export function PassiveSearchBar({
   modalTitle,
   className,
 }: PassiveSearchBarProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
-  const openModal = useModalStore((s) => s.openModal)
   const setTriggerRef = useModalStore((s) => s.setTriggerRef)
   const resetNav = useNavigationStore((s) => s.reset)
 
-  // Prefetch the search-sheet route so its RSC payload is cached before tap —
-  // without this, tapping incurs a network round-trip before the real input
-  // mounts, well outside iOS's synchronous-focus window for showing the keyboard.
+  // Prefetch for a snappier router.push -- no longer load-bearing for focus
+  // (see open() below), but avoids an avoidable network wait before the URL
+  // updates.
   useEffect(() => {
     router.prefetch(href)
   }, [router, href])
 
-  // Navigating on the anchor's own click (bubbled from the input) is unreliable on iOS:
-  // focusing the input from pointerdown to open the keyboard can suppress the
-  // follow-up click entirely. Navigate imperatively from the same pointerdown instead.
-  function navigate() {
-    inputRef.current?.focus()
-    console.log('[focus-debug] proxy focus() called, activeElement:', document.activeElement, 'is proxy:', document.activeElement === inputRef.current)
-    setTriggerRef(inputRef.current)
+  // There is exactly one real search input: the one inside the sheet
+  // (TeacherSearchBar, marked with data-search-input). This button doesn't
+  // proxy a second, throwaway input -- it mounts the sheet SYNCHRONOUSLY via
+  // flushSync (forcing React to commit before this handler returns), then
+  // focuses that real input directly, still inside this trusted pointerdown
+  // gesture, which is what lets iOS show the keyboard. router.push after is
+  // URL/history sync only (shareable link, back button) -- it doesn't gate
+  // the sheet's existence or focus.
+  function open() {
     resetNav()
-    const store = useModalStore.getState()
-    if (store.isOpen) {
-      store.pushModal(modalTitle ?? placeholder)
-    } else {
-      openModal(modalTitle ?? placeholder)
-    }
-    console.log('[focus-debug] calling router.push', href)
+    flushSync(() => {
+      useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
+    })
+    const realInput = document.querySelector<HTMLInputElement>('[data-search-input]')
+    realInput?.focus()
+    setTriggerRef(realInput)
     router.push(href)
   }
 
   return (
-    <a
-      href={href}
-      tabIndex={-1}
-      onClick={(e) => e.preventDefault()}
+    <button
+      type="button"
+      onPointerDown={open}
+      aria-label={ariaLabel ?? placeholder}
       className={cn(
-        'flex min-h-[44px] w-full items-center gap-3 rounded-xl border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-3 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 cursor-pointer',
+        'flex min-h-[44px] w-full items-center gap-3 rounded-xl border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-3 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
         className
       )}
     >
@@ -78,22 +78,7 @@ export function PassiveSearchBar({
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.35-4.35" />
       </svg>
-      {/*
-        Real input, not decorative text: focusing it on pointerdown (inside the
-        gesture that also navigates) is what lets iOS open the keyboard here and
-        keep it open when SheetChrome hands focus to the real search input once
-        the sheet mounts. A readOnly or non-input proxy won't trigger the keyboard.
-      */}
-      <input
-        ref={inputRef}
-        type="search"
-        inputMode="search"
-        placeholder={placeholder}
-        aria-label={ariaLabel ?? placeholder}
-        onPointerDown={navigate}
-        onChange={(e) => { e.target.value = '' }}
-        className="flex-1 min-w-0 bg-transparent text-white/40 light:text-gray-500 placeholder:text-white/40 light:placeholder:text-gray-500 outline-none cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-ring"
-      />
-    </a>
+      <span className="text-white/40 light:text-gray-500">{placeholder}</span>
+    </button>
   )
 }

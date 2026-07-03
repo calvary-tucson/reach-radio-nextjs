@@ -2,12 +2,11 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PassiveSearchBar } from '@/components/global/PassiveSearchBar'
 
-const { pushMock, prefetchMock, openModalMock, setTriggerRefMock, pushModalMock, resetMock } = vi.hoisted(() => ({
+const { pushMock, prefetchMock, openSearchSheetMock, setTriggerRefMock, resetMock } = vi.hoisted(() => ({
   pushMock: vi.fn(),
   prefetchMock: vi.fn(),
-  openModalMock: vi.fn(),
+  openSearchSheetMock: vi.fn(),
   setTriggerRefMock: vi.fn(),
-  pushModalMock: vi.fn(),
   resetMock: vi.fn(),
 }))
 
@@ -17,10 +16,8 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/stores/modal', () => {
   const state = {
-    isOpen: false,
-    openModal: openModalMock,
     setTriggerRef: setTriggerRefMock,
-    pushModal: pushModalMock,
+    openSearchSheet: openSearchSheetMock,
   }
   function useModalStore(selector: (s: typeof state) => unknown) {
     return selector(state)
@@ -37,33 +34,28 @@ vi.mock('@/lib/stores/navigation-store', () => ({
 describe('PassiveSearchBar', () => {
   it('renders placeholder text', () => {
     render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." />)
-    expect(screen.getByPlaceholderText('Search teachers...')).toBeInTheDocument()
+    expect(screen.getByText('Search teachers...')).toBeInTheDocument()
   })
 
-  it('renders a real input so iOS can show the keyboard on pointerdown', () => {
+  it('renders a real button (not a fake link) so there is no throwaway proxy input', () => {
     render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." />)
-    const input = screen.getByRole('searchbox')
-    expect(input.tagName).toBe('INPUT')
+    const button = screen.getByRole('button', { name: 'Search teachers...' })
+    expect(button.tagName).toBe('BUTTON')
   })
 
-  it('renders a link pointing to the provided href', () => {
+  it('button has cursor-pointer class', () => {
     render(<PassiveSearchBar href="/teachers/search" />)
-    expect(screen.getByRole('link', { hidden: true })).toHaveAttribute('href', '/teachers/search')
+    expect(screen.getByRole('button').className).toContain('cursor-pointer')
   })
 
-  it('link has cursor-pointer class', () => {
-    render(<PassiveSearchBar href="/teachers/search" />)
-    expect(screen.getByRole('link', { hidden: true }).className).toContain('cursor-pointer')
-  })
-
-  it('navigates imperatively on pointerdown instead of relying on click bubbling', () => {
-    render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." />)
-    fireEvent.pointerDown(screen.getByRole('searchbox'))
+  it('opens the search sheet synchronously and syncs the URL on pointerdown', () => {
+    render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." modalTitle="Search Teachers" />)
+    fireEvent.pointerDown(screen.getByRole('button'))
+    expect(openSearchSheetMock).toHaveBeenCalledWith('Search Teachers')
     expect(pushMock).toHaveBeenCalledWith('/teachers/search')
-    expect(openModalMock).toHaveBeenCalled()
   })
 
-  it('prefetches the href on mount so the sheet route is cached before tap', () => {
+  it('prefetches the href on mount so router.push resolves fast', () => {
     render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." />)
     expect(prefetchMock).toHaveBeenCalledWith('/teachers/search')
   })

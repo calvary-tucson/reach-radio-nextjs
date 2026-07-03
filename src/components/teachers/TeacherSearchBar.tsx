@@ -53,6 +53,7 @@ export function TeacherSearchBar() {
         />
         <input
           ref={inputRef}
+          data-search-input
           type="search"
           placeholder="Search teachers..."
           value={displayValue}
