@@ -37,25 +37,98 @@ export function PassiveSearchBar({
   // (TeacherSearchBar, marked with data-search-input). This button doesn't
   // proxy a second, throwaway input -- it mounts the sheet SYNCHRONOUSLY via
   // flushSync (forcing React to commit before this handler returns), then
-  // focuses that real input directly, still inside this trusted pointerdown
+  // focuses that real input directly, still inside this trusted click
   // gesture, which is what lets iOS show the keyboard. router.push after is
   // URL/history sync only (shareable link, back button) -- it doesn't gate
   // the sheet's existence or focus.
+  //
+  // Uses onClick, not onPointerDown/onTouchStart: those fire the instant a
+  // finger touches the button, before the browser knows whether it's a tap
+  // or the start of a scroll/swipe -- so swiping past this button (e.g.
+  // scrolling the teachers page) would open the sheet. click only fires
+  // after a touch ends without an intervening scroll, which is exactly the
+  // tap-vs-swipe distinction we want, and it's still a trusted gesture that
+  // can synchronously open the iOS keyboard.
   function open() {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[modal-debug][v2-routeannouncer-guard] PassiveSearchBar.open() called')
+    }
     resetNav()
-    flushSync(() => {
-      useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
-    })
+    try {
+      flushSync(() => {
+        useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
+      })
+    } catch (err) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[modal-debug] flushSync(openSearchSheet) threw', err)
+      }
+      throw err
+    }
     const realInput = document.querySelector<HTMLInputElement>('[data-search-input]')
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[modal-debug] post-flushSync focus attempt', { found: !!realInput })
+    }
     realInput?.focus()
     setTriggerRef(realInput)
-    router.push(href)
+    // scroll: false suppresses Next's default post-navigation scroll (and,
+    // on older layout-router internals, a domNode.focus() on the newly
+    // rendered segment) -- not needed for the search-sheet focus bug itself
+    // (that was our own RouteAnnouncer stealing focus, fixed at its source
+    // in src/components/bridge/RouteAnnouncer.tsx), but still correct: we
+    // don't want any of Next's default scroll/focus management for this
+    // soft, modal-driven navigation.
+    router.push(href, { scroll: false })
+
+    // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
+    // Checking activeElement over a few ticks to see if something (e.g. Radix
+    // FocusScope's StrictMode-cleanup setTimeout) steals focus back off the
+    // input shortly after this synchronous gesture handler returns.
+    if (process.env.NODE_ENV !== 'production') {
+      const describe = () => {
+        const el = document.activeElement
+        return {
+          tag: el?.tagName,
+          isRealInput: el === realInput,
+          id: el?.id || undefined,
+          windowScrollY: window.scrollY,
+          bodyPosition: document.body.style.position,
+          htmlPosition: document.documentElement.style.position,
+        }
+      }
+      console.log('[modal-debug] activeElement sync', describe())
+      requestAnimationFrame(() => console.log('[modal-debug] activeElement +rAF', describe()))
+      setTimeout(() => console.log('[modal-debug] activeElement +0ms', describe()), 0)
+      setTimeout(() => console.log('[modal-debug] activeElement +50ms', describe()), 50)
+      setTimeout(() => console.log('[modal-debug] activeElement +300ms', describe()), 300)
+
+      // Ground-truth rects: which box is actually the wrong size when the
+      // keyboard is open, rather than trusting computed style values.
+      // Log plain numbers, not DOMRect objects -- Safari's console prints a
+      // bare "DOMRect" placeholder with no values when the log is copied as
+      // text, so the actual numbers never survive a paste.
+      const flattenRect = (el: Element | null) => {
+        if (!el) return null
+        const r = el.getBoundingClientRect()
+        return { top: r.top, bottom: r.bottom, height: r.height, left: r.left, width: r.width }
+      }
+      setTimeout(() => {
+        console.log('[modal-debug][v2-routeannouncer-guard] rendered rects +500ms', {
+          wrapperRect: flattenRect(document.querySelector('[data-sheet-wrapper]')),
+          dialogRect: flattenRect(document.querySelector('[role="dialog"]')),
+          scrollBoxRect: flattenRect(document.querySelector('[data-sheet-scroll]')),
+          docScrollTop: document.documentElement.scrollTop,
+          vvHeight: window.visualViewport?.height,
+          vvOffsetTop: window.visualViewport?.offsetTop,
+          innerHeight: window.innerHeight,
+        })
+      }, 500)
+    }
   }
 
   return (
     <button
       type="button"
-      onPointerDown={open}
+      onClick={open}
       aria-label={ariaLabel ?? placeholder}
       className={cn(
         'flex min-h-[44px] w-full items-center gap-3 rounded-xl border border-white/10 light:border-gray-300 bg-white/5 light:bg-gray-50 px-4 py-3 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',

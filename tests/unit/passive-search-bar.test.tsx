@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PassiveSearchBar } from '@/components/global/PassiveSearchBar'
 
@@ -32,6 +32,10 @@ vi.mock('@/lib/stores/navigation-store', () => ({
 }))
 
 describe('PassiveSearchBar', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('renders placeholder text', () => {
     render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." />)
     expect(screen.getByText('Search teachers...')).toBeInTheDocument()
@@ -48,11 +52,18 @@ describe('PassiveSearchBar', () => {
     expect(screen.getByRole('button').className).toContain('cursor-pointer')
   })
 
-  it('opens the search sheet synchronously and syncs the URL on pointerdown', () => {
+  it('opens the search sheet synchronously and syncs the URL on click', () => {
+    render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." modalTitle="Search Teachers" />)
+    fireEvent.click(screen.getByRole('button'))
+    expect(openSearchSheetMock).toHaveBeenCalledWith('Search Teachers')
+    expect(pushMock).toHaveBeenCalledWith('/teachers/search', { scroll: false })
+  })
+
+  it('does not open the search sheet on pointerdown alone (avoids opening on swipe/scroll)', () => {
     render(<PassiveSearchBar href="/teachers/search" placeholder="Search teachers..." modalTitle="Search Teachers" />)
     fireEvent.pointerDown(screen.getByRole('button'))
-    expect(openSearchSheetMock).toHaveBeenCalledWith('Search Teachers')
-    expect(pushMock).toHaveBeenCalledWith('/teachers/search')
+    expect(openSearchSheetMock).not.toHaveBeenCalled()
+    expect(pushMock).not.toHaveBeenCalled()
   })
 
   it('prefetches the href on mount so router.push resolves fast', () => {
