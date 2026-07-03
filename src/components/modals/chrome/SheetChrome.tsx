@@ -47,15 +47,20 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
       if (input) {
         observer?.disconnect()
         clearTimeout(fallbackTimer)
+        console.log('[focus-debug] SheetChrome found input via MutationObserver, activeElement before focus:', document.activeElement)
         input.focus()
+        console.log('[focus-debug] SheetChrome called input.focus(), activeElement after:', document.activeElement, 'match:', document.activeElement === input)
       }
     }
 
     // Input may already be in the DOM (e.g., no Suspense delay)
     const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
     if (immediate) {
+      console.log('[focus-debug] SheetChrome found input immediately (no Suspense gap), activeElement before focus:', document.activeElement)
       immediate.focus()
+      console.log('[focus-debug] SheetChrome called immediate.focus(), activeElement after:', document.activeElement, 'match:', document.activeElement === immediate)
     } else {
+      console.log('[focus-debug] SheetChrome: no input in DOM yet, starting MutationObserver')
       // Watch for input to be inserted by a Suspense boundary resolving
       observer = new MutationObserver(tryFocus)
       if (contentRef.current) {
