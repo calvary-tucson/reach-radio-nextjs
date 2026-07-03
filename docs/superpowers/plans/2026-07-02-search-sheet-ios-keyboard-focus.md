@@ -264,6 +264,25 @@ Confirmed **Task 2.A**: the trace showed `activeElement` was the proxy input at 
 
 **Next device retest:** do one hard reload first (a `[Fast Refresh] rebuilding` line appeared mid-trace last time — HMR noise mid-tap complicates timing reads), then tap once, capture the full trace again.
 
+### Task 1.1 result (2026-07-02, second and third device traces)
+
+Second trace: with Task 2.A applied, `activeElement` before `SheetChrome`'s focus call was correctly the proxy input (not the dialog div) — Radix no longer steals focus, confirming Task 2.A's fix works as intended. That trace showed no dismiss signal at all, but the user still saw the sheet/keyboard flash-and-disappear on other attempts — so Task 2.A alone wasn't sufficient. Ruled out a hard-reload/tunnel fallback (Network tab showed a normal `?_rsc=` fetch, not a full document navigation) and the native-app bridge (repro is in Safari directly on `dev.calvarytucson.com`, not the WebView).
+
+Third trace, from a tap that reproduced the failure, ended with:
+```
+SheetChrome backdrop onClick fired, target: DIV, isBackdrop: true, clientX/Y: 162, 151
+handleClose entered, caller stack: SheetChrome[<div>.onClick]@...
+justOpenedRef window closed (500ms elapsed)
+pathname effect fired {pathname: "/teachers", isOpen: false, ...}
+onCloseAutoFocus fired
+```
+
+**4th hypothesis confirmed as the real root cause:** `SheetChrome.tsx`'s own backdrop `onClick` (`role="presentation"` div, not any Radix mechanism) fires with `isBackdrop: true` and calls `onDismiss()` → `handleClose()`. Mechanism: iOS Safari's trailing synthetic click from the original tap gesture lands at the tap's original screen coordinates; during the sheet's entrance (slide-up) animation, those coordinates can still be showing the backdrop rather than the sheet's content, so `e.target === e.currentTarget` passes and the sheet dismisses itself immediately after opening.
+
+**Fixed and committed:** removed the now-confirmed-dead `justOpenedRef` guard from `@modal/layout.tsx` (two traces showed `onPointerDownOutside`/`onInteractOutside`/`onFocusOutside` never fire — that was never the actual mechanism). Added a `justMountedRef` guard directly in `SheetChrome.tsx`'s backdrop `onClick`, cleared after `ENTER_DURATION + 50ms` (new constant in `@/lib/constants/modal`, matching the mobile sheet-enter animation's actual 300ms length) — ignores backdrop dismissal until the entrance animation has finished. Applies to all `SheetChrome` consumers (search sheet, `ContactSheet`), not just this repro path.
+
+**Status: awaiting a 4th device trace to confirm both fixes (2.A + the backdrop guard) together resolve the bug fully** — keyboard shows and stays, sheet stays open. Debug logging is still in place (removal is a Phase 4 cleanup task) so a recurrence would still be caught.
+
 ### Task 2.A: Prevent Radix's default open-auto-focus from stealing focus
 
 **Files:**
