@@ -8,6 +8,7 @@ import { ModalProvider } from '@/components/modals/ModalContext'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { DragHandle } from '@/components/global/DragHandle'
+import { TeacherSearchSheetContent } from '@/components/teachers/TeacherSearchSheetContent'
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { useShallow } from 'zustand/react/shallow'
 import { useModalStore } from '@/lib/stores/modal'
@@ -71,6 +72,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
     isClosing,
     title,
     stackDepth,
+    rootSheet,
     close,
     startClosing,
     expectingRoute,
@@ -83,6 +85,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
       isClosing: s.isClosing,
       title: s.title,
       stackDepth: s.stackDepth,
+      rootSheet: s.rootSheet,
       close: s.close,
       startClosing: s.startClosing,
       expectingRoute: s.expectingRoute,
@@ -114,12 +117,10 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
 
   useEffect(() => {
-    console.log('[focus-debug] pathname effect fired', { pathname, isOpen, isClosing, expectingRoute, expectingBack })
     if (!isOpen) return
-    if (expectingRoute) { routeArrived(); console.log('[focus-debug] -> routeArrived()'); return }
-    if (expectingBack) { clearBack(); console.log('[focus-debug] -> clearBack()'); return }
+    if (expectingRoute) { routeArrived(); return }
+    if (expectingBack) { clearBack(); return }
     if (isOpen && !isClosing) {
-      console.log('[focus-debug] -> unexpected pathname change, force-closing')
       close()
       dismissGuardRef.current = false
     }
@@ -130,7 +131,6 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   // Pops all stacked history entries (depth + 1) in one go via window.history.go
   // so the user lands on the page they had before the modal was opened.
   const handleClose = useCallback(() => {
-    console.log('[focus-debug] handleClose entered, caller stack:', new Error().stack?.split('\n').slice(1, 5).join(' | '))
     if (dismissGuardRef.current) return
     dismissGuardRef.current = true
     startClosing()
@@ -168,22 +168,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         />
         <DialogPrimitive.Content
           className="fixed inset-0 z-[70] outline-none"
-          onOpenAutoFocus={(e) => {
-            console.log('[focus-debug] onOpenAutoFocus fired, activeElement before:', document.activeElement)
-            e.preventDefault()
-          }}
-          onCloseAutoFocus={(e) => {
-            console.log('[focus-debug] onCloseAutoFocus fired')
-          }}
-          onFocusOutside={(e) => {
-            console.log('[focus-debug] onFocusOutside fired, target:', (e.target as HTMLElement)?.tagName, e.target)
-          }}
-          onPointerDownOutside={(e) => {
-            console.log('[focus-debug] onPointerDownOutside fired, target:', (e.target as HTMLElement)?.tagName)
-          }}
-          onInteractOutside={(e) => {
-            console.log('[focus-debug] onInteractOutside fired, type:', e.type, 'target:', (e.target as HTMLElement)?.tagName)
-          }}
+          onOpenAutoFocus={(e) => { e.preventDefault() }}
           onEscapeKeyDown={(e) => {
             const active = document.activeElement as HTMLInputElement | null
             if (active?.tagName === 'INPUT' && active.value.length > 0) {
@@ -205,13 +190,17 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
             isClosing={isClosing}
             stackDepth={stackDepth}
           >
-            <Suspense
-              fallback={
-                <ModalSkeleton title={title} onDismiss={handleClose} isClosing={isClosing} />
-              }
-            >
-              {children}
-            </Suspense>
+            {rootSheet === 'search' && stackDepth === 0 ? (
+              <TeacherSearchSheetContent />
+            ) : (
+              <Suspense
+                fallback={
+                  <ModalSkeleton title={title} onDismiss={handleClose} isClosing={isClosing} />
+                }
+              >
+                {children}
+              </Suspense>
+            )}
           </ModalProvider>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
