@@ -8,7 +8,12 @@ interface ModalStore {
   title: string | null
   triggerRef: HTMLElement | null
   stackDepth: number
+  // What's rendered at stackDepth 0 -- fixed for the whole stack's lifetime
+  // (pushModal/prepareBack never touch it), so a detail sheet pushed on top
+  // of the search sheet still resolves back to the search sheet when popped.
+  rootSheet: 'search' | 'detail' | null
   openModal: (title?: string) => void
+  openSearchSheet: (title?: string) => void
   pushModal: (title?: string) => void
   setTriggerRef: (el: HTMLElement | null) => void
   routeArrived: () => void
@@ -26,6 +31,7 @@ export const useModalStore = create<ModalStore>((set) => ({
   title: null,
   triggerRef: null,
   stackDepth: 0,
+  rootSheet: null,
   openModal: (title) =>
     set({
       expectingRoute: true,
@@ -34,6 +40,17 @@ export const useModalStore = create<ModalStore>((set) => ({
       isClosing: false,
       title: title ?? null,
       stackDepth: 0,
+      rootSheet: 'detail',
+    }),
+  openSearchSheet: (title) =>
+    set({
+      expectingRoute: true,
+      expectingBack: false,
+      isOpen: true,
+      isClosing: false,
+      title: title ?? null,
+      stackDepth: 0,
+      rootSheet: 'search',
     }),
   pushModal: (title) =>
     set((state) => ({
@@ -63,5 +80,6 @@ export const useModalStore = create<ModalStore>((set) => ({
     title: null,
     triggerRef: null,
     stackDepth: 0,
+    rootSheet: null,
   }),
 }))
