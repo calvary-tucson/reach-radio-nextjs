@@ -21,11 +21,28 @@ interface SearchData {
 export function TeacherSearchSheetContent() {
   const [data, setData] = useState<SearchData | null>(null)
 
+  // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[modal-debug] TeacherSearchSheetContent mounted')
+    }
+    return () => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[modal-debug] TeacherSearchSheetContent UNMOUNTED')
+      }
+    }
+  }, [])
+
   useEffect(() => {
     let cancelled = false
     fetch('/api/teachers/search-data')
       .then((res) => res.json())
       .then((json: SearchData) => { if (!cancelled) setData(json) })
+      .catch((err) => {
+        if (!cancelled && process.env.NODE_ENV !== 'production') {
+          console.log('[modal-debug] search-data fetch failed', err)
+        }
+      })
     return () => { cancelled = true }
   }, [])
 
