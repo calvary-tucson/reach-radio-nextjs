@@ -6,7 +6,7 @@ import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { DragHandle } from '@/components/global/DragHandle'
-import { MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
+import { ENTER_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { cn } from '@/lib/utils'
 
 interface SheetChromeProps {
@@ -26,6 +26,16 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   const contentRef = useRef<HTMLDivElement>(null)
   const drag = useSheetDrag({ onDismiss, contentRef })
   const titleId = useId()
+  // iOS Safari fires a trailing synthetic click from the gesture that opened
+  // this sheet, at the original tap's screen coordinates -- which can still
+  // land on the backdrop while the enter animation hasn't yet covered that
+  // position. Ignore backdrop dismissal until the entrance animation finishes.
+  const justMountedRef = useRef(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => { justMountedRef.current = false }, ENTER_DURATION + 50)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Focus into panel on mount so VoiceOver enters dialog mode.
   // When autoFocusInput is true, focus the first input/textarea via MutationObserver
@@ -86,9 +96,8 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
       role="presentation"
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center cursor-pointer"
       onClick={(e) => {
-        const isBackdrop = e.target === e.currentTarget
-        console.log('[focus-debug] SheetChrome backdrop onClick fired, target:', (e.target as HTMLElement)?.tagName, 'isBackdrop:', isBackdrop, 'clientX/Y:', e.clientX, e.clientY)
-        if (isBackdrop) onDismiss()
+        if (justMountedRef.current) return
+        if (e.target === e.currentTarget) onDismiss()
       }}
     >
       <div
