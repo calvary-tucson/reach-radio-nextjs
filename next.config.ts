@@ -3,9 +3,9 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   reactCompiler: true,
   cacheComponents: true,
+  allowedDevOrigins: ['dev.calvarytucson.com'],
   experimental: {
     serverComponentsHmrCache: true,
-    viewTransition: true,
   },
   images: {
     remotePatterns: [
@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
+    const isDev = process.env.NODE_ENV !== 'production'
     return [
       {
         source: '/js/iFrameResizer.contentWindow.min.js',
@@ -38,7 +39,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com https://www.gstatic.com`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://cdn.sanity.io data: blob: https://www.google.com",
               "media-src 'self' https://*.radiojar.com https://reach.radio",
