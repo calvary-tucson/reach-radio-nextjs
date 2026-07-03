@@ -93,10 +93,34 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   )
   const dismissGuardRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
+  // iOS Safari fires a trailing synthetic mousedown/pointerdown after a touch
+  // sequence ends, targeting the element that opened the sheet (now outside
+  // the dialog). With the route prefetched, Content can mount fast enough for
+  // Radix's outside-dismiss listener to catch that stray event and close the
+  // sheet immediately after it opens. Ignore outside-interactions for a brief
+  // window right after opening to absorb it.
+  const justOpenedRef = useRef(false)
+  const justOpenedTimer = useRef<ReturnType<typeof setTimeout>>(null)
 
   useEffect(() => {
-    return () => { if (dismissTimer.current) clearTimeout(dismissTimer.current) }
+    return () => {
+      if (dismissTimer.current) clearTimeout(dismissTimer.current)
+      if (justOpenedTimer.current) clearTimeout(justOpenedTimer.current)
+    }
   }, [])
+
+  useEffect(() => {
+    if (!isOpen) return
+    justOpenedRef.current = true
+    console.log('[focus-debug] justOpenedRef window opened')
+    justOpenedTimer.current = setTimeout(() => {
+      justOpenedRef.current = false
+      console.log('[focus-debug] justOpenedRef window closed (500ms elapsed)')
+    }, 500)
+    return () => {
+      if (justOpenedTimer.current) clearTimeout(justOpenedTimer.current)
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return
@@ -112,10 +136,12 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
 
   useEffect(() => {
+    console.log('[focus-debug] pathname effect fired', { pathname, isOpen, isClosing, expectingRoute, expectingBack })
     if (!isOpen) return
-    if (expectingRoute) { routeArrived(); return }
-    if (expectingBack) { clearBack(); return }
+    if (expectingRoute) { routeArrived(); console.log('[focus-debug] -> routeArrived()'); return }
+    if (expectingBack) { clearBack(); console.log('[focus-debug] -> clearBack()'); return }
     if (isOpen && !isClosing) {
+      console.log('[focus-debug] -> unexpected pathname change, force-closing')
       close()
       dismissGuardRef.current = false
     }
@@ -163,6 +189,23 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         />
         <DialogPrimitive.Content
           className="fixed inset-0 z-[70] outline-none"
+          onOpenAutoFocus={(e) => {
+            console.log('[focus-debug] onOpenAutoFocus fired, activeElement before:', document.activeElement)
+          }}
+          onCloseAutoFocus={(e) => {
+            console.log('[focus-debug] onCloseAutoFocus fired')
+          }}
+          onFocusOutside={(e) => {
+            console.log('[focus-debug] onFocusOutside fired, target:', (e.target as HTMLElement)?.tagName, e.target)
+          }}
+          onPointerDownOutside={(e) => {
+            console.log('[focus-debug] onPointerDownOutside fired, target:', (e.target as HTMLElement)?.tagName, 'justOpened:', justOpenedRef.current)
+            if (justOpenedRef.current) e.preventDefault()
+          }}
+          onInteractOutside={(e) => {
+            console.log('[focus-debug] onInteractOutside fired, type:', e.type, 'target:', (e.target as HTMLElement)?.tagName, 'justOpened:', justOpenedRef.current)
+            if (justOpenedRef.current) e.preventDefault()
+          }}
           onEscapeKeyDown={(e) => {
             const active = document.activeElement as HTMLInputElement | null
             if (active?.tagName === 'INPUT' && active.value.length > 0) {
