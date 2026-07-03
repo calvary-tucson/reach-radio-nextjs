@@ -248,6 +248,22 @@ Read the trace in this order and pick the first branch that matches:
 - **If none of the above show up as the cause** — e.g. `SheetChrome called input.focus()` genuinely fires and `activeElement` matches, but the keyboard still doesn't show or the sheet still closes for a reason not captured by any log line above — **stop coding fixes**. This means the single-cause hypotheses are exhausted (this would be the 3rd+ attempt). Do not run Task 2.A/B/C speculatively. Go straight to **Phase 3** and discuss the architectural pivot with the user before writing any of it.
 - **If a Task 2.X fix was applied and the device retest (its final step) still fails** — do not treat that as "single-cause hypotheses exhausted." Re-run **Task 1.1** for a fresh trace with the fix still in place first. Only fall through to Phase 3 once a fresh trace, captured after a real fix attempt, still shows no matching branch — don't jump to the architectural rewrite off a stale or absent trace.
 
+### Task 1.1 result (2026-07-02, first device trace)
+
+Confirmed **Task 2.A**: the trace showed `activeElement` was the proxy input at `onOpenAutoFocus fired`, then the dialog `<div role="dialog" ... tabindex="-1">` at `SheetChrome found input immediately` (before SheetChrome's own `.focus()` call ran). Radix moved focus to a non-editable div in between — on iOS that alone drops the keyboard, and a later `.focus()` on the real input (even milliseconds after) doesn't bring it back without a fresh gesture. **Applied and committed** (`e.preventDefault()` on `onOpenAutoFocus`).
+
+**Ruled out: Task 2.B and 2.C.** No `onPointerDownOutside`/`onInteractOutside`/`onFocusOutside` line appeared anywhere in the trace, and the `-> unexpected pathname change, force-closing` line never appeared either (the pathname effect for `/teachers` fired with `isOpen` *already* `false`). Neither branch's mechanism is the cause of the observed auto-close.
+
+**New, previously-unanticipated 4th cause found:** the trace's tail (`isOpen: false` pathname-effect entry for `/teachers`, followed by `onCloseAutoFocus`) is the fingerprint of `handleClose`'s `setTimeout` body (`close()` then `window.history.go(-(depth+1))`) having actually run — meaning `onDismiss` was invoked from somewhere. With Radix's own outside-dismiss/escape paths ruled out by the silent logs, the only remaining path to `onDismiss` is `SheetChrome`'s own backdrop `onClick` (`role="presentation"` div, `src/components/modals/chrome/SheetChrome.tsx:86-91`) — not instrumented by Phase 0. Leading hypothesis: the trailing synthetic click from the original tap fires while the sheet is still mid-entrance-animation, landing on the backdrop (still exposed at those screen coordinates) before the sheet has slid fully into place.
+
+**Added logging (not yet a fix) for this 4th hypothesis**, alongside applying 2.A, so the next device trace can confirm or refute it in one round trip:
+- `SheetChrome.tsx`'s backdrop `onClick`: logs `e.target.tagName`, whether `e.target === e.currentTarget`, and `e.clientX`/`e.clientY`.
+- `@modal/layout.tsx`'s `handleClose`: logs a caller-stack snippet (`new Error().stack?.split('\n').slice(1, 5)`) at entry, to see what actually invoked it.
+
+**Note for whoever executes this plan from a fresh read:** the branch-selection list below (originally written before this trace) predates this finding and does not cover the backdrop-click hypothesis. Treat the "New, previously-unanticipated 4th cause" section above as authoritative for what's currently being tested — do not re-derive branch selection from the original bullet list alone without reading this update first.
+
+**Next device retest:** do one hard reload first (a `[Fast Refresh] rebuilding` line appeared mid-trace last time — HMR noise mid-tap complicates timing reads), then tap once, capture the full trace again.
+
 ### Task 2.A: Prevent Radix's default open-auto-focus from stealing focus
 
 **Files:**
