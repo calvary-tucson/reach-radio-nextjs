@@ -57,6 +57,35 @@ html.native-app body {
   overscroll-behavior: none;
 }
 
+/* === Native search-field focus ===
+   Approved one-off exception to AGENTS.md's blanket
+   `focus-visible:ring-2 focus-visible:ring-ring` a11y rule (2026-07-06),
+   scoped to the native-wrapped app only -- plain web (desktop keyboard
+   users, mobile Safari visitors) keeps the full compliant ring via the
+   Tailwind utility in TeacherSearchBar.tsx. Inside the wrapper, touch is
+   the primary input and a glowing web-style ring reads as un-native; HIG
+   and Material both treat a search field's focus as a subtle border/
+   background shift instead. `.native-android` (set alongside `.native-app`
+   when `window.Android` is present) gets Material's more visible
+   accent-colored border; iOS falls through to the shared, more minimal
+   `.native-app` treatment matching HIG's own search-bar restraint.
+   Selector specificity here is deliberately higher than Tailwind's
+   generated ring utility so this wins regardless of stylesheet order. */
+html.native-app [data-search-input]:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+html.light.native-app [data-search-input]:focus-visible {
+  border-color: rgba(75, 85, 99, 0.6);
+}
+
+html.native-android [data-search-input]:focus-visible {
+  border-width: 2px;
+  border-color: rgba(132, 184, 79, 0.7);
+}
+
 /* === Webview / Mobile Shell === */
 
 body {

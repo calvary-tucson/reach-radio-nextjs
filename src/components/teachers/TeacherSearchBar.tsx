@@ -59,7 +59,12 @@ export function TeacherSearchBar() {
           value={displayValue}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Escape') clear() }}
-          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          // Plain web keeps the full a11y ring (focus-visible:ring-ring),
+          // per AGENTS.md. Inside the native-wrapped app, globals.css
+          // overrides this to a platform-native border/background shift
+          // instead of a glowing web ring (approved a11y one-off, 2026-07-06)
+          // -- see the "Native search-field focus" block in globals.css.
+          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/40 light:placeholder:text-gray-400 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Search teachers"
         />
         {displayValue && (
