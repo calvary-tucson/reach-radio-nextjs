@@ -5,7 +5,7 @@ import { flushSync } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useModalStore } from '@/lib/stores/modal'
 import { useNavigationStore } from '@/lib/stores/navigation-store'
-import { cn } from '@/lib/utils'
+import { cn, focusWithoutScroll } from '@/lib/utils'
 
 interface PassiveSearchBarProps {
   href: string
@@ -55,11 +55,7 @@ export function PassiveSearchBar({
       useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
     })
     const realInput = document.querySelector<HTMLInputElement>('[data-search-input]')
-    // preventScroll: true stops WebKit's native "scroll ancestor to reveal
-    // focused input" from firing. Without it, that scroll races the
-    // keyboard's visualViewport resize and can leave the fixed-position
-    // sheet in a paint/layout desync on first open (see SheetChrome.tsx).
-    realInput?.focus({ preventScroll: true })
+    focusWithoutScroll(realInput)
     setTriggerRef(realInput)
     // scroll: false suppresses Next's default post-navigation scroll (and,
     // on older layout-router internals, a domNode.focus() on the newly

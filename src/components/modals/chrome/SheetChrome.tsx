@@ -8,7 +8,7 @@ import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useVisualViewportOffset } from '@/lib/hooks/useVisualViewportOffset'
 import { DragHandle } from '@/components/global/DragHandle'
 import { ENTER_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
-import { cn } from '@/lib/utils'
+import { cn, focusWithoutScroll } from '@/lib/utils'
 
 // Dev-only defense in depth: React StrictMode's mount/cleanup/remount
 // double-invoke races Radix FocusScope's cleanup, which can restore focus to
@@ -27,7 +27,7 @@ function guardFocus(input: HTMLElement, container: HTMLElement | null) {
     const active = document.activeElement
     if (active === input) return
     if (!container || !container.contains(active)) {
-      input.focus({ preventScroll: true })
+      focusWithoutScroll(input)
     }
   }
   document.addEventListener('focusin', onFocusIn)
@@ -77,7 +77,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   useEffect(() => {
     if (!autoFocusInput) {
       const timer = setTimeout(() => {
-        contentRef.current?.focus({ preventScroll: true })
+        focusWithoutScroll(contentRef.current)
       }, 250)
       return () => clearTimeout(timer)
     }
@@ -91,7 +91,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
       if (input) {
         observer?.disconnect()
         clearTimeout(fallbackTimer)
-        input.focus({ preventScroll: true })
+        focusWithoutScroll(input)
         unguard = guardFocus(input, contentRef.current)
       }
     }
@@ -99,7 +99,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     // Input may already be in the DOM (e.g., no Suspense delay)
     const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
     if (immediate) {
-      immediate.focus({ preventScroll: true })
+      focusWithoutScroll(immediate)
       unguard = guardFocus(immediate, contentRef.current)
     } else {
       // Watch for input to be inserted by a Suspense boundary resolving
@@ -110,7 +110,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
       // Fallback: focus dialog container if no input appears within 2s
       fallbackTimer = setTimeout(() => {
         observer?.disconnect()
-        contentRef.current?.focus({ preventScroll: true })
+        focusWithoutScroll(contentRef.current)
       }, 2000)
     }
 
