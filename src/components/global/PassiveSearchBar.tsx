@@ -50,25 +50,16 @@ export function PassiveSearchBar({
   // tap-vs-swipe distinction we want, and it's still a trusted gesture that
   // can synchronously open the iOS keyboard.
   function open() {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[modal-debug][v2-routeannouncer-guard] PassiveSearchBar.open() called')
-    }
     resetNav()
-    try {
-      flushSync(() => {
-        useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
-      })
-    } catch (err) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[modal-debug] flushSync(openSearchSheet) threw', err)
-      }
-      throw err
-    }
+    flushSync(() => {
+      useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
+    })
     const realInput = document.querySelector<HTMLInputElement>('[data-search-input]')
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[modal-debug] post-flushSync focus attempt', { found: !!realInput })
-    }
-    realInput?.focus()
+    // preventScroll: true stops WebKit's native "scroll ancestor to reveal
+    // focused input" from firing. Without it, that scroll races the
+    // keyboard's visualViewport resize and can leave the fixed-position
+    // sheet in a paint/layout desync on first open (see SheetChrome.tsx).
+    realInput?.focus({ preventScroll: true })
     setTriggerRef(realInput)
     // scroll: false suppresses Next's default post-navigation scroll (and,
     // on older layout-router internals, a domNode.focus() on the newly
@@ -78,51 +69,6 @@ export function PassiveSearchBar({
     // don't want any of Next's default scroll/focus management for this
     // soft, modal-driven navigation.
     router.push(href, { scroll: false })
-
-    // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
-    // Checking activeElement over a few ticks to see if something (e.g. Radix
-    // FocusScope's StrictMode-cleanup setTimeout) steals focus back off the
-    // input shortly after this synchronous gesture handler returns.
-    if (process.env.NODE_ENV !== 'production') {
-      const describe = () => {
-        const el = document.activeElement
-        return {
-          tag: el?.tagName,
-          isRealInput: el === realInput,
-          id: el?.id || undefined,
-          windowScrollY: window.scrollY,
-          bodyPosition: document.body.style.position,
-          htmlPosition: document.documentElement.style.position,
-        }
-      }
-      console.log('[modal-debug] activeElement sync', describe())
-      requestAnimationFrame(() => console.log('[modal-debug] activeElement +rAF', describe()))
-      setTimeout(() => console.log('[modal-debug] activeElement +0ms', describe()), 0)
-      setTimeout(() => console.log('[modal-debug] activeElement +50ms', describe()), 50)
-      setTimeout(() => console.log('[modal-debug] activeElement +300ms', describe()), 300)
-
-      // Ground-truth rects: which box is actually the wrong size when the
-      // keyboard is open, rather than trusting computed style values.
-      // Log plain numbers, not DOMRect objects -- Safari's console prints a
-      // bare "DOMRect" placeholder with no values when the log is copied as
-      // text, so the actual numbers never survive a paste.
-      const flattenRect = (el: Element | null) => {
-        if (!el) return null
-        const r = el.getBoundingClientRect()
-        return { top: r.top, bottom: r.bottom, height: r.height, left: r.left, width: r.width }
-      }
-      setTimeout(() => {
-        console.log('[modal-debug][v2-routeannouncer-guard] rendered rects +500ms', {
-          wrapperRect: flattenRect(document.querySelector('[data-sheet-wrapper]')),
-          dialogRect: flattenRect(document.querySelector('[role="dialog"]')),
-          scrollBoxRect: flattenRect(document.querySelector('[data-sheet-scroll]')),
-          docScrollTop: document.documentElement.scrollTop,
-          vvHeight: window.visualViewport?.height,
-          vvOffsetTop: window.visualViewport?.offsetTop,
-          innerHeight: window.innerHeight,
-        })
-      }, 500)
-    }
   }
 
   return (
