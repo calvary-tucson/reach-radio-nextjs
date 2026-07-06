@@ -80,7 +80,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
         <input
           id="name" name="name" type="text" required minLength={2} maxLength={100}
           data-native-focus
-          className="w-full h-11 bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="w-full h-11 bg-gray-700/50 light:bg-gray-100 border border-white/10 light:border-gray-300 text-white light:text-gray-900 rounded px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         />
       </div>
       <div>
@@ -88,7 +88,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
         <input
           id="email" name="email" type="email" required
           data-native-focus
-          className="w-full h-11 bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="w-full h-11 bg-gray-700/50 light:bg-gray-100 border border-white/10 light:border-gray-300 text-white light:text-gray-900 rounded px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         />
       </div>
       <div>
@@ -96,7 +96,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
         <textarea
           id="message" name="message" required rows={5} minLength={10} maxLength={2000}
           data-native-focus
-          className="w-full bg-gray-700/50 light:bg-gray-100 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none resize-none"
+          className="w-full bg-gray-700/50 light:bg-gray-100 border border-white/10 light:border-gray-300 text-white light:text-gray-900 rounded px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none resize-none"
         />
       </div>
 
