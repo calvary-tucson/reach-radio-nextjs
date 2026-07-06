@@ -44,6 +44,15 @@ Applied at **every** focus call site in the chain (`PassiveSearchBar.tsx`'s init
 
 Kept as defense-in-depth, not as the primary fix: a `useVisualViewportOffset` hook (syncs the sheet's `top` to `window.visualViewport.offsetTop`) stays wired in `SheetChrome.tsx` and `@modal/layout.tsx`'s overlay — useful for any *other* path that might still shift the visual viewport, but it alone was never sufficient (see ruled-out #2/#3 above).
 
+## Lessons for the next project with this architecture
+
+- **A large, sudden `window.scrollY` jump immediately after a `.focus()` call on a fixed-position container is WebKit's native focus-reveal scroll — not a scroll-lock gap.** Don't reach for a stronger body/html scroll lock; that operates on touch-driven scroll and won't touch this.
+- **The fix lives at the call site of `.focus()`, not in CSS or a scroll-lock layer.** `{ preventScroll: true }` removes the trigger entirely. Apply it to **every** `.focus()` call in the interaction chain — a single missed call site (fallback timer, MutationObserver branch, focus-guard reclaim, etc.) still leaves a scroll trigger live.
+- **A script-triggered `.focus()` cannot reopen an already-dismissed iOS keyboard**, even from native code via `evaluateJavaScript`. Any keyboard-reopen must be chained synchronously from a live user gesture — this rules out an entire class of "just refocus it" fixes, on both the web and native sides of a WebView wrapper.
+- **When a CSS-geometry hypothesis is falsified twice** (state/computed-style is correct but `getBoundingClientRect()` disagrees), stop iterating on CSS/JS geometry compensation — it's a paint bug, not a layout bug, and no amount of correct computed style will fix a paint that already desynced.
+- **Test cold first-focus specifically**, on a fresh page load, not a warm reload. Second-focus-onward almost always looks fine regardless of whether the bug is actually fixed — it's easy to "fix" this by accident of test timing and ship it still broken.
+- If a native WKWebView wrapper hits this same symptom independent of any web-side fix, check whether the WebView's own frame/`scrollView.contentInset` can be adjusted directly from `UIResponder.keyboardWillShowNotification`, sidestepping page-side compositor behavior entirely — but try `preventScroll` on the web side first, since it fixes this at zero cost to either side and doesn't require native changes.
+
 ## Where the two writeups agreed vs. added distinct value
 
 | | Web-side (this repo, sessions 2-4) | Native-side (`reach-radio-native-ios` session) |
@@ -53,27 +62,12 @@ Kept as defense-in-depth, not as the primary fix: a `useVisualViewportOffset` ho
 | Fix found | Not found — 7 categories ruled out, stalled, handed off | Found `preventScroll: true` independently |
 | Unique contribution | Precise paint-vs-layout desync mechanism (wrapper vs. dialog child disagreeing internally) | WKWebView-specific debugging footguns (cache purge, version-gate skip, harness hygiene) — see below |
 
-The confirmation that this reproduces in a WKWebView with no address bar at all is worth calling out on its own: it rules out "address-bar-collapse" as a *necessary* part of the compound transition (the web-side root cause write-up initially framed it as address-bar-collapse + keyboard-rise). The actually-necessary condition is just: fixed-position layer + first-ever keyboard-driven `visualViewport` transition on that page load, address bar involved or not.
-
-## Checklist for the next project with this architecture
-
-- Any full-height/fixed-position sheet with an autofocused input needs `preventScroll: true` on **all** of its focus calls, not just the obvious one — a single missed call site (fallback timer, MutationObserver branch, focus-guard reclaim, etc.) still leaves a scroll trigger live.
-- If you already built a `visualViewport`-tracking repositioning hook to fight this bug, you can leave it in as a no-op safety net, but the real fix is removing the scroll trigger, not compensating for its side effects after the fact.
-- **Test cold first-focus specifically**, on a fresh page load, not a warm reload. Second-focus-onward almost always looks fine regardless of whether the bug is actually fixed — it's easy to "fix" this by accident of test timing and ship it still broken.
-- A large, sudden `window.scrollY` jump immediately after `.focus()` on a fixed-position container is WebKit's native focus-reveal scroll, not a scroll-lock gap — don't reach for a stronger body/html scroll lock, it won't touch this.
+The confirmation that this reproduces in a WKWebView with no address bar at all is worth calling out on its own: it rules out "address-bar-collapse" as a *necessary* part of the compound transition (the web-side root-cause writeup initially framed it as address-bar-collapse + keyboard-rise). The actually-necessary condition is just: fixed-position layer + first-ever keyboard-driven `visualViewport` transition on that page load, address bar involved or not.
 
 ## Native-side lessons (WKWebView-wrapper debugging)
 
-Surfaced while diagnosing this bug from the native iOS wrapper app pointed at a dev tunnel — worth flagging for any future native-wrapper debugging session, independent of this specific bug:
+Surfaced while diagnosing this bug from the native iOS wrapper app pointed at a dev tunnel — general WKWebView debugging footguns, not specific to this bug:
 
 1. **WKWebView has its own disk/memory cache**, entirely separate from mobile Safari's. Restarting the dev server, or even a hard-reload in Safari's own devtools, does nothing to it. If you're chasing "why does the device still show old JS after I changed the code," suspect this first — force a purge via `WKWebsiteDataStore.default().removeData(ofTypes:modifiedSince:)`.
 2. **A same-version rebuild+reinstall on a physical device does not clear app data.** If the app has "purge WKWebView cache on version bump" logic gated on `CFBundleShortVersionString` (reasonable for production upgrades), that gate silently skips the purge across every debug rebuild during a single dev session — Xcode's incremental install doesn't touch `UserDefaults` or the website data store. Temporarily force the purge unconditionally while debugging, and remember to restore the version-gate afterward.
 3. If you repurpose a native wrapper as a disposable test harness for a web-side bug (pointing its fallback URL at a different dev tunnel to get a real on-device WKWebView + Safari Web Inspector combo, without standing up a separate test app), track every temp-patched file explicitly and revert as a batch once the repro is confirmed — easy to lose track of which files are "real" vs. harness-only after several rounds.
-
-## Generalizable lesson for future WebView/mobile-web projects
-
-- **A large, sudden `window.scrollY` jump immediately following a `.focus()` call, on a fixed-position container, is WebKit's native focus-reveal scroll — not a scroll-lock gap.** Don't reach for stronger body/html scroll locks to fix it; they operate on touch-driven scroll and won't stop this.
-- **The fix is at the call site of `.focus()`, not in CSS or in a scroll-lock layer.** `{ preventScroll: true }` removes the trigger entirely. Check every `.focus()` call in the interaction chain — a single missed call site (e.g. a fallback/guard path) can leave the bug intact.
-- **A script-triggered `.focus()` cannot reopen an already-dismissed iOS keyboard**, even from native code via `evaluateJavaScript`. Any keyboard-reopen must be chained synchronously from a live user gesture. This rules out an entire class of "just refocus it" fixes, on both the web and native sides of a WebView wrapper.
-- **When a CSS-geometry hypothesis is falsified twice** (state/computed-style is correct but `getBoundingClientRect()` disagrees), stop iterating on CSS/JS geometry compensation — it's a paint bug, not a layout bug, and no amount of correct computed style will fix a paint that already desynced.
-- If a native WKWebView wrapper hits this same symptom independent of any web-side fix, check whether the WebView's own frame/`scrollView.contentInset` can be adjusted directly from `UIResponder.keyboardWillShowNotification`, sidestepping page-side compositor behavior entirely — but try `preventScroll` on the web side first, since it fixes this at zero cost to either side and doesn't require native changes.
