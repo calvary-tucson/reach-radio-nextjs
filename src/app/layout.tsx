@@ -146,7 +146,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark|system)/);var t=m?m[1]:'dark';var r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;document.documentElement.classList.add(r);}catch(e){}try{if(window.inNativeApp||document.cookie.indexOf('mobile-app=true')>=0){document.documentElement.classList.add('native-app');}}catch(e){}try{if(window.Android&&window.Android.postMessage){document.documentElement.classList.add('native-android');}}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark|system)/);var t=m?m[1]:'dark';var r=t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;document.documentElement.classList.add(r);}catch(e){}try{if(window.inNativeApp||document.cookie.indexOf('mobile-app=true')>=0){document.documentElement.classList.add('native-app');}}catch(e){}try{if(window.Android&&window.Android.postMessage){document.documentElement.classList.add('native-app','native-android');}}catch(e){}})();`,
           }}
         />
         <link rel="preconnect" href="https://cdn.sanity.io" />
