@@ -4,6 +4,12 @@
 
 **Applies to:** any full-height `position:fixed`/`position:absolute` overlay or sheet on iOS Safari or a WKWebView-based app, whenever it contains an input/textarea that gets programmatically focused. Relevant to `reach-radio-native-ios` / `reach-radio-native-android` WebView wrappers and any future project embedding web content in a native shell.
 
+**Provenance note:** this doc merges two independent writeups of the *same* bug from two different sessions/repos that converged on the identical fix without coordinating:
+- The web-side debugging trail (`reach-radio-nextjs`, sessions 2-4, see [[project-search-sheet-focus-ios]] memory) — root-caused the paint desync with on-device `getBoundingClientRect`/`getComputedStyle` numbers, ruled out 6 fix categories, but stalled before finding `preventScroll` and handed off to the native side.
+- A `reach-radio-native-ios` session's writeup (`docs/bugs/ios-webview-keyboard-fixed-position.md`, now merged and deleted) — found `preventScroll` independently, plus native/WKWebView-specific debugging footguns not visible from the web side.
+
+Where the two accounts describe the same mechanism, the numbers/evidence are consistent across both — that agreement is itself useful signal that the root cause is correctly identified, not an artifact of one session's environment.
+
 ## Symptom
 
 A full-screen search sheet (`position:fixed`, `h-[100dvh]`) rendered correctly on every open *except* the very first keyboard focus after a fresh page load. On that first focus only, the sheet rendered cramped — only ~1 result visible, page content bleeding through below the cutoff. Dismissing the keyboard and refocusing rendered correctly from then on, every time.
@@ -37,6 +43,32 @@ input.focus({ preventScroll: true })
 Applied at **every** focus call site in the chain (`PassiveSearchBar.tsx`'s initial open, and all focus calls in `SheetChrome.tsx`'s mount-focus effect + `guardFocus` reclaim helper). `preventScroll: true` is a standard `HTMLElement.focus()` option — it tells the browser "move focus here, but skip your default scroll-into-view behavior." With no scroll, there's no race with the keyboard's viewport resize, so the downstream WebKit paint desync never gets a chance to occur.
 
 Kept as defense-in-depth, not as the primary fix: a `useVisualViewportOffset` hook (syncs the sheet's `top` to `window.visualViewport.offsetTop`) stays wired in `SheetChrome.tsx` and `@modal/layout.tsx`'s overlay — useful for any *other* path that might still shift the visual viewport, but it alone was never sufficient (see ruled-out #2/#3 above).
+
+## Where the two writeups agreed vs. added distinct value
+
+| | Web-side (this repo, sessions 2-4) | Native-side (`reach-radio-native-ios` session) |
+|---|---|---|
+| Root cause | Same: WebKit native scroll-into-view-on-focus racing keyboard viewport resize | Same, described independently |
+| Evidence | On-device `getBoundingClientRect`/`getComputedStyle` rects, exact pixel numbers (`top:337` vs `top:0` vs `top:-337`) | Confirmed reproduces in both mobile Safari **and** a native WKWebView — ruled out "WKWebView address-bar" as a variable, since WKWebView has no address bar at all |
+| Fix found | Not found — 7 categories ruled out, stalled, handed off | Found `preventScroll: true` independently |
+| Unique contribution | Precise paint-vs-layout desync mechanism (wrapper vs. dialog child disagreeing internally) | WKWebView-specific debugging footguns (cache purge, version-gate skip, harness hygiene) — see below |
+
+The confirmation that this reproduces in a WKWebView with no address bar at all is worth calling out on its own: it rules out "address-bar-collapse" as a *necessary* part of the compound transition (the web-side root cause write-up initially framed it as address-bar-collapse + keyboard-rise). The actually-necessary condition is just: fixed-position layer + first-ever keyboard-driven `visualViewport` transition on that page load, address bar involved or not.
+
+## Checklist for the next project with this architecture
+
+- Any full-height/fixed-position sheet with an autofocused input needs `preventScroll: true` on **all** of its focus calls, not just the obvious one — a single missed call site (fallback timer, MutationObserver branch, focus-guard reclaim, etc.) still leaves a scroll trigger live.
+- If you already built a `visualViewport`-tracking repositioning hook to fight this bug, you can leave it in as a no-op safety net, but the real fix is removing the scroll trigger, not compensating for its side effects after the fact.
+- **Test cold first-focus specifically**, on a fresh page load, not a warm reload. Second-focus-onward almost always looks fine regardless of whether the bug is actually fixed — it's easy to "fix" this by accident of test timing and ship it still broken.
+- A large, sudden `window.scrollY` jump immediately after `.focus()` on a fixed-position container is WebKit's native focus-reveal scroll, not a scroll-lock gap — don't reach for a stronger body/html scroll lock, it won't touch this.
+
+## Native-side lessons (WKWebView-wrapper debugging)
+
+Surfaced while diagnosing this bug from the native iOS wrapper app pointed at a dev tunnel — worth flagging for any future native-wrapper debugging session, independent of this specific bug:
+
+1. **WKWebView has its own disk/memory cache**, entirely separate from mobile Safari's. Restarting the dev server, or even a hard-reload in Safari's own devtools, does nothing to it. If you're chasing "why does the device still show old JS after I changed the code," suspect this first — force a purge via `WKWebsiteDataStore.default().removeData(ofTypes:modifiedSince:)`.
+2. **A same-version rebuild+reinstall on a physical device does not clear app data.** If the app has "purge WKWebView cache on version bump" logic gated on `CFBundleShortVersionString` (reasonable for production upgrades), that gate silently skips the purge across every debug rebuild during a single dev session — Xcode's incremental install doesn't touch `UserDefaults` or the website data store. Temporarily force the purge unconditionally while debugging, and remember to restore the version-gate afterward.
+3. If you repurpose a native wrapper as a disposable test harness for a web-side bug (pointing its fallback URL at a different dev tunnel to get a real on-device WKWebView + Safari Web Inspector combo, without standing up a separate test app), track every temp-patched file explicitly and revert as a batch once the repro is confirmed — easy to lose track of which files are "real" vs. harness-only after several rounds.
 
 ## Generalizable lesson for future WebView/mobile-web projects
 
