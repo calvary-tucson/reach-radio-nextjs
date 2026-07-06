@@ -7,6 +7,7 @@ import { Suspense, useCallback, useEffect, useRef } from 'react'
 import { ModalProvider } from '@/components/modals/ModalContext'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
+import { useVisualViewportOffset } from '@/lib/hooks/useVisualViewportOffset'
 import { DragHandle } from '@/components/global/DragHandle'
 import { SectionErrorBoundary } from '@/components/global/SectionErrorBoundary'
 import { TeacherSearchSheetContent } from '@/components/teachers/TeacherSearchSheetContent'
@@ -97,6 +98,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   )
   const dismissGuardRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
+  const overlayOffsetTop = useVisualViewportOffset()
 
   // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
   if (process.env.NODE_ENV !== 'production') {
@@ -174,9 +176,10 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         <DialogPrimitive.Overlay
           className={
             isClosing
-              ? 'fixed inset-0 z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
-              : 'fixed inset-0 z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-in_0.2s_ease-out_both]'
+              ? 'fixed inset-x-0 top-0 h-[100dvh] z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
+              : 'fixed inset-x-0 top-0 h-[100dvh] z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-in_0.2s_ease-out_both]'
           }
+          style={overlayOffsetTop !== null ? { top: overlayOffsetTop } : undefined}
         />
         <DialogPrimitive.Content
           className="fixed inset-0 z-[70] outline-none"

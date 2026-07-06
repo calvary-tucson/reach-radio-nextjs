@@ -5,6 +5,7 @@ import { useEffect, useId, useRef } from 'react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useVisualViewportOffset } from '@/lib/hooks/useVisualViewportOffset'
 import { DragHandle } from '@/components/global/DragHandle'
 import { ENTER_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { cn } from '@/lib/utils'
@@ -26,13 +27,7 @@ function guardFocus(input: HTMLElement, container: HTMLElement | null) {
     const active = document.activeElement
     if (active === input) return
     if (!container || !container.contains(active)) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[modal-debug][v2-routeannouncer-guard] guardFocus reclaiming', {
-          stolenByTag: active?.tagName,
-          stolenById: (active as HTMLElement | null)?.id,
-        })
-      }
-      input.focus()
+      input.focus({ preventScroll: true })
     }
   }
   document.addEventListener('focusin', onFocusIn)
@@ -62,6 +57,8 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   const contentRef = useRef<HTMLDivElement>(null)
   const drag = useSheetDrag({ onDismiss, contentRef })
   const titleId = useId()
+  const viewport = useVisualViewportOffset()
+
   // iOS Safari fires a trailing synthetic click from the gesture that opened
   // this sheet, at the original tap's screen coordinates -- which can still
   // land on the backdrop while the enter animation hasn't yet covered that
@@ -80,7 +77,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   useEffect(() => {
     if (!autoFocusInput) {
       const timer = setTimeout(() => {
-        contentRef.current?.focus()
+        contentRef.current?.focus({ preventScroll: true })
       }, 250)
       return () => clearTimeout(timer)
     }
@@ -94,10 +91,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
       if (input) {
         observer?.disconnect()
         clearTimeout(fallbackTimer)
-        input.focus()
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('[modal-debug][v2-routeannouncer-guard] tryFocus (MutationObserver) focused input')
-        }
+        input.focus({ preventScroll: true })
         unguard = guardFocus(input, contentRef.current)
       }
     }
@@ -105,10 +99,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     // Input may already be in the DOM (e.g., no Suspense delay)
     const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
     if (immediate) {
-      immediate.focus()
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[modal-debug][v2-routeannouncer-guard] immediate branch focused input')
-      }
+      immediate.focus({ preventScroll: true })
       unguard = guardFocus(immediate, contentRef.current)
     } else {
       // Watch for input to be inserted by a Suspense boundary resolving
@@ -119,7 +110,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
       // Fallback: focus dialog container if no input appears within 2s
       fallbackTimer = setTimeout(() => {
         observer?.disconnect()
-        contentRef.current?.focus()
+        contentRef.current?.focus({ preventScroll: true })
       }, 2000)
     }
 
@@ -132,11 +123,21 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
 
   useFocusTrap(contentRef)
 
+  // Scrolling/swiping the sheet's content should dismiss the keyboard,
+  // matching native search UX (e.g. Mail, Messages search).
+  function handleScrollDismissKeyboard() {
+    const active = document.activeElement as HTMLElement | null
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') && contentRef.current?.contains(active)) {
+      active.blur()
+    }
+  }
+
   return (
     <div
       role="presentation"
       data-sheet-wrapper
-      className="fixed inset-0 flex items-end sm:items-center sm:justify-center cursor-pointer"
+      className="fixed inset-x-0 top-0 h-[100dvh] flex items-end sm:items-center sm:justify-center cursor-pointer"
+      style={viewport !== null ? { top: viewport } : undefined}
       onClick={(e) => {
         if (justMountedRef.current) return
         if (e.target === e.currentTarget) onDismiss()
@@ -150,7 +151,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
         {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': ariaLabel ?? 'Dialog' })}
         className={cn(
           'w-full overflow-hidden flex flex-col border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0',
-          'rounded-t-2xl rounded-b-none h-[100dvh] will-change-transform',
+          'rounded-t-2xl rounded-b-none h-[100dvh]',
           isClosing ? MODAL_EXIT_ANIMATION : MODAL_ENTER_ANIMATION,
           'sm:inset-auto sm:h-auto sm:max-h-[90dvh] sm:max-w-2xl sm:w-[95vw] sm:rounded-2xl',
           className
@@ -177,7 +178,11 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <div data-sheet-scroll className="flex-1 overflow-y-auto">
+        <div
+          data-sheet-scroll
+          className="flex-1 overflow-y-auto pb-[env(keyboard-inset-height,0px)]"
+          onScroll={handleScrollDismissKeyboard}
+        >
           {padded ? <div className="p-6">{children}</div> : children}
         </div>
       </div>
