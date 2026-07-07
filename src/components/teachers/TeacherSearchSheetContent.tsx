@@ -20,31 +20,26 @@ interface SearchData {
 // blocks the input's own mount/focus.
 export function TeacherSearchSheetContent() {
   const [data, setData] = useState<SearchData | null>(null)
-
-  // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[modal-debug] TeacherSearchSheetContent mounted')
-    }
-    return () => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[modal-debug] TeacherSearchSheetContent UNMOUNTED')
-      }
-    }
-  }, [])
+  const [error, setError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     let cancelled = false
     fetch('/api/teachers/search-data')
-      .then((res) => res.json())
-      .then((json: SearchData) => { if (!cancelled) setData(json) })
-      .catch((err) => {
-        if (!cancelled && process.env.NODE_ENV !== 'production') {
-          console.log('[modal-debug] search-data fetch failed', err)
-        }
+      .then((res) => {
+        if (!res.ok) throw new Error(`search-data fetch failed: ${res.status}`)
+        return res.json()
+      })
+      .then((json: SearchData) => {
+        if (cancelled) return
+        setData(json)
+        setError(false)
+      })
+      .catch(() => {
+        if (!cancelled) setError(true)
       })
     return () => { cancelled = true }
-  }, [])
+  }, [retryCount])
 
   return (
     <SheetChrome title="Search Teachers" padded={false} autoFocusInput>
@@ -55,7 +50,23 @@ export function TeacherSearchSheetContent() {
         <TeacherSortControl />
       </div>
       <div className="px-4 pb-16">
-        {data ? (
+        {error ? (
+          <div className="text-center py-12 space-y-3">
+            <p className="text-sm text-white/90 light:text-gray-500">
+              Couldn&apos;t load teachers.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setError(false)
+                setRetryCount((n) => n + 1)
+              }}
+              className="min-h-[44px] px-4 rounded-lg border border-white/10 light:border-gray-300 text-white/90 light:text-gray-700 text-sm cursor-pointer hover:bg-white/10 light:hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              Retry
+            </button>
+          </div>
+        ) : data ? (
           <TeacherSearchClient teachers={data.teachers} scheduleTeachers={data.scheduleTeachers} />
         ) : (
           <SearchResultsSkeleton />
