@@ -101,7 +101,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
       </div>
 
       <label className="flex gap-3 cursor-pointer items-start">
-        <input type="checkbox" name="gdprConsent" required className="mt-1 h-6 w-6 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none" />
+        <input type="checkbox" name="gdprConsent" required data-native-focus className="mt-1 h-6 w-6 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none" />
         <span className="text-white light:text-gray-900 text-sm leading-relaxed">
           I consent to having my submitted information stored for the purpose of responding to my inquiry. *
         </span>
@@ -109,6 +109,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
 
       <button
         type="submit" disabled={isPending}
+        data-native-focus
         className="bg-[var(--color-brand-green)] text-[#0a1305] px-6 py-3 min-h-[44px] rounded font-medium text-sm disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         {isPending ? 'Sending...' : 'Send Message'}
