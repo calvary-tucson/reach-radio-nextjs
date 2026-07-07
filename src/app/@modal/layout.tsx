@@ -184,6 +184,12 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
         <DialogPrimitive.Content
           className="fixed inset-0 z-[70] outline-none"
           onOpenAutoFocus={(e) => { e.preventDefault() }}
+          // Radix's own restore-on-unmount never captured our real focus
+          // target (we focus the sheet's input synchronously via flushSync,
+          // before Radix's focusin listener attaches), so its default
+          // behavior resets focus to <body> here, clobbering handleClose's
+          // triggerEl.focus(). We own focus restoration ourselves.
+          onCloseAutoFocus={(e) => { e.preventDefault() }}
           onEscapeKeyDown={(e) => {
             const active = document.activeElement as HTMLInputElement | null
             if (active?.tagName === 'INPUT' && active.value.length > 0) {

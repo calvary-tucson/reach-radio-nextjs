@@ -58,6 +58,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
   const drag = useSheetDrag({ onDismiss, contentRef })
   const titleId = useId()
   const viewport = useVisualViewportOffset()
+  const unguardRef = useRef<(() => void) | null>(null)
 
   // iOS Safari fires a trailing synthetic click from the gesture that opened
   // this sheet, at the original tap's screen coordinates -- which can still
@@ -84,7 +85,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
 
     let observer: MutationObserver | null = null
     let fallbackTimer: ReturnType<typeof setTimeout> | undefined
-    let unguard: (() => void) | undefined
+    let debounceFrame: number | undefined
 
     function tryFocus() {
       const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
@@ -92,18 +93,28 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
         observer?.disconnect()
         clearTimeout(fallbackTimer)
         focusWithoutScroll(input)
-        unguard = guardFocus(input, contentRef.current)
+        unguardRef.current = guardFocus(input, contentRef.current)
       }
+    }
+
+    // Batch bursts of mutation records (e.g. a Suspense boundary rendering a
+    // whole subtree at once) into a single querySelector per frame.
+    function scheduleFocusCheck() {
+      if (debounceFrame !== undefined) return
+      debounceFrame = requestAnimationFrame(() => {
+        debounceFrame = undefined
+        tryFocus()
+      })
     }
 
     // Input may already be in the DOM (e.g., no Suspense delay)
     const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
     if (immediate) {
       focusWithoutScroll(immediate)
-      unguard = guardFocus(immediate, contentRef.current)
+      unguardRef.current = guardFocus(immediate, contentRef.current)
     } else {
       // Watch for input to be inserted by a Suspense boundary resolving
-      observer = new MutationObserver(tryFocus)
+      observer = new MutationObserver(scheduleFocusCheck)
       if (contentRef.current) {
         observer.observe(contentRef.current, { childList: true, subtree: true })
       }
@@ -117,9 +128,24 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     return () => {
       observer?.disconnect()
       clearTimeout(fallbackTimer)
-      unguard?.()
+      if (debounceFrame !== undefined) cancelAnimationFrame(debounceFrame)
+      unguardRef.current?.()
+      unguardRef.current = null
     }
   }, [autoFocusInput])
+
+  // Tear down the focusin guard the instant the sheet starts closing (not
+  // when it eventually unmounts) -- otherwise a caller restoring focus to
+  // its trigger element during the exit animation (see ModalLayout's
+  // handleClose) races this guard's still-attached listener, which sees
+  // focus land outside the sheet and forces it back onto the (about to be
+  // removed) input, which then drops focus to <body> when the sheet unmounts.
+  useEffect(() => {
+    if (isClosing) {
+      unguardRef.current?.()
+      unguardRef.current = null
+    }
+  }, [isClosing])
 
   useFocusTrap(contentRef)
 

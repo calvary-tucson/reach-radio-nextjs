@@ -50,13 +50,14 @@ export function PassiveSearchBar({
   // tap-vs-swipe distinction we want, and it's still a trusted gesture that
   // can synchronously open the iOS keyboard.
   function open() {
+    const triggerEl = document.activeElement instanceof HTMLElement ? document.activeElement : null
     resetNav()
     flushSync(() => {
       useModalStore.getState().openSearchSheet(modalTitle ?? placeholder)
     })
     const realInput = document.querySelector<HTMLInputElement>('[data-search-input]')
     focusWithoutScroll(realInput)
-    setTriggerRef(realInput)
+    setTriggerRef(triggerEl)
     // scroll: false suppresses Next's default post-navigation scroll (and,
     // on older layout-router internals, a domNode.focus() on the newly
     // rendered segment) -- not needed for the search-sheet focus bug itself
