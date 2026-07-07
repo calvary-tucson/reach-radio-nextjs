@@ -100,20 +100,9 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
   const overlayOffsetTop = useVisualViewportOffset()
 
-  // TEMP: search-sheet-focus-ios diagnostic logging. Remove once root-caused.
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('[modal-debug] render', { isOpen, rootSheet, stackDepth, expectingRoute, expectingBack })
-  }
-
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[modal-debug] ModalLayout mounted')
-    }
     return () => {
       if (dismissTimer.current) clearTimeout(dismissTimer.current)
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[modal-debug] ModalLayout UNMOUNTED')
-      }
     }
   }, [])
 
@@ -213,11 +202,20 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
           >
             {rootSheet === 'search' && stackDepth === 0 ? (
               <SectionErrorBoundary
-                fallback={
-                  <div className="p-6 text-white/90">
-                    [modal-debug] TeacherSearchSheetContent threw — check console
+                fallback={(retry) => (
+                  <div className="p-6 text-center space-y-3">
+                    <p className="text-white/90 light:text-gray-700 text-sm">
+                      Something went wrong. Please try again.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={retry}
+                      className="min-h-[44px] px-4 rounded-lg border border-white/10 light:border-gray-300 text-white/90 light:text-gray-700 text-sm cursor-pointer hover:bg-white/10 light:hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    >
+                      Retry
+                    </button>
                   </div>
-                }
+                )}
               >
                 <TeacherSearchSheetContent />
               </SectionErrorBoundary>
