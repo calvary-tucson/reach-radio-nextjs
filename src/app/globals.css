@@ -79,7 +79,7 @@ html.native-app [data-search-input]:focus-visible,
 html.native-app [data-native-focus]:focus-visible {
   outline: none;
   box-shadow: none;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 html.light.native-app [data-search-input]:focus-visible,
