@@ -138,7 +138,7 @@ export function TeacherSearchClient({
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-white/70 light:text-gray-400 py-12">
+          <p className="text-sm text-white/90 light:text-gray-400 py-12">
             No teachers found. Try a different search.
           </p>
         )}
