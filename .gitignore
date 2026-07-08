@@ -42,8 +42,13 @@ yarn-error.log*
 next-env.d.ts
 .worktrees/
 
-# Claude Code
-.claude/
+# Claude Code — only custom agents/skills are tracked; everything else
+# (session-logs, settings.local.json, worktrees, templates, locks) stays local.
+.claude/*
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
 
 # Playwright MCP artifacts
 .playwright-mcp/
