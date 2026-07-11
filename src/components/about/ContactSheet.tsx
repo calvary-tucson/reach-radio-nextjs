@@ -7,6 +7,7 @@ import { SheetChrome } from '@/components/modals/chrome/SheetChrome'
 import { ContactForm } from '@/components/about/ContactForm'
 import { EXIT_DURATION } from '@/lib/constants/modal'
 import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useMediaStore } from '@/lib/store/media-store'
 
 interface ContactSheetProps {
   open: boolean
@@ -31,11 +32,11 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
     triggerRef.current = document.activeElement as HTMLElement
   }, [open])
 
-  // Hide native bottom nav while sheet is open (matches @modal/layout.tsx behavior)
+  // Hide native bottom nav + media bar while sheet is open (matches @modal/layout.tsx behavior)
   useEffect(() => {
     if (!open) return
-    postMessageToNative({ showMobileNav: false })
-    return () => { postMessageToNative({ showMobileNav: true }) }
+    postMessageToNative({ showMobileNav: false, showMediaBar: false })
+    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: useMediaStore.getState().showMediaBar }) }
   }, [open])
 
   const handleDismiss = useCallback(() => {

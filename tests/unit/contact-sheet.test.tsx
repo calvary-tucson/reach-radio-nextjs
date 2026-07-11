@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ContactSheet } from '@/components/about/ContactSheet'
+import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useMediaStore } from '@/lib/store/media-store'
 
 // Mock SheetChrome — isolate ContactSheet behavior from SheetChrome internals
 vi.mock('@/components/modals/chrome/SheetChrome', () => ({
@@ -73,5 +75,17 @@ describe('ContactSheet', () => {
     vi.advanceTimersByTime(300)
     expect(onClose).not.toHaveBeenCalled()
     vi.useRealTimers()
+  })
+
+  it('hides both the native media bar and bottom nav while open', () => {
+    render(<ContactSheet open={true} onClose={vi.fn()} />)
+    expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: false, showMediaBar: false })
+  })
+
+  it('restores the media bar to its pre-sheet store value on unmount', () => {
+    useMediaStore.setState({ showMediaBar: true })
+    const { unmount } = render(<ContactSheet open={true} onClose={vi.fn()} />)
+    unmount()
+    expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: true, showMediaBar: true })
   })
 })
