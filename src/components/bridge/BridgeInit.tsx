@@ -170,8 +170,18 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
   }, [])
 
-  // On route change: send location + showMediaBar + nav visibility
+  // On route change: send location + showMediaBar + nav visibility.
+  // Skip the bar fields while a modal sheet is open -- ModalLayout owns bar
+  // visibility there (see its isOpen effect), and this computed value would
+  // otherwise race it. This matters for /teachers/search specifically:
+  // isTeacherDetailPath() deliberately excludes it, so without this guard
+  // this effect would send showMediaBar/showMobileNav: true right after
+  // ModalLayout hides them, popping the bars back up while the sheet is open.
   useEffect(() => {
+    if (useModalStore.getState().isOpen) {
+      postMessageToNative({ location: pathname })
+      return
+    }
     const isDetail = isTeacherDetailPath(pathname)
     postMessageToNative({ location: pathname, showMediaBar: pathname !== '/' && !isDetail, showMobileNav: !isDetail })
   }, [pathname])
