@@ -83,4 +83,12 @@ describe('SleepTimerSheet', () => {
     expect(onClose).toHaveBeenCalledOnce()
     vi.useRealTimers()
   })
+
+  it('hides the on-page media bar while open and restores it on unmount', () => {
+    useMediaStore.setState({ showMediaBar: true })
+    const { unmount } = render(<SleepTimerSheet open={true} onClose={vi.fn()} />)
+    expect(useMediaStore.getState().showMediaBar).toBe(false)
+    unmount()
+    expect(useMediaStore.getState().showMediaBar).toBe(true)
+  })
 })

@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { BottomSheet, type BottomSheetHandle } from '@/components/global/BottomSheet'
 import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
-import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
 
 const TIMER_OPTIONS = [5, 10, 15, 30, 45, 60]
 
@@ -28,11 +28,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
     }))
   )
 
-  useEffect(() => {
-    if (!open) return
-    postMessageToNative({ showMobileNav: false, showMediaBar: false })
-    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: useMediaStore.getState().showMediaBar }) }
-  }, [open])
+  useHideMediaBarWhileOpen(open)
 
   function start(mins: number) {
     startSleepTimer(mins * 60)
