@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useIsNativeApp } from '@/lib/hooks/useIsNativeApp'
 
 interface BackButtonProps {
   /** "mobile" = fixed green circle (hidden on md+), "desktop" = inline glass pill (hidden below md) */
@@ -12,11 +12,7 @@ interface BackButtonProps {
 
 export function BackButton({ variant, className }: BackButtonProps) {
   const router = useRouter()
-  const [isApp, setIsApp] = useState(false)
-
-  useEffect(() => {
-    setIsApp(document.documentElement.classList.contains('native-app'))
-  }, [])
+  const isApp = useIsNativeApp()
 
   function handleBack() {
     router.back()

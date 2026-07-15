@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 import { useMediaStore } from '@/lib/store/media-store'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
+import { useIsNativeApp } from '@/lib/hooks/useIsNativeApp'
 
 export function VolumeControl() {
   const { volume, isMuted, setVolume, toggleMute } = useMediaStore(
@@ -16,11 +16,7 @@ export function VolumeControl() {
       toggleMute: s.toggleMute,
     }))
   )
-  const [isNative, setIsNative] = useState(false)
-
-  useEffect(() => {
-    setIsNative(document.documentElement.classList.contains('native-app'))
-  }, [])
+  const isNative = useIsNativeApp()
 
   const effectiveVolume = isMuted ? 0 : volume
 
