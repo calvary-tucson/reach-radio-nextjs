@@ -84,7 +84,7 @@ html.native-app [data-native-focus]:focus-visible {
 
 html.light.native-app [data-search-input]:focus-visible,
 html.light.native-app [data-native-focus]:focus-visible {
-  border-color: rgba(75, 85, 99, 0.6);
+  border-color: rgba(31, 41, 55, 0.85);
 }
 
 html.native-android [data-search-input]:focus-visible,
