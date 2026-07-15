@@ -10,11 +10,18 @@ export function TeacherSearchBar() {
   const searchParams = useSearchParams()
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const [displayValue, setDisplayValue] = useState(searchParams.get('q') ?? '')
+  const currentQuery = searchParams.get('q') ?? ''
+  const [lastSyncedQuery, setLastSyncedQuery] = useState(currentQuery)
+  const [displayValue, setDisplayValue] = useState(currentQuery)
 
-  useEffect(() => {
-    setDisplayValue(searchParams.get('q') ?? '')
-  }, [searchParams])
+  // Adjust displayValue during render when the URL's ?q= actually changes
+  // (e.g. back/forward navigation), instead of in an effect -- comparing
+  // the derived string (not the searchParams object) avoids resetting
+  // displayValue on renders caused by this component's own debounced typing.
+  if (currentQuery !== lastSyncedQuery) {
+    setLastSyncedQuery(currentQuery)
+    setDisplayValue(currentQuery)
+  }
 
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
