@@ -23,11 +23,16 @@ export function RadioPlayer() {
   )
   const containerRef = useRef<HTMLDivElement>(null)
   const togglePlay = useTogglePlay()
+  const [prevImage, setPrevImage] = useState(image)
   const [imgSrc, setImgSrc] = useState(image || FALLBACK_OG_IMAGE)
 
-  useEffect(() => {
+  // Adjust imgSrc during render when the store's image changes, instead of
+  // in an effect -- keeps this in sync with `image` while still letting
+  // onError below independently override it to the fallback.
+  if (image !== prevImage) {
+    setPrevImage(image)
     setImgSrc(image || FALLBACK_OG_IMAGE)
-  }, [image])
+  }
 
   useEffect(() => {
     if (!containerRef.current) return
