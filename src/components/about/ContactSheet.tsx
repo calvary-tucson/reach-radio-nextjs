@@ -1,13 +1,12 @@
 'use client'
 
 import { createPortal } from 'react-dom'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { ModalProvider } from '@/components/modals/ModalContext'
 import { SheetChrome } from '@/components/modals/chrome/SheetChrome'
 import { ContactForm } from '@/components/about/ContactForm'
 import { EXIT_DURATION } from '@/lib/constants/modal'
-import { postMessageToNative } from '@/lib/bridge/post-message'
-import { useMediaStore } from '@/lib/store/media-store'
+import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
 
 interface ContactSheetProps {
   open: boolean
@@ -15,13 +14,15 @@ interface ContactSheetProps {
 }
 
 export function ContactSheet({ open, onClose }: ContactSheetProps) {
-  const [mounted, setMounted] = useState(false)
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
   const [isClosing, setIsClosing] = useState(false)
   const triggerRef = useRef<HTMLElement | null>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => setMounted(true), [])
 
   useEffect(() => () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
@@ -33,11 +34,7 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
   }, [open])
 
   // Hide native bottom nav + media bar while sheet is open (matches @modal/layout.tsx behavior)
-  useEffect(() => {
-    if (!open) return
-    postMessageToNative({ showMobileNav: false, showMediaBar: false })
-    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: useMediaStore.getState().showMediaBar }) }
-  }, [open])
+  useHideMediaBarWhileOpen(open)
 
   const handleDismiss = useCallback(() => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)

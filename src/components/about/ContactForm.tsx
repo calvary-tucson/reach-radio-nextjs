@@ -1,6 +1,6 @@
 'use client'
 
-import { startTransition, useActionState, useEffect, useRef } from 'react'
+import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { submitContact, type ContactState } from '@/actions/contact'
 
@@ -16,7 +16,7 @@ const initial: ContactState = { success: false }
 export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
   const [state, formAction, isPending] = useActionState(submitContact, initial)
   const formRef = useRef<HTMLFormElement>(null)
-  const timestampRef = useRef(Date.now().toString())
+  const [timestamp] = useState(() => Date.now().toString())
   const prevStateRef = useRef(state)
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
         <input type="text" name="homepage" tabIndex={-1} autoComplete="off" aria-hidden="true" />
         <input type="text" name="phone" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       </div>
-      <input type="hidden" name="timestamp" value={timestampRef.current} />
+      <input type="hidden" name="timestamp" value={timestamp} />
       {dryRun && <input type="hidden" name="dryRun" value="1" />}
 
       <div>
@@ -110,12 +110,19 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
       <button
         type="submit" disabled={isPending}
         data-native-focus
-        className="bg-[var(--color-brand-green)] text-[#0a1305] px-6 py-3 min-h-[44px] rounded font-medium text-sm disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        className="inline-flex items-center gap-2 bg-[var(--color-brand-green)] text-[#0a1305] px-6 py-3 min-h-[44px] rounded font-medium text-sm disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
+        {isPending && (
+          <span
+            role="status"
+            aria-label="Sending"
+            className="h-4 w-4 shrink-0 border-2 border-[#0a1305] border-t-transparent rounded-full motion-safe:animate-spin"
+          />
+        )}
         {isPending ? 'Sending...' : 'Send Message'}
       </button>
       {state.error && (
-        <p id="form-error" role="alert" className="text-red-400 text-sm">{state.error}</p>
+        <p id="form-error" role="alert" className="text-red-400 light:text-red-600 text-sm">{state.error}</p>
       )}
     </form>
   )
