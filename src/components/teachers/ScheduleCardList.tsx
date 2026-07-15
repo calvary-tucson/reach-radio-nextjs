@@ -30,7 +30,7 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
 
   return (
     <div className="flex flex-col gap-2">
-      {slots.map((slot, i) => {
+      {slots.map((slot) => {
         if (slot.type === 'music') {
           return (
             <div
