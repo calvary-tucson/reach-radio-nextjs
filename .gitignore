@@ -57,3 +57,6 @@ next-env.d.ts
 review-*.png
 visual-*.png
 .superpowers/
+
+# macOS/Google Drive sync artifacts
+Icon?
