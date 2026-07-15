@@ -3,20 +3,20 @@ import { postMessageToNative } from '@/lib/bridge/post-message'
 
 describe('postMessageToNative', () => {
   beforeEach(() => {
-    delete (window as any).Android
-    delete (window as any).webkit
+    delete window.Android
+    delete window.webkit
   })
 
   it('calls Android.postMessage when Android interface present', () => {
     const mockPostMessage = vi.fn()
-    ;(window as any).Android = { postMessage: mockPostMessage }
+    window.Android = { postMessage: mockPostMessage }
     postMessageToNative({ isPlaying: true })
     expect(mockPostMessage).toHaveBeenCalledWith('{"protocolVersion":1,"isPlaying":true}')
   })
 
   it('calls webkit.messageHandlers.messageHandler.postMessage when on iOS', () => {
     const mockPostMessage = vi.fn()
-    ;(window as any).webkit = {
+    window.webkit = {
       messageHandlers: { messageHandler: { postMessage: mockPostMessage } },
     }
     postMessageToNative({ isPlaying: true })
@@ -29,14 +29,14 @@ describe('postMessageToNative', () => {
 
   it('wraps messages with protocolVersion: 1', () => {
     const mockPostMessage = vi.fn()
-    ;(window as any).Android = { postMessage: mockPostMessage }
+    window.Android = { postMessage: mockPostMessage }
     postMessageToNative({ loaded: true })
     expect(mockPostMessage).toHaveBeenCalledWith('{"protocolVersion":1,"loaded":true}')
   })
 
   it('uses webkit when Android is not present', () => {
     const mockPostMessage = vi.fn()
-    ;(window as any).webkit = {
+    window.webkit = {
       messageHandlers: { messageHandler: { postMessage: mockPostMessage } },
     }
     postMessageToNative({ location: '/teachers' })

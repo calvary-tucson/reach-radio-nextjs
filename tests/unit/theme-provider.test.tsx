@@ -48,7 +48,7 @@ describe('ThemeProvider', () => {
   })
 
   it('follows system preference (light) when no cookie and not native app', async () => {
-    vi.stubGlobal('matchMedia', (q: string) => ({
+    vi.stubGlobal('matchMedia', () => ({
       matches: false, // prefers-color-scheme: light
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),

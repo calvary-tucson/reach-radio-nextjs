@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { filterTeachers } from '@/lib/teachers/filter'
 import type { TeacherSummary, ScheduleDay } from '@/lib/sanity/types'
-import type { SortOption } from '@/lib/teachers/filter'
 
 const teachers: TeacherSummary[] = [
   { name: 'Jack Hibbs', slug: 'jack-hibbs', title: 'Real Life Radio', photo: null },

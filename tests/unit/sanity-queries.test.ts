@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { teacherListQuery, teacherDetailQuery, scheduleQuery, fullScheduleQuery } from '@/lib/sanity/queries'
+import { teacherListQuery, teacherDetailQuery, scheduleQuery } from '@/lib/sanity/queries'
 
 describe('GROQ queries', () => {
   it('teacherListQuery is a non-empty string', () => {

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 describe('Button', () => {
@@ -23,7 +24,7 @@ describe('Button', () => {
   it('renders as child element with asChild', () => {
     render(
       <Button asChild>
-        <a href="/test">Link</a>
+        <Link href="/test">Link</Link>
       </Button>
     )
     expect(screen.getByRole('link', { name: 'Link' })).toBeInTheDocument()

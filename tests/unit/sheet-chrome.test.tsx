@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event'
 import { useState, useEffect } from 'react'
 import { SheetChrome } from '@/components/modals/chrome/SheetChrome'
 import { ModalProvider } from '@/components/modals/ModalContext'
-import { MODAL_ENTER_ANIMATION } from '@/lib/constants/modal'
 
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
   useSheetDrag: () => ({
@@ -36,16 +35,17 @@ function WrapperWithInput({ onDismiss = vi.fn() } = {}) {
   )
 }
 
+function DelayedInput() {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    const id = setTimeout(() => setShow(true), 50)
+    return () => clearTimeout(id)
+  }, [])
+  return show ? <input type="text" aria-label="Delayed input" /> : null
+}
+
 // Wrapper where input appears 50ms after mount (simulates Suspense resolving)
 function WrapperWithDelayedInput({ onDismiss = vi.fn() } = {}) {
-  function DelayedInput() {
-    const [show, setShow] = useState(false)
-    useEffect(() => {
-      const id = setTimeout(() => setShow(true), 50)
-      return () => clearTimeout(id)
-    }, [])
-    return show ? <input type="text" aria-label="Delayed input" /> : null
-  }
   return (
     <ModalProvider onDismiss={onDismiss} onBack={vi.fn()} isClosing={false} stackDepth={0}>
       <SheetChrome title="Test Sheet" autoFocusInput>
