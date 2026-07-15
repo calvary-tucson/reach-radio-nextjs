@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
         <h1>Privacy Policy</h1>
         <p><strong>Last updated:</strong> March 17, 2026</p>
         <p>
-          Calvary Chapel of Tucson, Inc. ("we," "us," or "our") operates the Reach Radio website (
+          Calvary Chapel of Tucson, Inc. (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates the Reach Radio website (
           <a href="https://reach.radio">reach.radio</a>) and the Reach Radio mobile applications available on the{' '}
           <a href="https://apps.apple.com/us/app/reach-radio-fm/id1246500077" target="_blank" rel="noopener noreferrer">
             Apple App Store
@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
           <a href="https://play.google.com/store/apps/details?id=com.goodbarber.reachradio&hl=en_US&gl=US" target="_blank" rel="noopener noreferrer">
             Google Play Store
           </a>{' '}
-          (collectively, the "Service"). This Privacy Policy describes how we collect, use, and protect
+          (collectively, the &quot;Service&quot;). This Privacy Policy describes how we collect, use, and protect
           your information when you use the Service.
         </p>
         <p>
@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
         </ul>
         <p>
           The app does process audio stream metadata (such as song title, artist name, and artwork) from
-          our streaming service in order to display "now playing" information. This metadata is not stored
+          our streaming service in order to display &quot;now playing&quot; information. This metadata is not stored
           and does not contain personal information.
         </p>
         <h3>Photographic Images</h3>
@@ -139,7 +139,7 @@ export default function PrivacyPolicyPage() {
         <h2>Changes to This Policy</h2>
         <p>
           Calvary Chapel of Tucson, Inc. may update this Privacy Policy from time to time. We will post the
-          revised policy on this page with an updated "Last updated" date. Your continued use of the Service
+          revised policy on this page with an updated &quot;Last updated&quot; date. Your continued use of the Service
           after any changes constitutes acceptance of the updated policy.
         </p>
 
