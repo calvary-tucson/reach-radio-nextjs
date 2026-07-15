@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useTransition } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { useShallow } from 'zustand/react/shallow'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useModalStore } from '@/lib/stores/modal'
@@ -56,23 +55,12 @@ function clearMobileAppCookie() {
 export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { title, artist, resolvedArtist, image, isMuted, volume } = useMediaStore(
-    useShallow((s) => ({
-      title: s.title,
-      artist: s.artist,
-      resolvedArtist: s.resolvedArtist,
-      image: s.image,
-      isMuted: s.isMuted,
-      volume: s.volume,
-    }))
-  )
   const mediaBarStateBeforeFocus = useRef<boolean | null>(null)
   const [isRefreshPending, startRefreshTransition] = useTransition()
   const wasRefreshPendingRef = useRef(false)
 
   // Native bridge: receive commands from iOS/Android via CustomEvent
   // Fix: gate on isNativeBridgePresent() (both platforms) not window.inNativeApp (iOS only)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- bridge must initialize exactly once; router is stable and adding it causes re-runs on every navigation; streamUrl intentionally excluded — treated as mount-time constant; native receives it once via the loaded handshake
   useEffect(() => {
     if (!isNativeBridgePresent()) return
 
@@ -148,7 +136,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     }
 
     return () => window.removeEventListener('nativeCommand', handler)
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- bridge must initialize exactly once; router is stable and adding it causes re-runs on every navigation; streamUrl intentionally excluded — treated as mount-time constant; native receives it once via the loaded handshake
 
   // native 'refresh' command completion → ack so native ends pull-to-refresh spinner
   useEffect(() => {
@@ -186,27 +174,53 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     postMessageToNative({ location: pathname, showMediaBar: pathname !== '/' && !isDetail, showMobileNav: !isDetail })
   }, [pathname])
 
-  // Forward track metadata to native whenever it changes in the store
+  // Forward track metadata + mute/volume to native via a direct store
+  // subscription rather than a reactive hook — this component returns null,
+  // so re-rendering it on every media store change bought nothing.
   useEffect(() => {
     if (!isNativeBridgePresent()) return
-    postMessageToNative({ title, artist, resolvedArtist, image })
-  }, [title, artist, resolvedArtist, image])
 
-  // Forward mute/volume to native so AVPlayer can apply them
-  useEffect(() => {
-    if (!isNativeBridgePresent()) return
-    postMessageToNative({ isMuted, volume })
-  }, [isMuted, volume])
+    function forwardTrackInfo() {
+      const { title, artist, resolvedArtist, image } = useMediaStore.getState()
+      postMessageToNative({ title, artist, resolvedArtist, image })
+    }
+    function forwardPlaybackSettings() {
+      const { isMuted, volume } = useMediaStore.getState()
+      postMessageToNative({ isMuted, volume })
+    }
+
+    forwardTrackInfo()
+    forwardPlaybackSettings()
+
+    return useMediaStore.subscribe((state, prevState) => {
+      if (
+        state.title !== prevState.title ||
+        state.artist !== prevState.artist ||
+        state.resolvedArtist !== prevState.resolvedArtist ||
+        state.image !== prevState.image
+      ) {
+        forwardTrackInfo()
+      }
+      if (state.isMuted !== prevState.isMuted || state.volume !== prevState.volume) {
+        forwardPlaybackSettings()
+      }
+    })
+  }, [])
 
   // Input focus/blur: hide bars when keyboard appears (native + web), restore after.
   // Skipped while a modal is open — ModalLayout owns bar visibility there, and Radix's
   // focus-scope re-triggers focus/blur on the autofocused input as it manages focus
   // trapping, which would otherwise race this ref-based capture/restore and leave the
   // media bar incorrectly restored to visible mid-sheet.
+  // Also skipped for any focus target inside an aria-modal="true" container — standalone
+  // sheets (ContactSheet, etc.) that don't use useModalStore own their own bar visibility,
+  // and without this guard, tabbing between their fields races this handler and can leave
+  // the media bar stuck visible while the sheet is still open.
   useEffect(() => {
     function onFocusIn(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
       if (useModalStore.getState().isOpen) return
+      if (e.target.closest('[aria-modal="true"]')) return
       if (mediaBarStateBeforeFocus.current === null) {
         mediaBarStateBeforeFocus.current = useMediaStore.getState().showMediaBar
       }
@@ -216,6 +230,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
     function onFocusOut(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
       if (useModalStore.getState().isOpen) return
+      if (e.target.closest('[aria-modal="true"]')) return
       const restoredMediaBar = mediaBarStateBeforeFocus.current
       if (restoredMediaBar !== null) {
         useMediaStore.getState().setShowMediaBar(restoredMediaBar)
