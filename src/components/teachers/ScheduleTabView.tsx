@@ -13,8 +13,7 @@ import { ScheduleCardList } from './ScheduleCardList'
 import { ScheduleWeekCards } from './ScheduleWeekCards'
 import { BottomSheet } from '@/components/global/BottomSheet'
 import { useModalStore } from '@/lib/stores/modal'
-import { postMessageToNative } from '@/lib/bridge/post-message'
-import { useMediaStore } from '@/lib/store/media-store'
+import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
 import type { TeacherWithSchedule } from '@/lib/sanity/types'
 
 dayjs.extend(utc)
@@ -58,11 +57,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
     [scheduleTeachers, selectedDay]
   )
 
-  useEffect(() => {
-    if (!sheetOpen) return
-    postMessageToNative({ showMobileNav: false, showMediaBar: false })
-    return () => { postMessageToNative({ showMobileNav: true, showMediaBar: useMediaStore.getState().showMediaBar }) }
-  }, [sheetOpen])
+  useHideMediaBarWhileOpen(sheetOpen)
 
   const handleSelect = useCallback(
     (teacher: TeacherWithSchedule) => {
