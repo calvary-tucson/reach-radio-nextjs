@@ -1,12 +1,13 @@
 'use client'
 
 import { createPortal } from 'react-dom'
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ModalProvider } from '@/components/modals/ModalContext'
 import { SheetChrome } from '@/components/modals/chrome/SheetChrome'
 import { ContactForm } from '@/components/about/ContactForm'
 import { EXIT_DURATION } from '@/lib/constants/modal'
 import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
+import { useHydrated } from '@/hooks/useHydrated'
 
 interface ContactSheetProps {
   open: boolean
@@ -14,11 +15,7 @@ interface ContactSheetProps {
 }
 
 export function ContactSheet({ open, onClose }: ContactSheetProps) {
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  )
+  const mounted = useHydrated()
   const [isClosing, setIsClosing] = useState(false)
   const triggerRef = useRef<HTMLElement | null>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
