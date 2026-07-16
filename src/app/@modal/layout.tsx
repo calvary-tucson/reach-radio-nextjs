@@ -14,8 +14,7 @@ import { TeacherSearchSheetContent } from '@/components/teachers/TeacherSearchSh
 import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
 import { useShallow } from 'zustand/react/shallow'
 import { useModalStore } from '@/lib/stores/modal'
-import { useMediaStore } from '@/lib/store/media-store'
-import { postMessageToNative } from '@/lib/bridge/post-message'
+import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
 import { cn } from '@/lib/utils'
 
 function ModalSkeleton({
@@ -105,16 +104,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
     }
   }, [])
 
-  useEffect(() => {
-    if (!isOpen) return
-    const prevShowMediaBar = useMediaStore.getState().showMediaBar
-    useMediaStore.getState().setShowMediaBar(false)
-    postMessageToNative({ showMobileNav: false, showMediaBar: false })
-    return () => {
-      useMediaStore.getState().setShowMediaBar(prevShowMediaBar)
-      postMessageToNative({ showMobileNav: true, showMediaBar: prevShowMediaBar })
-    }
-  }, [isOpen])
+  useHideMediaBarWhileOpen(isOpen)
 
   const pathname = usePathname()
 
