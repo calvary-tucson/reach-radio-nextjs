@@ -75,3 +75,35 @@ Surfaced while diagnosing this bug from the native iOS wrapper app pointed at a 
 1. **WKWebView has its own disk/memory cache**, entirely separate from mobile Safari's. Restarting the dev server, or even a hard-reload in Safari's own devtools, does nothing to it. If you're chasing "why does the device still show old JS after I changed the code," suspect this first — force a purge via `WKWebsiteDataStore.default().removeData(ofTypes:modifiedSince:)`.
 2. **A same-version rebuild+reinstall on a physical device does not clear app data.** If the app has "purge WKWebView cache on version bump" logic gated on `CFBundleShortVersionString` (reasonable for production upgrades), that gate silently skips the purge across every debug rebuild during a single dev session — Xcode's incremental install doesn't touch `UserDefaults` or the website data store. Temporarily force the purge unconditionally while debugging, and remember to restore the version-gate afterward.
 3. If you repurpose a native wrapper as a disposable test harness for a web-side bug (pointing its fallback URL at a different dev tunnel to get a real on-device WKWebView + Safari Web Inspector combo, without standing up a separate test app), track every temp-patched file explicitly and revert as a batch once the repro is confirmed — easy to lose track of which files are "real" vs. harness-only after several rounds.
+
+## Follow-up: focus-trap disabled-element gap (2026-07-16)
+
+An audit of every `focusWithoutScroll` call site (prompted by a review of this
+bug's commit history) found a related but distinct gap: the shared
+`useFocusTrap` hook's focusable-element selector didn't exclude `disabled`
+elements. Whenever a sheet's trailing control was conditionally disabled
+(e.g. `ContactForm`'s submit button during its real `isPending` async submit
+window), the hook's computed "last focusable element" became that
+unreachable disabled control, so the forward-Tab wrap silently stopped
+firing.
+
+`ContactSheet` had independently re-implemented its own Tab-wrap trap by
+hand, using a selector that correctly excluded disabled elements — which is
+why *that* sheet never displayed the symptom, at the cost of duplicating
+logic the shared `useFocusTrap` hook was supposed to own, plus adding a
+second `role="dialog"` nested inside `SheetChrome`'s own (an a11y defect,
+and the cause of a previously-failing unit test).
+
+**Fix:** correct `useFocusTrap`'s selector once (`FOCUSABLE_SELECTOR` now
+excludes `:not([disabled])` on every relevant tag), then delete
+`ContactSheet`'s duplicate trap and duplicate dialog role, relying entirely
+on `SheetChrome`'s already-installed `useFocusTrap(contentRef)`.
+
+**Lesson for the next project with this architecture:** if you find two
+independent focus-trap (or focus-management) implementations layered on the
+same dialog "for defense in depth," check whether they use *identical*
+focusable-element criteria before assuming one safely no-ops in the
+other's presence. A silent selector divergence between them can mask a real
+bug in the "primary" implementation until an edge case — here, a
+conditionally-disabled trailing control — breaks the assumption that both
+compute the same first/last elements.
