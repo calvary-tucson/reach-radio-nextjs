@@ -69,13 +69,7 @@ npm test
 npx playwright test
 ```
 
-**Known pre-existing failures (do not fix as part of unrelated PRs):**
-- `home.spec.ts` — expects `h2` with "Today's Schedule" (removed from UI) and `RadioStation` as the first JSON-LD script (it's the second)
-- `teachers.spec.ts` — search aria-live count text mismatch
-- `bridge.spec.ts` — native postMessage bridge test flaky without native context
-- Unit tests: ~22 failing in ThemeProvider and a few other component suites
-
-6 e2e tests pass; 4 fail. 227 unit tests pass; 22 fail. All failures are pre-existing.
+All unit and e2e tests pass — no known pre-existing failures.
 
 ## Gotchas
 
