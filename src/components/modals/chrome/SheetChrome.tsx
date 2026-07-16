@@ -40,6 +40,11 @@ function guardFocus(input: HTMLElement, container: HTMLElement | null) {
   }
 }
 
+// Excludes honeypot inputs (tabindex="-1", aria-hidden="true") and hidden
+// fields (type="hidden") so autofocus lands on the first real, visible field
+// instead of an off-screen spam trap or a hidden metadata input.
+const FOCUSABLE_INPUT_SELECTOR = 'input:not([type="hidden"]):not([tabindex="-1"]):not([aria-hidden="true"]), textarea:not([tabindex="-1"]):not([aria-hidden="true"])'
+
 interface SheetChromeProps {
   children: React.ReactNode
   title?: string
@@ -88,7 +93,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     let debounceFrame: number | undefined
 
     function tryFocus() {
-      const input = contentRef.current?.querySelector<HTMLElement>('input, textarea')
+      const input = contentRef.current?.querySelector<HTMLElement>(FOCUSABLE_INPUT_SELECTOR)
       if (input) {
         observer?.disconnect()
         clearTimeout(fallbackTimer)
@@ -108,7 +113,7 @@ export function SheetChrome({ children, title, ariaLabel, padded = true, autoFoc
     }
 
     // Input may already be in the DOM (e.g., no Suspense delay)
-    const immediate = contentRef.current?.querySelector<HTMLElement>('input, textarea')
+    const immediate = contentRef.current?.querySelector<HTMLElement>(FOCUSABLE_INPUT_SELECTOR)
     if (immediate) {
       focusWithoutScroll(immediate)
       unguardRef.current = guardFocus(immediate, contentRef.current)
