@@ -59,4 +59,4 @@ visual-*.png
 .superpowers/
 
 # macOS/Google Drive sync artifacts
-Icon?
+Icon[!a-zA-Z0-9]
