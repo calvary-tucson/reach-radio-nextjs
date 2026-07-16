@@ -19,7 +19,6 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
   const [isClosing, setIsClosing] = useState(false)
   const triggerRef = useRef<HTMLElement | null>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
@@ -46,22 +45,7 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
   useEffect(() => {
     if (!open) return
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { handleDismiss(); return }
-      if (e.key === 'Tab') {
-        const dialog = dialogRef.current
-        if (!dialog) return
-        const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]):not([tabindex="-1"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        ))
-        if (!focusable.length) return
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
-        if (e.shiftKey) {
-          if (document.activeElement === first) { e.preventDefault(); last.focus() }
-        } else {
-          if (document.activeElement === last) { e.preventDefault(); first.focus() }
-        }
-      }
+      if (e.key === 'Escape') handleDismiss()
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
@@ -87,7 +71,7 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
       }`}
       onClick={handleDismiss}
     >
-      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Contact Us" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+      <div onClick={(e) => e.stopPropagation()}>
         <ModalProvider
           onDismiss={handleDismiss}
           onBack={handleDismiss}
