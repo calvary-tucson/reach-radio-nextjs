@@ -41,7 +41,7 @@ function ThemeInit({ children }: { children: React.ReactNode }) {
     const param = searchParams?.get('theme') ?? null
     if (param === 'light' || param === 'dark' || param === 'system') {
       setThemeCookie(param)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- this branch also writes the theme cookie and mutates document.documentElement's class list in lockstep; splitting the state update out to a render-time adjustment would decouple them and risk a theme-flash on initial paint
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- this and the other setThemeState calls below coordinate theme state with cookie/DOM mutations to prevent theme-flash on paint
       setThemeState(param)
       applyTheme(param)
       return
