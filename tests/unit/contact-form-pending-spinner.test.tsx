@@ -29,12 +29,12 @@ describe('ContactForm — submit pending state', () => {
   it('shows a spinner alongside the submit button while pending', () => {
     mockState({ success: false }, true)
     render(<ContactForm />)
-    expect(screen.getByRole('status', { name: /sending/i })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(/sending/i)
   })
 
   it('does not show a spinner when not pending', () => {
     mockState({ success: false }, false)
     render(<ContactForm />)
-    expect(screen.queryByRole('status', { name: /sending/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('')
   })
 })

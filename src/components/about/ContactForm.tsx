@@ -118,7 +118,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
             className="h-4 w-4 shrink-0 border-2 border-[#0a1305] border-t-transparent rounded-full motion-safe:animate-spin"
           />
         )}
-        <span role="status" aria-label={isPending ? 'Sending...' : undefined} className="sr-only" />
+        <span role="status" className="sr-only">{isPending ? 'Sending...' : ''}</span>
         {isPending ? 'Sending...' : 'Send Message'}
       </button>
       {state.error && (
