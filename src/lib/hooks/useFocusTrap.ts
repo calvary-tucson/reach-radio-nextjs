@@ -1,7 +1,7 @@
 import { type RefObject, useEffect } from 'react'
 import { focusWithoutScroll } from '@/lib/utils'
 
-const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]):not([tabindex="-1"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export function useFocusTrap(containerRef: RefObject<HTMLElement | null>): void {
   useEffect(() => {
