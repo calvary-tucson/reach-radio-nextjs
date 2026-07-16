@@ -28,9 +28,11 @@ describe('ContactForm onSuccess', () => {
   })
 
   it('calls onSuccess when submission succeeds', async () => {
-    mockState({ success: true })
     const onSuccess = vi.fn()
-    render(<ContactForm onSuccess={onSuccess} />)
+    mockState({ success: false })
+    const { rerender } = render(<ContactForm onSuccess={onSuccess} />)
+    mockState({ success: true })
+    rerender(<ContactForm onSuccess={onSuccess} />)
     await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce())
   })
 
