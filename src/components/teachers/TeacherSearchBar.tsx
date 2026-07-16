@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { Search, X } from 'lucide-react'
+import { focusWithoutScroll } from '@/lib/utils'
 
 export function TeacherSearchBar() {
   const pathname = usePathname()
@@ -48,7 +49,7 @@ export function TeacherSearchBar() {
     setDisplayValue('')
     if (debounceRef.current) clearTimeout(debounceRef.current)
     pushQuery('')
-    inputRef.current?.focus()
+    focusWithoutScroll(inputRef.current)
   }
 
   return (
