@@ -114,8 +114,7 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
       >
         {isPending && (
           <span
-            role="status"
-            aria-label="Sending"
+            aria-hidden="true"
             className="h-4 w-4 shrink-0 border-2 border-[#0a1305] border-t-transparent rounded-full motion-safe:animate-spin"
           />
         )}
