@@ -35,6 +35,6 @@ describe('ContactForm — submit pending state', () => {
   it('does not show a spinner when not pending', () => {
     mockState({ success: false }, false)
     render(<ContactForm />)
-    expect(screen.getByRole('status')).toHaveTextContent('')
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 })
