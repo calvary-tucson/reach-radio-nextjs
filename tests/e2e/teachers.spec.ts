@@ -25,7 +25,7 @@ test.describe('Teachers', () => {
 
     // Count label announces results
     const countLabel = page.locator('[aria-live="polite"]')
-    await expect(countLabel).toContainText('teachers found')
+    await expect(countLabel).toContainText(/\d+ teachers? found/)
 
     // Clearing search restores full list
     await searchInput.fill('')
