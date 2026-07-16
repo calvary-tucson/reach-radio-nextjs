@@ -25,7 +25,7 @@ export function BackButton({ variant, className }: BackButtonProps) {
         onClick={handleBack}
         aria-label="Go back"
         className={cn(
-          'fixed left-3 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-green-700 p-2 pr-2.5 md:hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+          'fixed left-3 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-green-700 p-2 pr-2.5 md:hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-black',
           !isApp && 'top-[72px]',
           className,
         )}
@@ -44,7 +44,7 @@ export function BackButton({ variant, className }: BackButtonProps) {
       onClick={handleBack}
       aria-label="Go back"
       className={cn(
-        'hidden h-11 w-11 items-center justify-center rounded-full bg-white/50 text-gray-900 light:bg-gray-200 light:text-gray-900 motion-safe:transition-all duration-300 hover:bg-white/65 light:hover:bg-gray-300 md:flex cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+        'hidden h-11 w-11 items-center justify-center rounded-full bg-white/50 text-gray-900 light:bg-gray-200 light:text-gray-900 motion-safe:transition-all duration-300 hover:bg-white/65 light:hover:bg-gray-300 md:flex cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-black',
         className,
       )}
     >
