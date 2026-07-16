@@ -56,7 +56,7 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
             type="button"
             onClick={() => onSelect(slot.teacher)}
             aria-label={`${slot.teacher.name} ${formatTimeMinutes(slot.startMinutes)} to ${formatTimeMinutes(slot.endMinutes)}`}
-            className={`rounded-xl text-left motion-safe:transition-colors cursor-pointer w-full ${
+            className={`rounded-xl text-left motion-safe:transition-colors cursor-pointer w-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
               compact ? 'px-2 py-2' : 'px-4 py-3'
             } ${
               isActive

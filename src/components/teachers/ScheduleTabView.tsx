@@ -95,7 +95,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
           aria-haspopup="listbox"
           aria-expanded={sheetOpen}
           onClick={() => setSheetOpen(true)}
-          className="flex items-center gap-2 mb-4 px-4 py-[7px] rounded-full bg-[#262d34] light:bg-gray-100 border border-white/20 light:border-gray-300 text-white light:text-gray-900 text-sm font-semibold cursor-pointer"
+          className="flex items-center gap-2 mb-4 px-4 py-[7px] rounded-full bg-[#262d34] light:bg-gray-100 border border-white/20 light:border-gray-300 text-white light:text-gray-900 text-sm font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <span>{selectedDay === today ? `Today — ${selectedDay}` : selectedDay}</span>
           <ChevronDown className="h-3.5 w-3.5 text-white/50 light:text-gray-400" aria-hidden="true" />
