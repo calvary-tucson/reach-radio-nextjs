@@ -51,7 +51,7 @@ export function SleepTimerOverlay() {
       role="dialog"
       aria-modal="true"
       aria-label="Sleep timer active"
-      className="absolute inset-0 z-10 bg-black/80 rounded flex flex-col items-center justify-center gap-4"
+      className="absolute inset-0 z-20 bg-black/80 rounded flex flex-col items-center justify-center gap-4"
     >
       <p
         className="text-white text-4xl font-mono"
