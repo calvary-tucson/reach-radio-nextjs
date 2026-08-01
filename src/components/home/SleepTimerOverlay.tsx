@@ -51,16 +51,21 @@ export function SleepTimerOverlay() {
       role="dialog"
       aria-modal="true"
       aria-label="Sleep timer active"
-      className="absolute inset-0 z-20 bg-black/80 rounded flex flex-col items-center justify-center gap-4"
+      className="absolute inset-0 z-20 bg-black/80 rounded flex flex-col items-center justify-center gap-4 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-200"
     >
-      <p
-        className="text-white text-4xl font-mono"
-        aria-live="polite"
-        aria-atomic="true"
-        aria-label={`${minutes} minute${minutes !== 1 ? 's' : ''} ${secs} seconds remaining`}
-      >
-        {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
-      </p>
+      <div className="flex flex-col items-center gap-1">
+        <p aria-hidden="true" className="text-amber-400 text-xs font-semibold uppercase tracking-wide">
+          Sleep Timer
+        </p>
+        <p
+          className="text-white text-4xl font-mono"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-label={`${minutes} minute${minutes !== 1 ? 's' : ''} ${secs} seconds remaining`}
+        >
+          {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
+        </p>
+      </div>
       <button
         ref={cancelBtnRef}
         onClick={cancel}
