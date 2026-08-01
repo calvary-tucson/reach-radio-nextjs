@@ -93,6 +93,26 @@ html.native-android [data-native-focus]:focus-visible {
   border-color: rgba(132, 184, 79, 0.7);
 }
 
+/* === Native focus-ring suppression (all interactive elements) ===
+   Separate, wider exception (2026-07-31) from the native form-field one
+   above -- that one substitutes a border/background indicator; this one
+   removes focus indication entirely, everywhere, inside html.native-app.
+   The wrapped app is touch-first with no external keyboard for the vast
+   majority of users, and Tailwind's focus-visible:ring-2 glow reads as
+   web chrome inside a native shell. Plain web (desktop, mobile
+   Safari/Chrome outside the wrapper) is unaffected and keeps the full
+   a11y-compliant ring per AGENTS.md.
+   Zeroes only the ring layers of Tailwind v4's composed box-shadow
+   (`--tw-ring-shadow` / `--tw-ring-offset-shadow`, reset to their own
+   "off" value of `0 0 #0000`) rather than `box-shadow: none`, so an
+   element's unrelated shadow (e.g. shadow-md on a card) survives being
+   focused. */
+html.native-app *:focus-visible {
+  outline: none;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}
+
 /* === Webview / Mobile Shell === */
 
 body {
