@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useMediaStore } from '@/lib/store/media-store'
 import { PlayPauseButton } from './PlayPauseButton'
 import { NowPlayingInfo } from './NowPlayingInfo'
+import { SleepTimerIndicator } from './SleepTimerIndicator'
 import { isTeacherDetailPath } from '@/lib/routes'
 
 export function MediaBar() {
@@ -24,6 +25,7 @@ export function MediaBar() {
     >
       <NowPlayingInfo />
       <PlayPauseButton />
+      <SleepTimerIndicator />
     </div>
   )
 }
