@@ -32,8 +32,17 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(funct
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
     setVisible(false)
     closeTimerRef.current = setTimeout(() => {
+      // Another dialog (e.g. an overlay that opened as this sheet closed)
+      // may have already claimed focus during the close animation — only
+      // restore it to the trigger if it's still sitting inside this sheet.
+      // Checked before onClose() so it doesn't depend on whether the
+      // resulting unmount flushes synchronously.
+      const active = document.activeElement
+      const focusStillInSheet = !active || active === document.body || sheetRef.current?.contains(active)
       onClose()
-      triggerRef.current?.focus()
+      if (focusStillInSheet) {
+        triggerRef.current?.focus()
+      }
     }, 280)
   }, [onClose])
 
