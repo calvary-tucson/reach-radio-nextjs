@@ -85,7 +85,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
               <button
                 type="button"
                 onClick={cancel}
-                className="w-full bg-white/5 light:bg-red-50 border border-red-500/30 text-red-400 light:text-red-600 py-4 rounded-xl font-semibold text-lg hover:bg-red-500/10 light:hover:bg-red-100 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
+                className="w-full bg-white/5 light:bg-red-50 border border-red-500/30 text-red-400 light:text-red-700 py-4 rounded-xl font-semibold text-lg hover:bg-red-500/10 light:hover:bg-red-100 motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer"
               >
                 Cancel Timer
               </button>
