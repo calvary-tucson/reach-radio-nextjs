@@ -31,6 +31,7 @@ describe('BridgeInit — sleep timer commands', () => {
       sleepTimerPaused: false,
       remainingSleepSeconds: 0,
       sleepTimerEndsAt: null,
+      sleepTimerSheetOpen: false,
     })
     render(<BridgeInit streamUrl="https://stream.example.com" />)
   })
@@ -70,5 +71,10 @@ describe('BridgeInit — sleep timer commands', () => {
     useMediaStore.getState().startSleepTimer(300)
     dispatchCommand({ type: 'setSleepTimer', seconds: 60 })
     expect(useMediaStore.getState().remainingSleepSeconds).toBe(60)
+  })
+
+  it('openSleepTimerSheet command sets sleepTimerSheetOpen to true', () => {
+    dispatchCommand({ type: 'openSleepTimerSheet' })
+    expect(useMediaStore.getState().sleepTimerSheetOpen).toBe(true)
   })
 })

@@ -40,4 +40,11 @@ test.describe('Native bridge', () => {
     await dispatchNativeCommand(page, { type: 'refresh' })
     expect(true).toBe(true)
   })
+
+  test('nativeCommand openSleepTimerSheet opens the sleep timer sheet', async ({ page }) => {
+    await mockNativeBridge(page)
+    await page.goto('/')
+    await dispatchNativeCommand(page, { type: 'openSleepTimerSheet' })
+    await expect(page.getByRole('dialog', { name: 'Sleep timer' })).toBeVisible()
+  })
 })
