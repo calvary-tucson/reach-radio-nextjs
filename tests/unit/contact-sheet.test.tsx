@@ -86,13 +86,13 @@ describe('ContactSheet', () => {
     expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: false, showMediaBar: false })
   })
 
-  it('restores the media bar to the natively-correct value for the current route on unmount', () => {
-    // The fixed hook derives the restore value as `pathname !== '/' && !isTeacherDetailPath(pathname)`
-    // (mocked pathname is '/about' — not '/', not a teacher detail path), so it's true
-    // regardless of what showMediaBar happened to be set to before the sheet opened.
+  it('restores the media bar to its pre-sheet store value on unmount, not a value derived from pathname', () => {
+    // Deliberately start at false — pathname-derivation (mocked '/about', not
+    // '/', not a teacher detail path) would produce true, so restoring false
+    // here proves the hook replays the captured value instead of recomputing.
     useMediaStore.setState({ showMediaBar: false })
     const { unmount } = render(<ContactSheet open={true} onClose={vi.fn()} />)
     unmount()
-    expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: true, showMediaBar: true })
+    expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: true, showMediaBar: false })
   })
 })

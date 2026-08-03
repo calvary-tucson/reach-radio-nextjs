@@ -88,15 +88,21 @@ describe('SleepTimerSheet', () => {
     vi.useRealTimers()
   })
 
-  it('hides the on-page media bar while open and restores it (derived from pathname) on unmount', () => {
-    // Deliberately start from the wrong value — proves the restore is derived
-    // from pathname, not replayed from whatever showMediaBar happened to be.
-    useMediaStore.setState({ showMediaBar: false })
+  it('hides the on-page media bar while open and restores its pre-sheet value on unmount', () => {
+    // Pathname-derivation (mocked '/about') would produce true regardless —
+    // start at true so this test doesn't accidentally pass either way, and
+    // additionally verify with a diverging false case below.
+    useMediaStore.setState({ showMediaBar: true })
     const { unmount } = render(<SleepTimerSheet open={true} onClose={vi.fn()} />)
     expect(useMediaStore.getState().showMediaBar).toBe(false)
     unmount()
-    // Mocked pathname is '/about' (not '/', not a teacher detail path), so the
-    // derived value is true, regardless of the false it started from.
     expect(useMediaStore.getState().showMediaBar).toBe(true)
+  })
+
+  it('restores false when the captured value was false, even though pathname-derivation would produce true', () => {
+    useMediaStore.setState({ showMediaBar: false })
+    const { unmount } = render(<SleepTimerSheet open={true} onClose={vi.fn()} />)
+    unmount()
+    expect(useMediaStore.getState().showMediaBar).toBe(false)
   })
 })

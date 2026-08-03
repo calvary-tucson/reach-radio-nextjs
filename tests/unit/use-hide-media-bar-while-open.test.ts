@@ -16,7 +16,7 @@ vi.mock('@/lib/bridge/post-message', () => ({
 
 describe('useHideMediaBarWhileOpen', () => {
   beforeEach(() => {
-    useMediaStore.setState({ showMediaBar: false })
+    useMediaStore.setState({ showMediaBar: false, openStandaloneSheetCount: 0 })
   })
 
   afterEach(() => {
@@ -24,13 +24,18 @@ describe('useHideMediaBarWhileOpen', () => {
     vi.restoreAllMocks()
   })
 
-  it('re-derives showMediaBar=true on close for /teachers/search, not the stale captured false', () => {
-    mockPathname = '/teachers/search'
-    useMediaStore.setState({ showMediaBar: false })
+  it('restores the captured showMediaBar value on close, even when it diverges from the pathname-derived value', () => {
+    // Pathname-derivation for '/' would produce false, but the store was
+    // legitimately set true by something else (e.g. RadioPlayer's scroll
+    // observer on the home page) before the sheet opened — the restore must
+    // replay that captured value, not recompute from pathname.
+    mockPathname = '/'
+    useMediaStore.setState({ showMediaBar: true })
     const { rerender } = renderHook(({ open }) => useHideMediaBarWhileOpen(open), {
       initialProps: { open: false },
     })
     rerender({ open: true })
+    expect(useMediaStore.getState().showMediaBar).toBe(false)
     rerender({ open: false })
 
     expect(useMediaStore.getState().showMediaBar).toBe(true)
@@ -38,23 +43,9 @@ describe('useHideMediaBarWhileOpen', () => {
     expect(calls.at(-1)?.[0]).toEqual({ showMobileNav: true, showMediaBar: true })
   })
 
-  it('re-derives showMediaBar=false on close for a teacher detail path', () => {
-    mockPathname = '/teachers/john-macarthur'
-    useMediaStore.setState({ showMediaBar: true })
-    const { rerender } = renderHook(({ open }) => useHideMediaBarWhileOpen(open), {
-      initialProps: { open: false },
-    })
-    rerender({ open: true })
-    rerender({ open: false })
-
-    expect(useMediaStore.getState().showMediaBar).toBe(false)
-    const calls = vi.mocked(postMessageToNative).mock.calls
-    expect(calls.at(-1)?.[0]).toEqual({ showMobileNav: false, showMediaBar: false })
-  })
-
-  it('re-derives showMediaBar=false on close for the home page', () => {
-    mockPathname = '/'
-    useMediaStore.setState({ showMediaBar: true })
+  it('restores false when the captured value was false, regardless of pathname', () => {
+    mockPathname = '/teachers/search'
+    useMediaStore.setState({ showMediaBar: false })
     const { rerender } = renderHook(({ open }) => useHideMediaBarWhileOpen(open), {
       initialProps: { open: false },
     })
@@ -64,5 +55,31 @@ describe('useHideMediaBarWhileOpen', () => {
     expect(useMediaStore.getState().showMediaBar).toBe(false)
     const calls = vi.mocked(postMessageToNative).mock.calls
     expect(calls.at(-1)?.[0]).toEqual({ showMobileNav: true, showMediaBar: false })
+  })
+
+  it('derives showMobileNav from the current pathname on close, independent of the captured showMediaBar value', () => {
+    mockPathname = '/teachers/john-macarthur'
+    useMediaStore.setState({ showMediaBar: true })
+    const { rerender } = renderHook(({ open }) => useHideMediaBarWhileOpen(open), {
+      initialProps: { open: false },
+    })
+    rerender({ open: true })
+    rerender({ open: false })
+
+    expect(useMediaStore.getState().showMediaBar).toBe(true)
+    const calls = vi.mocked(postMessageToNative).mock.calls
+    expect(calls.at(-1)?.[0]).toEqual({ showMobileNav: false, showMediaBar: true })
+  })
+
+  it('increments openStandaloneSheetCount while open and decrements it back to 0 on close', () => {
+    mockPathname = '/about'
+    const { rerender } = renderHook(({ open }) => useHideMediaBarWhileOpen(open), {
+      initialProps: { open: false },
+    })
+    expect(useMediaStore.getState().openStandaloneSheetCount).toBe(0)
+    rerender({ open: true })
+    expect(useMediaStore.getState().openStandaloneSheetCount).toBe(1)
+    rerender({ open: false })
+    expect(useMediaStore.getState().openStandaloneSheetCount).toBe(0)
   })
 })

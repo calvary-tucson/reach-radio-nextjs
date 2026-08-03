@@ -5,6 +5,7 @@ import { TeacherSearchClient } from '@/components/teachers/TeacherSearchClient'
 import { TeacherSearchBar } from '@/components/teachers/TeacherSearchBar'
 import { TeacherSortControl } from '@/components/teachers/TeacherSortControl'
 import { SearchResultsSkeleton } from '@/components/skeletons/SearchResultsSkeleton'
+import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 
 export const metadata: Metadata = {
   title: 'Search Teachers',
@@ -19,6 +20,7 @@ async function SearchContent() {
 export default function TeachersSearchPage() {
   return (
     <div className="px-4 py-6 sm:px-6 space-y-4">
+      <ShowMediaBar />
       {/* Row 1: search + sort */}
       <div className="flex items-center gap-2">
         <div className="flex-1">

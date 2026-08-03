@@ -17,6 +17,7 @@ interface MediaState {
   sleepTimerEndsAt: number | null
   remainingSleepSeconds: number
   sleepTimerSheetOpen: boolean
+  openStandaloneSheetCount: number
   setIsPlaying: (v: boolean) => void
   setIsBuffering: (v: boolean) => void
   setVolume: (v: number) => void
@@ -33,6 +34,8 @@ interface MediaState {
   setSleepTimer: (seconds: number) => void
   openSleepTimerSheet: () => void
   closeSleepTimerSheet: () => void
+  incrementOpenStandaloneSheetCount: () => void
+  decrementOpenStandaloneSheetCount: () => void
 }
 
 export const useMediaStore = create<MediaState>((set, get) => ({
@@ -51,6 +54,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   sleepTimerEndsAt: null,
   remainingSleepSeconds: 0,
   sleepTimerSheetOpen: false,
+  openStandaloneSheetCount: 0,
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
   setVolume: (v) => { const clamped = Math.max(0, Math.min(100, v)); set((s) => ({ volume: clamped, isMuted: clamped === 0, previousVolume: clamped === 0 ? s.volume : s.previousVolume })) },
@@ -102,4 +106,6 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   },
   openSleepTimerSheet: () => set({ sleepTimerSheetOpen: true }),
   closeSleepTimerSheet: () => set({ sleepTimerSheetOpen: false }),
+  incrementOpenStandaloneSheetCount: () => set((s) => ({ openStandaloneSheetCount: s.openStandaloneSheetCount + 1 })),
+  decrementOpenStandaloneSheetCount: () => set((s) => ({ openStandaloneSheetCount: Math.max(0, s.openStandaloneSheetCount - 1) })),
 }))

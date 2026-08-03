@@ -19,6 +19,7 @@ describe('useMediaStore', () => {
       remainingSleepSeconds: 0,
       sleepTimerEndsAt: null,
       sleepTimerSheetOpen: false,
+      openStandaloneSheetCount: 0,
     })
   })
 
@@ -216,6 +217,22 @@ describe('useMediaStore', () => {
     const { sleepTimerActive, remainingSleepSeconds } = useMediaStore.getState()
     expect(sleepTimerActive).toBe(true)
     expect(remainingSleepSeconds).toBe(300)
+  })
+
+  it('incrementOpenStandaloneSheetCount increases the count by 1', () => {
+    useMediaStore.getState().incrementOpenStandaloneSheetCount()
+    expect(useMediaStore.getState().openStandaloneSheetCount).toBe(1)
+  })
+
+  it('decrementOpenStandaloneSheetCount decreases the count by 1', () => {
+    useMediaStore.getState().incrementOpenStandaloneSheetCount()
+    useMediaStore.getState().decrementOpenStandaloneSheetCount()
+    expect(useMediaStore.getState().openStandaloneSheetCount).toBe(0)
+  })
+
+  it('decrementOpenStandaloneSheetCount does not go below 0', () => {
+    useMediaStore.getState().decrementOpenStandaloneSheetCount()
+    expect(useMediaStore.getState().openStandaloneSheetCount).toBe(0)
   })
 
 })

@@ -21,25 +21,30 @@ export function useHideMediaBarWhileOpen(open: boolean) {
   // Deliberate render-time sync so the cleanup below always reads the pathname
   // current as of the commit it runs in; moving this into its own effect would
   // race the `open` effect's cleanup on a route-change-plus-close in the same
-  // commit, reintroducing a narrower version of the stale-restore bug this
-  // hook exists to fix.
+  // commit.
   // eslint-disable-next-line react-hooks/refs
   pathnameRef.current = pathname
 
   useEffect(() => {
     if (!open) return
+    const prevShowMediaBar = useMediaStore.getState().showMediaBar
+    useMediaStore.getState().incrementOpenStandaloneSheetCount()
     useMediaStore.getState().setShowMediaBar(false)
     postMessageToNative({ showMobileNav: false, showMediaBar: false })
     return () => {
-      // Re-derive the natively-correct value the same way BridgeInit's own
-      // pathname effect does, instead of trusting a captured "previous"
-      // store value — that value is stale on any route with no <ShowMediaBar />
-      // mount (e.g. /teachers/search), which would otherwise leave native's
-      // media bar hidden until the next route change.
+      // showMediaBar restores the value captured when the sheet opened: pages
+      // set the natively-correct value via <ShowMediaBar/> or their own
+      // scroll/focus logic (RadioPlayer's scroll observer, the donate page's
+      // form focus/blur), and that's the only thing that actually knows what
+      // it should be — deriving it fresh from pathname alone ignores those
+      // page-owned overrides and stomps them on every sheet close.
+      // showMobileNav has no such page-owned source, so it's still safe (and
+      // an improvement over the old hardcoded `true`) to derive it fresh from
+      // the pathname current as of this close.
       const isDetail = isTeacherDetailPath(pathnameRef.current)
-      const restored = pathnameRef.current !== '/' && !isDetail
-      useMediaStore.getState().setShowMediaBar(restored)
-      postMessageToNative({ showMobileNav: !isDetail, showMediaBar: restored })
+      useMediaStore.getState().decrementOpenStandaloneSheetCount()
+      useMediaStore.getState().setShowMediaBar(prevShowMediaBar)
+      postMessageToNative({ showMobileNav: !isDetail, showMediaBar: prevShowMediaBar })
     }
   }, [open])
 }
