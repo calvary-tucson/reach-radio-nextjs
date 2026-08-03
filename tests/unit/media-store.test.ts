@@ -18,6 +18,7 @@ describe('useMediaStore', () => {
       sleepTimerPaused: false,
       remainingSleepSeconds: 0,
       sleepTimerEndsAt: null,
+      sleepTimerSheetOpen: false,
     })
   })
 
@@ -196,6 +197,25 @@ describe('useMediaStore', () => {
     useMediaStore.getState().setMuted(false)
     expect(useMediaStore.getState().volume).toBe(60)
     expect(useMediaStore.getState().isMuted).toBe(false)
+  })
+
+  it('openSleepTimerSheet sets sleepTimerSheetOpen to true', () => {
+    useMediaStore.getState().openSleepTimerSheet()
+    expect(useMediaStore.getState().sleepTimerSheetOpen).toBe(true)
+  })
+
+  it('closeSleepTimerSheet sets sleepTimerSheetOpen to false', () => {
+    useMediaStore.getState().openSleepTimerSheet()
+    useMediaStore.getState().closeSleepTimerSheet()
+    expect(useMediaStore.getState().sleepTimerSheetOpen).toBe(false)
+  })
+
+  it('openSleepTimerSheet does not change sleep timer active/remaining state', () => {
+    useMediaStore.getState().startSleepTimer(300)
+    useMediaStore.getState().openSleepTimerSheet()
+    const { sleepTimerActive, remainingSleepSeconds } = useMediaStore.getState()
+    expect(sleepTimerActive).toBe(true)
+    expect(remainingSleepSeconds).toBe(300)
   })
 
 })

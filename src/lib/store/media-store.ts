@@ -16,6 +16,7 @@ interface MediaState {
   sleepTimerPaused: boolean
   sleepTimerEndsAt: number | null
   remainingSleepSeconds: number
+  sleepTimerSheetOpen: boolean
   setIsPlaying: (v: boolean) => void
   setIsBuffering: (v: boolean) => void
   setVolume: (v: number) => void
@@ -30,6 +31,8 @@ interface MediaState {
   resumeSleepTimer: () => void
   cancelSleepTimer: () => void
   setSleepTimer: (seconds: number) => void
+  openSleepTimerSheet: () => void
+  closeSleepTimerSheet: () => void
 }
 
 export const useMediaStore = create<MediaState>((set, get) => ({
@@ -47,6 +50,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   sleepTimerPaused: false,
   sleepTimerEndsAt: null,
   remainingSleepSeconds: 0,
+  sleepTimerSheetOpen: false,
   setIsPlaying: (v) => set({ isPlaying: v }),
   setIsBuffering: (v) => set({ isBuffering: v }),
   setVolume: (v) => { const clamped = Math.max(0, Math.min(100, v)); set((s) => ({ volume: clamped, isMuted: clamped === 0, previousVolume: clamped === 0 ? s.volume : s.previousVolume })) },
@@ -96,4 +100,6 @@ export const useMediaStore = create<MediaState>((set, get) => ({
       set({ remainingSleepSeconds: seconds, sleepTimerEndsAt: !sleepTimerPaused ? Date.now() + seconds * 1000 : null })
     }
   },
+  openSleepTimerSheet: () => set({ sleepTimerSheetOpen: true }),
+  closeSleepTimerSheet: () => set({ sleepTimerSheetOpen: false }),
 }))
