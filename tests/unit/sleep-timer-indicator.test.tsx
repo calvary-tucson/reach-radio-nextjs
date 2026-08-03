@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SleepTimerIndicator } from '@/components/media-bar/SleepTimerIndicator'
+import { GlobalSleepTimerSheet } from '@/components/media-bar/GlobalSleepTimerSheet'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { useMediaStore } from '@/lib/store/media-store'
 
@@ -16,6 +17,7 @@ function renderWithProvider() {
   return render(
     <TooltipProvider>
       <SleepTimerIndicator />
+      <GlobalSleepTimerSheet />
     </TooltipProvider>
   )
 }
@@ -26,6 +28,7 @@ beforeEach(() => {
     sleepTimerPaused: false,
     remainingSleepSeconds: 0,
     sleepTimerEndsAt: null,
+    sleepTimerSheetOpen: false,
   })
 })
 
@@ -63,8 +66,9 @@ describe('SleepTimerIndicator', () => {
     // The trigger button should disappear immediately...
     expect(screen.queryByRole('button', { name: /sleep timer active/i })).not.toBeInTheDocument()
     // ...but the sheet must still be mounted so it can finish its close
-    // animation and restore focus. Without the fix, the whole component
-    // (including SleepTimerSheet) would unmount and the dialog would vanish.
+    // animation and restore focus. GlobalSleepTimerSheet's mount depends
+    // only on sleepTimerSheetOpen, never on sleepTimerActive, so this holds
+    // structurally regardless of which trigger opened it.
     expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 })

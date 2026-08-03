@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SleepTimerButton } from '@/components/home/SleepTimerButton'
+import { GlobalSleepTimerSheet } from '@/components/media-bar/GlobalSleepTimerSheet'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { useMediaStore } from '@/lib/store/media-store'
 
@@ -16,12 +17,19 @@ function renderWithProvider() {
   return render(
     <TooltipProvider>
       <SleepTimerButton />
+      <GlobalSleepTimerSheet />
     </TooltipProvider>
   )
 }
 
 beforeEach(() => {
-  useMediaStore.setState({ sleepTimerActive: false, sleepTimerPaused: false, remainingSleepSeconds: 0, sleepTimerEndsAt: null })
+  useMediaStore.setState({
+    sleepTimerActive: false,
+    sleepTimerPaused: false,
+    remainingSleepSeconds: 0,
+    sleepTimerEndsAt: null,
+    sleepTimerSheetOpen: false,
+  })
 })
 
 describe('SleepTimerButton', () => {

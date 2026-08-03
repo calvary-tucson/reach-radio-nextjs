@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
 import { MediaBar } from '@/components/media-bar/MediaBar'
+import { GlobalSleepTimerSheet } from '@/components/media-bar/GlobalSleepTimerSheet'
 import { BridgeInit } from '@/components/bridge/BridgeInit'
 import { Header } from '@/components/layout/Header'
 import { MobileHeader } from '@/components/layout/MobileHeader'
@@ -172,6 +173,7 @@ export default function RootLayout({
               <LayoutFooter />
             </Suspense>
             <MediaBar />
+            <GlobalSleepTimerSheet />
             <Toaster richColors position="top-center" />
             <RouteAnnouncer />
           </TooltipProvider>
