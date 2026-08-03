@@ -26,6 +26,10 @@ vi.mock('@/lib/routes', async () => {
 
 describe('BridgeInit — route effect vs. open sheet', () => {
   beforeEach(() => {
+    // vi.restoreAllMocks() (afterEach, below) only restores vi.spyOn spies —
+    // it does not clear vi.fn() call history, so postMessageToNative's calls
+    // accumulate across tests/describes in this file without this.
+    vi.mocked(postMessageToNative).mockClear()
     mockPathname = '/teachers/search'
     useModalStore.setState({ isOpen: true, rootSheet: 'search' })
   })
@@ -57,6 +61,9 @@ describe('BridgeInit — route effect vs. open sheet', () => {
 
 describe('BridgeInit — route effect vs. open standalone sheet', () => {
   beforeEach(() => {
+    // See note in the describe block above — mockClear() is required each
+    // time or these assertions can match a stale call from an earlier test.
+    vi.mocked(postMessageToNative).mockClear()
     mockPathname = '/teachers/search'
     useMediaStore.setState({ openStandaloneSheetCount: 1 })
   })
