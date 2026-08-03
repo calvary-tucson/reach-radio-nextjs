@@ -102,7 +102,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(funct
         aria-modal="true"
         aria-label={ariaLabel}
         tabIndex={-1}
-        className={`fixed inset-x-0 bottom-0 z-[70] bg-gray-800 light:bg-white rounded-t-2xl motion-safe:transition-transform duration-[280ms] ease-out will-change-transform outline-none ${
+        className={`fixed inset-x-0 bottom-0 z-[70] bg-[#0f1a0a] light:bg-white rounded-t-2xl motion-safe:transition-transform duration-[280ms] ease-out will-change-transform outline-none ${
           visible ? 'translate-y-0' : 'translate-y-full'
         } ${className ?? ''}`}
       >
