@@ -57,6 +57,9 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   const router = useRouter()
   const pathname = usePathname()
   const mediaBarStateBeforeFocus = useRef<boolean | null>(null)
+  const pathnameRef = useRef(pathname)
+  // eslint-disable-next-line react-hooks/refs
+  pathnameRef.current = pathname
   const [isRefreshPending, startRefreshTransition] = useTransition()
   const wasRefreshPendingRef = useRef(false)
 
@@ -220,6 +223,8 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
   // sheets (ContactSheet, etc.) that don't use useModalStore own their own bar visibility,
   // and without this guard, tabbing between their fields races this handler and can leave
   // the media bar stuck visible while the sheet is still open.
+  // Reads pathname via pathnameRef rather than a [pathname] dependency, so the
+  // listeners attach once instead of tearing down/re-adding on every navigation.
   useEffect(() => {
     function onFocusIn(e: FocusEvent) {
       if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
@@ -240,8 +245,8 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
         useMediaStore.getState().setShowMediaBar(restoredMediaBar)
         mediaBarStateBeforeFocus.current = null
       }
-      const isDetail = isTeacherDetailPath(pathname)
-      const showMediaBar = restoredMediaBar !== null ? restoredMediaBar : (pathname !== '/' && !isDetail)
+      const isDetail = isTeacherDetailPath(pathnameRef.current)
+      const showMediaBar = restoredMediaBar !== null ? restoredMediaBar : (pathnameRef.current !== '/' && !isDetail)
       postMessageToNative({ showMobileNav: !isDetail, showMediaBar })
     }
     document.addEventListener('focusin', onFocusIn)
@@ -250,7 +255,7 @@ export function BridgeInit({ streamUrl }: BridgeInitProps) {
       document.removeEventListener('focusin', onFocusIn)
       document.removeEventListener('focusout', onFocusOut)
     }
-  }, [pathname])
+  }, [])
 
   // Native app detection: check injected bridge objects (most reliable),
   // then clear stale cookie if bridge absent. PostMessage fallback for future native versions.
