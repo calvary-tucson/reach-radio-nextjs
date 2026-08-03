@@ -3,6 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { SleepTimerSheet } from '@/components/home/SleepTimerSheet'
 import { useMediaStore } from '@/lib/store/media-store'
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/about',
+}))
+
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
   useSheetDrag: () => ({
     onTouchStart: vi.fn(),
@@ -84,11 +88,15 @@ describe('SleepTimerSheet', () => {
     vi.useRealTimers()
   })
 
-  it('hides the on-page media bar while open and restores it on unmount', () => {
-    useMediaStore.setState({ showMediaBar: true })
+  it('hides the on-page media bar while open and restores it (derived from pathname) on unmount', () => {
+    // Deliberately start from the wrong value — proves the restore is derived
+    // from pathname, not replayed from whatever showMediaBar happened to be.
+    useMediaStore.setState({ showMediaBar: false })
     const { unmount } = render(<SleepTimerSheet open={true} onClose={vi.fn()} />)
     expect(useMediaStore.getState().showMediaBar).toBe(false)
     unmount()
+    // Mocked pathname is '/about' (not '/', not a teacher detail path), so the
+    // derived value is true, regardless of the false it started from.
     expect(useMediaStore.getState().showMediaBar).toBe(true)
   })
 })

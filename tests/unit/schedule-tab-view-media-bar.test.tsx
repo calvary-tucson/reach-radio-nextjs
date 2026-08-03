@@ -5,6 +5,7 @@ import { useMediaStore } from '@/lib/store/media-store'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/teachers',
 }))
 
 vi.mock('@/components/teachers/ScheduleCardList', () => ({

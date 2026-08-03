@@ -2,6 +2,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ContactSheet } from '@/components/about/ContactSheet'
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/about',
+}))
+
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
   useSheetDrag: () => ({
     onTouchStart: vi.fn(),

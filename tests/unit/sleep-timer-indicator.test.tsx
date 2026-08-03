@@ -5,6 +5,10 @@ import { GlobalSleepTimerSheet } from '@/components/media-bar/GlobalSleepTimerSh
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { useMediaStore } from '@/lib/store/media-store'
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/',
+}))
+
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
   useSheetDrag: () => ({
     onTouchStart: vi.fn(),

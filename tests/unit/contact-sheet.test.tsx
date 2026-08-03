@@ -4,6 +4,10 @@ import { ContactSheet } from '@/components/about/ContactSheet'
 import { postMessageToNative } from '@/lib/bridge/post-message'
 import { useMediaStore } from '@/lib/store/media-store'
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/about',
+}))
+
 // Mock SheetChrome — isolate ContactSheet behavior from SheetChrome internals
 vi.mock('@/components/modals/chrome/SheetChrome', () => ({
   SheetChrome: ({ children, title }: { children: React.ReactNode; title?: string }) => (
@@ -82,8 +86,11 @@ describe('ContactSheet', () => {
     expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: false, showMediaBar: false })
   })
 
-  it('restores the media bar to its pre-sheet store value on unmount', () => {
-    useMediaStore.setState({ showMediaBar: true })
+  it('restores the media bar to the natively-correct value for the current route on unmount', () => {
+    // The fixed hook derives the restore value as `pathname !== '/' && !isTeacherDetailPath(pathname)`
+    // (mocked pathname is '/about' — not '/', not a teacher detail path), so it's true
+    // regardless of what showMediaBar happened to be set to before the sheet opened.
+    useMediaStore.setState({ showMediaBar: false })
     const { unmount } = render(<ContactSheet open={true} onClose={vi.fn()} />)
     unmount()
     expect(postMessageToNative).toHaveBeenCalledWith({ showMobileNav: true, showMediaBar: true })
