@@ -20,14 +20,6 @@ const nextConfig: NextConfig = {
     const isDev = process.env.NODE_ENV !== 'production'
     return [
       {
-        source: '/js/iFrameResizer.contentWindow.min.js',
-        headers: [
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Content-Type', value: 'application/javascript' },
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
-      {
         source: '/(.*)',
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
@@ -46,7 +38,7 @@ const nextConfig: NextConfig = {
               "connect-src 'self' https://api.sanity.io https://cdn.sanity.io https://*.radiojar.com https://www.google.com",
               "font-src 'self'",
               "object-src 'none'",
-              "frame-src https://forms.ministryforms.net https://www.google.com",
+              "frame-src https://www.google.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

@@ -1,143 +1,73 @@
-'use client'
+import { ExternalLink } from 'lucide-react'
+import { detectMobileApp } from '@/lib/utils/mobile-app'
+import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
+import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
+import { getDonateCtaCopy, PUSHPAY_GIVING_URL } from '@/lib/donate/cta'
 
-import { useEffect, useRef, useState } from 'react'
-import Script from 'next/script'
-import { useMediaStore } from '@/lib/store/media-store'
-import { postMessageToNative } from '@/lib/bridge/post-message'
-
-declare global {
-  interface Window {
-    iFrameResize?: (options: Record<string, unknown>, selector: string) => void
-  }
-  interface HTMLIFrameElement {
-    iFrameResizer?: { close(): void }
-  }
-}
-
-const DONATE_URL =
-  'https://forms.ministryforms.net/viewForm.aspx?formid=32b9c82a-1472-4180-b023-73b42532b63e&direct-link=true&embed=false'
-const EXPECTED_ORIGIN = 'https://forms.ministryforms.net'
-
-
-export default function DonatePage() {
-  const [loaded, setLoaded] = useState(false)
-  const [failed, setFailed] = useState(false)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const retryRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const resizeRetry1Ref = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const resizeRetry2Ref = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const setShowMediaBar = useMediaStore((s) => s.setShowMediaBar)
-
-  useEffect(() => {
-    setShowMediaBar(true)
-    timeoutRef.current = setTimeout(() => setFailed(true), 10000)
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      if (retryRef.current) clearTimeout(retryRef.current)
-      if (resizeRetry1Ref.current) clearTimeout(resizeRetry1Ref.current)
-      if (resizeRetry2Ref.current) clearTimeout(resizeRetry2Ref.current)
-    }
-  }, [setShowMediaBar])
-
-  useEffect(() => {
-    function handleMessage(event: MessageEvent) {
-      if (event.origin !== EXPECTED_ORIGIN) return
-      if (event.data?.type === 'donationFormInputFocus') {
-        setShowMediaBar(false)
-        postMessageToNative({ showMobileNav: false, showMediaBar: false })
-      } else if (event.data?.type === 'donationFormInputBlur') {
-        setShowMediaBar(true)
-        postMessageToNative({ showMobileNav: true, showMediaBar: true })
-      }
-    }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [setShowMediaBar])
-
-  function handleLoad() {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    if (retryRef.current) clearTimeout(retryRef.current)
-    if (resizeRetry1Ref.current) clearTimeout(resizeRetry1Ref.current)
-    if (resizeRetry2Ref.current) clearTimeout(resizeRetry2Ref.current)
-    setLoaded(true)
-    const resizeOpts = { log: false, heightCalculationMethod: 'bodyOffset', warningTimeout: 0 }
-    window.iFrameResize?.(resizeOpts, '#donation-iframe')
-    // Form dynamically loads iFrameResizer.contentWindow after onLoad fires.
-    // Delete the iFrameResizer property to bypass the "already setup" guard
-    // (without calling close() which removes the iframe from the DOM).
-    function retryResize() {
-      const el = iframeRef.current
-      if (!el || (el.style.height && el.style.height !== '0px')) return
-      try { delete el.iFrameResizer } catch { /* non-configurable property — skip */ }
-      window.iFrameResize?.(resizeOpts, '#donation-iframe')
-    }
-    resizeRetry1Ref.current = setTimeout(retryResize, 3000)
-    resizeRetry2Ref.current = setTimeout(retryResize, 6000)
-    let remaining = 5
-    function trySend() {
-      try {
-        iframeRef.current?.contentWindow?.postMessage(
-          { type: 'initParentInfo', origin: window.location.origin },
-          EXPECTED_ORIGIN
-        )
-      } catch (err) {
-        console.warn('postMessage to donation form failed:', err)
-      }
-      if (--remaining > 0) {
-        retryRef.current = setTimeout(trySend, 500)
-      }
-    }
-    trySend()
-  }
-
-  function handleError() {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    setFailed(true)
-    setShowMediaBar(true)
-  }
+export default async function DonatePage() {
+  const isMobileApp = await detectMobileApp()
+  const { target, reassurance } = getDonateCtaCopy(isMobileApp)
 
   return (
-    <div className="page-enter px-4 py-6 pb-8">
-      <h1 className="text-[22px] md:text-4xl font-extrabold text-white light:text-gray-900 tracking-tight mb-6">Donate</h1>
-      {failed ? (
-        <div role="alert" className="text-white/90 light:text-gray-500 text-sm py-8 text-center">
-          <p>Unable to load the donation form.</p>
+    <div className="page-enter px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-6">
+      <ShowMediaBar />
+
+      <div>
+        <h1 className="text-[22px] md:text-4xl font-extrabold text-white light:text-gray-900 tracking-tight">
+          Donate
+        </h1>
+        <p className="mt-2 text-sm md:text-base text-white/90 light:text-gray-600">
+          Support Reach Radio — your gift keeps Bible teaching and gospel music on the air across Tucson.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <TeacherInfoChip label="690AM · 106.7FM" variant="accent" />
+        <TeacherInfoChip label="24/7" variant="accent" />
+        <TeacherInfoChip label="Tucson, AZ" variant="accent" />
+      </div>
+
+      <div className="bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-5 md:p-6">
+        <h2 className="border-l-4 pl-3 font-bold text-sm border-l-[#84b84f] uppercase text-white light:text-gray-900 tracking-wide">
+          Keeping the Gospel on the Air, 24/7
+        </h2>
+        <p className="mt-3 text-white/90 light:text-gray-600 text-sm leading-relaxed">
+          Every gift keeps 690AM and 106.7FM on the air, reaching drivers, shut-ins, and anyone within
+          range of a radio — no app, login, or subscription required. Your support covers the airtime,
+          equipment, and staff that make that possible, day and night.
+        </p>
+      </div>
+
+      <div className="bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-5 md:p-6">
+        <div className="flex items-center justify-center gap-1 h-5 mb-4 motion-safe:animate-pulse" aria-hidden="true">
+          <span className="w-1 h-2 bg-[#84b84f] rounded-full" />
+          <span className="w-1 h-3.5 bg-[#84b84f] rounded-full" />
+          <span className="w-1 h-5 bg-[#84b84f] rounded-full" />
+          <span className="w-1 h-2.5 bg-[#84b84f] rounded-full" />
+          <span className="w-1 h-4 bg-[#84b84f] rounded-full" />
+        </div>
+
+        <div className="flex justify-center">
           <a
-            href={DONATE_URL}
-            target="_blank"
+            href={PUSHPAY_GIVING_URL}
             rel="noopener noreferrer"
-            className="mt-3 inline-block text-[var(--color-brand-green)] underline"
+            aria-describedby="donate-cta-note"
+            {...(target ? { target } : {})}
+            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#84b84f] hover:bg-[#96cc5e] text-[#0a1305] font-bold rounded-full cursor-pointer motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
-            Open donation form in new tab
+            <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0a1305] opacity-40" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0a1305]" />
+            </span>
+            Donate
+            <ExternalLink className="w-4 h-4" />
           </a>
         </div>
-      ) : (
-        <>
-          {!loaded && (
-            <div role="status" aria-label="Loading donation form..." className="motion-safe:animate-pulse flex flex-col gap-4 min-h-[1300px] md:min-h-[1200px] bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-4">
-              <div className="h-[60px] bg-white/5 light:bg-gray-200 rounded-xl" />
-              <div className="h-[1.2em] w-[90%] bg-white/5 light:bg-gray-200 rounded-xl" />
-              <div className="h-[1.2em] w-[60%] bg-white/5 light:bg-gray-200 rounded-xl" />
-              <div className="h-[150px] bg-white/5 light:bg-gray-200 rounded-xl" />
-              <div className="h-[1.2em] w-[85%] bg-white/5 light:bg-gray-200 rounded-xl" />
-              <div className="h-[1.2em] w-[75%] bg-white/5 light:bg-gray-200 rounded-xl" />
-              <div className="h-[100px] bg-white/5 light:bg-gray-200 rounded-xl" />
-            </div>
-          )}
-          <iframe
-            id="donation-iframe"
-            ref={iframeRef}
-            src={DONATE_URL}
-            title="Donation Form"
-            onLoad={handleLoad}
-            onError={handleError}
-            sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
-            className={`w-full min-h-[1300px] md:min-h-[1200px] border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${loaded ? 'block' : 'hidden'}`}
-          />
-        </>
-      )}
-      <Script src="/js/iFrameResizer.min.js" strategy="afterInteractive" />
+
+        <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/70 light:text-gray-500">
+          {reassurance}
+        </p>
+      </div>
     </div>
   )
 }
