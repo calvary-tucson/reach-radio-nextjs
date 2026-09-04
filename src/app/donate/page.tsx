@@ -2,14 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import { detectMobileApp } from '@/lib/utils/mobile-app'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
-import { getDonateCtaCopy } from '@/lib/donate/cta'
-
-// Placeholder until the PushPay giving page and its Preconfigured Redirect
-// (see docs/superpowers/specs/2026-09-04-donate-page-link-out-design.md,
-// Gaps #1-#3) are set up. Replace with the real giving link before launch —
-// the page renders and type-checks correctly either way, it just points
-// nowhere useful until this is swapped in.
-const PUSHPAY_GIVING_URL = 'https://pushpay.com/g/PLACEHOLDER-reach-radio'
+import { getDonateCtaCopy, PUSHPAY_GIVING_URL } from '@/lib/donate/cta'
 
 export default async function DonatePage() {
   const isMobileApp = await detectMobileApp()

@@ -1,3 +1,10 @@
+// Placeholder until the PushPay giving page and its Preconfigured Redirect
+// (see docs/superpowers/specs/2026-09-04-donate-page-link-out-design.md,
+// Gaps #1-#3) are set up. Replace with the real giving link before launch —
+// the page renders and type-checks correctly either way, it just points
+// nowhere useful until this is swapped in.
+export const PUSHPAY_GIVING_URL = 'https://pushpay.com/g/PLACEHOLDER-reach-radio'
+
 export interface DonateCtaCopy {
   /** '_blank' on web so the original tab survives; omitted in-app so the
    *  native WebView's own external-link interceptor (iOS's
