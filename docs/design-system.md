@@ -113,10 +113,10 @@ bg-white/5 border-white/10 text-white/60 can-hover:hover:border-white/20 can-hov
 
 ```tsx
 // accent variant
-bg-[rgba(132,184,79,0.1)] border border-[rgba(132,184,79,0.2)] text-[#84b84f]
+bg-[rgba(132,184,79,0.1)] light:bg-green-100 border border-[rgba(132,184,79,0.2)] light:border-green-300 text-[#84b84f] light:text-green-700
 
 // dim variant
-bg-white/5 border border-white/10 text-white/50
+bg-white/5 light:bg-gray-100 border border-white/10 light:border-gray-200 text-white/50 light:text-gray-500
 ```
 
 Both: `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold`
