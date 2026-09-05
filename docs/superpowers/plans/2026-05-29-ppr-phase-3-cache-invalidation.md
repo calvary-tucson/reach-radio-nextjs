@@ -289,7 +289,8 @@ Expected: no errors.
 - [ ] **Step 7: Rename the Vercel env var**
 
 ```bash
-vercel env rm SANITY_WEBHOOK_SECRET production preview
+vercel env rm SANITY_WEBHOOK_SECRET production --yes
+vercel env rm SANITY_WEBHOOK_SECRET preview --yes
 vercel env add SANITY_REVALIDATE_SECRET production
 vercel env add SANITY_REVALIDATE_SECRET preview
 ```
