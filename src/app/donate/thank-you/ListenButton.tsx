@@ -5,7 +5,7 @@ const BUTTON_CLASS =
 
 export function ListenButton() {
   return (
-    <Link href="/" className={BUTTON_CLASS}>
+    <Link href="/" aria-label="Return to Reach Radio player" className={BUTTON_CLASS}>
       Listen
     </Link>
   )
