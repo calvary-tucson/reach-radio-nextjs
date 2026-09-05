@@ -43,4 +43,34 @@ test.describe('Donate', () => {
     await expect(listen).toBeVisible()
     await expect(listen).toHaveAttribute('href', '/')
   })
+
+  test('thank-you page renders an unconditional return-to-app link', async ({ page }) => {
+    await page.goto('/donate/thank-you')
+    const returnLink = page.locator('a[href="reachradio://"]')
+    await expect(returnLink).toBeVisible()
+    // toContainText, not toHaveText: the element's full text content also
+    // includes the sr-only disclosure span's text (sr-only hides visually,
+    // not from textContent) — asserting the visible label and the
+    // disclosure as two separate, exact checks avoids relying on a loose
+    // regex to skip over that span.
+    await expect(returnLink).toContainText('Have the app? Return to Reach Radio')
+    await expect(returnLink.locator('span.sr-only')).toHaveText(
+      '(opens the Reach Radio app if installed; does nothing otherwise)'
+    )
+  })
+
+  test('return-to-app link renders even when the mobile-app cookie is set', async ({ page, context }) => {
+    // The whole point of this link: unlike the Donate CTA (which DOES
+    // branch on this cookie, per the "omits target in-app" test above),
+    // this link must render identically whether or not isMobileApp is
+    // true — that signal is never actually present on this page when
+    // reached via PushPay's redirect (see the design spec's "Why
+    // Universal Links don't work here" section), so gating on it would be
+    // wrong. Setting the cookie here (not clearing it) is what actually
+    // exercises that claim — a test against a cookie-free context can't
+    // fail either way and wouldn't prove anything.
+    await context.addCookies([{ name: 'mobile-app', value: 'true', url: 'http://localhost:3000' }])
+    await page.goto('/donate/thank-you')
+    await expect(page.locator('a[href="reachradio://"]')).toBeVisible()
+  })
 })

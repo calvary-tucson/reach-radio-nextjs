@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ExternalLink } from 'lucide-react'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { ListenButton } from './ListenButton'
 
@@ -29,6 +30,17 @@ export default function ThankYouPage() {
 
         <div className="mt-8 flex justify-center">
           <ListenButton />
+        </div>
+
+        <div className="mt-3 flex justify-center">
+          <a
+            href="reachradio://"
+            className="w-full md:w-auto inline-flex items-center justify-center gap-1.5 py-3 px-4 text-sm text-white/90 light:text-gray-600 cursor-pointer motion-safe:transition-colors hover:text-white light:hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-full"
+          >
+            Have the app? Return to Reach Radio
+            <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="sr-only"> (opens the Reach Radio app if installed; does nothing otherwise)</span>
+          </a>
         </div>
       </div>
     </div>
