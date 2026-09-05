@@ -1,15 +1,17 @@
+import { Suspense } from 'react'
 import { ExternalLink } from 'lucide-react'
 import { detectMobileApp } from '@/lib/utils/mobile-app'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
+import { DonatePageSkeleton } from '@/components/skeletons/DonatePageSkeleton'
 import { getDonateCtaCopy, PUSHPAY_GIVING_URL } from '@/lib/donate/cta'
 
-export default async function DonatePage() {
+async function DonateContent() {
   const isMobileApp = await detectMobileApp()
   const { target, reassurance } = getDonateCtaCopy(isMobileApp)
 
   return (
-    <div className="page-enter px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-6">
+    <>
       <ShowMediaBar />
 
       <div>
@@ -53,21 +55,32 @@ export default async function DonatePage() {
             rel="noopener noreferrer"
             aria-describedby="donate-cta-note"
             {...(target ? { target } : {})}
-            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#84b84f] hover:bg-[#96cc5e] text-[#0a1305] font-bold rounded-full cursor-pointer motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#84b84f] hover:bg-[#96cc5e] text-[#0a1305] font-bold rounded-full cursor-pointer motion-safe:transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
             <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
               <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0a1305] opacity-40" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0a1305]" />
             </span>
             Donate
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4" aria-hidden="true" />
+            {target && <span className="sr-only"> (opens in new tab)</span>}
           </a>
         </div>
 
-        <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/70 light:text-gray-500">
+        <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/90 light:text-gray-500">
           {reassurance}
         </p>
       </div>
+    </>
+  )
+}
+
+export default function DonatePage() {
+  return (
+    <div className="page-enter px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-6">
+      <Suspense fallback={<DonatePageSkeleton />}>
+        <DonateContent />
+      </Suspense>
     </div>
   )
 }
