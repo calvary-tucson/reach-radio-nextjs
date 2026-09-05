@@ -38,6 +38,13 @@ whether to do it consistently across all three projects rather than just this on
   not a bug.
 - The plan's "Bug 3" (weak plain-string auth) does not match current code either — it already uses
   `timingSafeEqual` plus a replay window (commits `8906cef`, `c37ff80`, `c6e2a8b`, `20bb21f`).
+- The plan's "Bug 2" (TAG_MAP key-name mismatch) is partially stale: the `settings`/`appSettings`
+  key-naming bug is fixed — current `TAG_MAP` uses `siteSettings: 'siteSettings'` and
+  `appSettings: 'appSettings'`, matching the tags actually used at the call sites (`layout.tsx`,
+  `about/page.tsx`, `native-config/route.ts`, `RadioStationSchema.tsx`, `WebSiteSchema.tsx`). The
+  "no fallback for unknown `_type`" part is also handled — the route returns
+  `{ revalidated: false, reason: 'unknown document type' }` rather than erroring. The remaining
+  part of Bug 2 is still live and is exactly the schedule-tag bug described next.
 - A real bug the plan missed: Sanity has no `schedule` document type — schedule data is a field
   *on* the `teacher` document (confirmed via `src/lib/sanity/queries.ts` GROQ:
   `_type == "teacher" && count(schedule...)`). `TodaySchedule.tsx` (the home page's Suspense
@@ -107,6 +114,15 @@ independently of invalidating the signature itself), and reject if
 `Date.now() - timestamp > 5 * 60_000`. This is the same pattern Stripe uses for its webhook
 signatures, and is strictly more robust than trusting a payload field, since it doesn't depend on
 what the GROQ projection includes.
+
+**Exact failure response:** an expired-replay-window request returns the identical response as an
+invalid signature — HTTP `401`, no distinguishing body field. Both cases mean "this request cannot
+be trusted"; treating them as one outcome keeps the check a simple boolean everywhere, which
+matters because calvarytucson-svelte's `hasValidRevalidateSecret` helper returns a plain
+`Promise<boolean>` and has no natural way to surface a second failure mode without complicating its
+signature. (`400` was considered — "malformed/stale request" rather than "auth failure" — but
+rejected specifically to keep all three repos' observable behavior identical for the same input,
+which is the stated goal of this migration.)
 
 ### 3. Per-repo scope
 
