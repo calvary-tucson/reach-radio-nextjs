@@ -49,10 +49,10 @@ Move hosting from Cloudflare Pages → Vercel. Required because Cloudflare Pages
 
 | Task | Status |
 |------|--------|
-| Env vars set in Vercel | ✅ Confirmed (`SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_WEBHOOK_SECRET`, `FORMSPREE_ENDPOINT`, `PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`) |
-| Deploy to Vercel production | 🔲 Not started |
-| Verify PPR routes show `◐` in Vercel preview | 🔲 Not started |
-| Point `reach.radio` DNS to Vercel | 🔲 Not started |
+| Env vars set in Vercel | ✅ Done — Production scope confirmed pre-existing; Preview scope was missing `SANITY_PROJECT_ID`/`SANITY_DATASET`/`SANITY_WEBHOOK_SECRET`/`FORMSPREE_ENDPOINT`/`RECAPTCHA_SECRET_KEY` (build failed without them), added from Doppler `dev` config on 2026-08-04 |
+| Verify PPR routes show `◐` in Vercel preview | ✅ Done 2026-08-04 — preview build clean, `/`, `/about`, `/donate`, `/teachers`, `/teachers/[slug]`, `/teachers/search`, `/about/privacy-policy` all show `◐` |
+| Deploy to Vercel production | ✅ Done 2026-08-04 — aliased to `https://reach-radio-nextjs.vercel.app` (not `reach.radio` yet — DNS below) |
+| Point `reach.radio` DNS to Vercel | 🔲 Not started — deliberately held; also listed under Step 4 (Go Live) since native apps still hardcode the Astro URL until App Store/Play Store updates ship |
 
 ---
 
