@@ -88,19 +88,45 @@ underlying WebView correctly, invisibly, behind a browser sheet that's
 still covering the whole screen — indistinguishable from the link doing
 nothing at all.
 
-**Fix:** when `.onOpenURL` receives a `reachradio://` URL, dismiss whatever
-view controller is currently presented before (or alongside) setting
-`navigationState.pendingDeepLink` — mirroring the exact window-scene-walking
-technique `presentSafariVC` already uses to *present* the sheet, run in
-reverse to *dismiss* it (walk `UIApplication.shared.connectedScenes` to the
-foreground `UIWindowScene`, get its key window's `rootViewController`, walk
-`.presentedViewController` to the topmost one, call `.dismiss(animated:)` on
-it if it exists). This is intentionally generic — "dismiss whatever's
-presented," not "specifically find and dismiss the Safari VC" — because a
-deep link arriving while *any* modal is covering the screen should reveal
-the content underneath; there's no other modal this app presents that a
-user would want preserved in preference to acting on a link they just
-tapped.
+**Fix, and exactly where it goes:** not in `.onOpenURL` itself.
+`.onOpenURL` only sets `navigationState.pendingDeepLink`; the actual
+navigation happens later, in `ContentView.swift`'s
+`handlePendingDeepLinkIfReady()` (`:473-477`), gated on
+`bridgeState.isBridgeReady`. Dismissing the sheet in `.onOpenURL` would
+drop it immediately while the WebView could still be showing the old page
+for a beat until that readiness gate clears — the dismiss and the
+navigation need to happen together. **Dismiss inside
+`handlePendingDeepLinkIfReady()`**, right where the link is actually
+consumed, so the two stay in step.
+
+The dismiss itself mirrors the exact window-scene-walking technique
+`presentSafariVC` (`WebViewCoordinator.swift:159-178`) already uses to
+*present* the sheet, run in reverse: walk `UIApplication.shared.connectedScenes`
+to the foreground `UIWindowScene` (filtering out CarPlay's scene the same
+way `presentSafariVC` already does — its comment there explains why
+`connectedScenes.first` alone is unreliable when CarPlay is connected),
+get its key window's `rootViewController`, walk `.presentedViewController`
+to the topmost one, call `.dismiss(animated:)` on it if it exists. This is
+intentionally generic — "dismiss whatever's presented," not "specifically
+find and dismiss the Safari VC" — because a deep link arriving while *any*
+modal is covering the screen should reveal the content underneath; there's
+no other modal this app presents that a user would want preserved in
+preference to acting on a link they just tapped.
+
+**Extract, don't duplicate:** the scene/top-VC-walking logic (with its
+CarPlay-exclusion filter) needs to exist in exactly one place, used by both
+`presentSafariVC` (to find where to *present*) and this new dismiss step
+(to find what to *dismiss*) — otherwise a hard-won, already-commented
+constraint silently drifts between two copies. Extract it into a small
+shared helper that returns the resolved topmost `UIViewController?`; each
+call site does its own `.present(...)` or `.dismiss(...)` on the result.
+This is also the testable seam — the resolution logic can get a unit test
+where an inline closure couldn't.
+
+This fix is independently shippable and testable before the web link
+(below) exists — trigger it with any `reachradio://` link opened from a
+page inside the `SFSafariViewController` sheet, not only from the specific
+"Have the app? Return to Reach Radio" link this spec adds.
 
 ### The exact URL
 
@@ -192,11 +218,14 @@ has established conventions for.
   `assetlinks.json`/`apple-app-site-association`, no Play Console SHA-256
   fingerprint, no DNS-cutover dependency. All of that is now unnecessary —
   removed from scope, not deferred.
-- No Android code changes — its existing `reachradio://` handler and
-  Custom Tab hand-off already bring the app forward correctly. (iOS needs
-  one small addition — see "iOS: the presented browser sheet must be
-  dismissed explicitly" above — this is the one native change this spec
-  does require.)
+- No Android code changes in this plan. Whether Android's existing
+  `reachradio://` handler and Custom Tab hand-off actually bring the app
+  forward cleanly is confirmed by the manual test in Testing/verification
+  below, not assumed here — unlike the iOS sheet, which is verified by
+  tracing the code (see "iOS: the presented browser sheet must be
+  dismissed explicitly" above, the one native change this spec does
+  require), Android's behavior is asserted only as "plausible" pending that
+  manual check.
 - No `launchMode` change on Android's `MainActivity` (currently
   `singleTop`) to close the gap documented in Gap #3 below. That change has
   its own blast radius — it also governs the notification `ACTION_PLAY`/
