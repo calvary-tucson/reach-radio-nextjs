@@ -3,7 +3,7 @@ import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { ListenButton } from './ListenButton'
 
 export const metadata: Metadata = {
-  title: 'Thank You',
+  title: { absolute: 'Thank You | Reach Radio' },
   description: 'Thank you for supporting Reach Radio — 106.7FM / 690AM in Tucson, AZ.',
   alternates: { canonical: '/donate/thank-you' },
   robots: { index: false },
