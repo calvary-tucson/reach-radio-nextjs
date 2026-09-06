@@ -55,7 +55,7 @@ both are independently testable.
   component, no new props or exported functions.
 - Produces: nothing new for later tasks. This is the only task in this plan.
 
-- [ ] **Step 1: Write the failing e2e test**
+- [x] **Step 1: Write the failing e2e test**
 
 Open `tests/e2e/donate.spec.ts`. Find the existing test
 `'thank-you page renders a Listen link back to home'` inside the
@@ -95,12 +95,12 @@ it, inside the same `describe` block:
   })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx playwright test tests/e2e/donate.spec.ts -g "return-to-app"`
 Expected: FAIL — no element matches `a[href="reachradio://"]` yet.
 
-- [ ] **Step 3: Add the link to the thank-you page**
+- [x] **Step 3: Add the link to the thank-you page**
 
 Read the current full contents of `src/app/donate/thank-you/page.tsx`
 first — it's a small file (under 40 lines) and this step replaces its
@@ -208,13 +208,13 @@ unambiguous. `py-3` plus the `flex items-center` layout gives the link a
 tap area at or above this project's 44px/`h-11` minimum touch-target
 convention.)
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx playwright test tests/e2e/donate.spec.ts`
 Expected: PASS, full file (all existing Donate tests plus the two new
 ones).
 
-- [ ] **Step 5: Manual both-themes contrast check**
+- [x] **Step 5: Manual both-themes contrast check**
 
 Run the dev server (`npm run dev`), open `/donate/thank-you`, and use the
 `ThemeToggle` in the footer ("Appearance" — Light/Dark/System) to switch
@@ -226,7 +226,7 @@ project has shipped a contrast gap on this exact page before (see
 `docs/superpowers/specs/2026-09-04-donate-page-link-out-design.md`'s Gap
 #2) — treat this as a required check, not a formality.
 
-- [ ] **Step 6: Full verification sweep**
+- [x] **Step 6: Full verification sweep**
 
 Run, in order, and confirm each is clean:
 
@@ -237,7 +237,7 @@ npx vitest run
 npx playwright test
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/app/donate/thank-you/page.tsx tests/e2e/donate.spec.ts
