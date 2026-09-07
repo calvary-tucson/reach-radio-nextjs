@@ -1,6 +1,6 @@
 // tests/e2e/donate.spec.ts
 import { test, expect } from '@playwright/test'
-import { PUSHPAY_GIVING_URL } from '@/lib/donate/cta'
+import { PUSHPAY_GIVING_URL, REACHRADIO_DEEP_LINK_URL } from '@/lib/donate/cta'
 
 test.describe('Donate', () => {
   // Locate by destination, not accessible name: on web, Header.tsx also
@@ -46,7 +46,7 @@ test.describe('Donate', () => {
 
   test('thank-you page renders an unconditional return-to-app link', async ({ page }) => {
     await page.goto('/donate/thank-you')
-    const returnLink = page.locator('a[href="reachradio://"]')
+    const returnLink = page.locator(`a[href="${REACHRADIO_DEEP_LINK_URL}"]`)
     await expect(returnLink).toBeVisible()
     // toContainText, not toHaveText: the element's full text content also
     // includes the sr-only disclosure span's text (sr-only hides visually,
@@ -71,6 +71,6 @@ test.describe('Donate', () => {
     // fail either way and wouldn't prove anything.
     await context.addCookies([{ name: 'mobile-app', value: 'true', url: 'http://localhost:3000' }])
     await page.goto('/donate/thank-you')
-    await expect(page.locator('a[href="reachradio://"]')).toBeVisible()
+    await expect(page.locator(`a[href="${REACHRADIO_DEEP_LINK_URL}"]`)).toBeVisible()
   })
 })

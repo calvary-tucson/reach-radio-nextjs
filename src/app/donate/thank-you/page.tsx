@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ExternalLink } from 'lucide-react'
 import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
+import { REACHRADIO_DEEP_LINK_URL } from '@/lib/donate/cta'
 import { ListenButton } from './ListenButton'
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function ThankYouPage() {
 
         <div className="mt-3 flex justify-center">
           <a
-            href="reachradio://"
+            href={REACHRADIO_DEEP_LINK_URL}
             className="w-full md:w-auto inline-flex items-center justify-center gap-1.5 py-3 px-4 text-sm text-white/90 light:text-gray-600 cursor-pointer motion-safe:transition-colors hover:text-white light:hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rounded-full"
           >
             Have the app? Return to Reach Radio

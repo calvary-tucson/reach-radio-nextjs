@@ -5,6 +5,11 @@
 // nowhere useful until this is swapped in.
 export const PUSHPAY_GIVING_URL = 'https://pushpay.com/g/PLACEHOLDER-reach-radio'
 
+// Custom-scheme deep link back into the Reach Radio native app. Unconditional
+// on the thank-you page (not gated on detectMobileApp()) — see
+// docs/superpowers/specs/2026-09-05-post-donation-app-reopen-design.md for why.
+export const REACHRADIO_DEEP_LINK_URL = 'reachradio://'
+
 export interface DonateCtaCopy {
   /** '_blank' on web so the original tab survives; omitted in-app so the
    *  native WebView's own external-link interceptor (iOS's
