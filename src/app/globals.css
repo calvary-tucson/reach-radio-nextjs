@@ -320,3 +320,14 @@ body[data-app] [data-media-bar] {
   from { opacity: 1; }
   to { opacity: 0; }
 }
+
+/* === reCAPTCHA badge ===
+   Google injects this floating widget globally once loaded and never removes it.
+   Keep it hidden except while ContactForm is actually mounted (see ContactForm.tsx). */
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+html.recaptcha-visible .grecaptcha-badge {
+  visibility: visible;
+}

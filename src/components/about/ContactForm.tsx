@@ -21,12 +21,15 @@ export function ContactForm({ onSuccess, dryRun = false }: ContactFormProps) {
 
   useEffect(() => {
     if (!RECAPTCHA_SITE_KEY) return
-    if (document.querySelector('script[data-recaptcha]')) return
-    const script = document.createElement('script')
-    script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`
-    script.async = true
-    script.dataset.recaptcha = '1'
-    document.head.appendChild(script)
+    if (!document.querySelector('script[data-recaptcha]')) {
+      const script = document.createElement('script')
+      script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`
+      script.async = true
+      script.dataset.recaptcha = '1'
+      document.head.appendChild(script)
+    }
+    document.documentElement.classList.add('recaptcha-visible')
+    return () => document.documentElement.classList.remove('recaptcha-visible')
   }, [])
 
   useEffect(() => {
