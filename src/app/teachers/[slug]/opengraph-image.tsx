@@ -19,7 +19,7 @@ export async function generateStaticParams() {
   }
 }
 
-const BG = 'linear-gradient(135deg, #1e1040 0%, #2D1B69 50%, #1a1040 100%)'
+const BG = 'linear-gradient(135deg, #1e3a0a 0%, #1A240F 50%, #0a1305 100%)'
 const GREEN = '#22C55E'
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
