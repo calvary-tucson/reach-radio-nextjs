@@ -8,7 +8,7 @@ Derived from the teachers pages (the most complete implementation). Apply these 
 
 | Role | Value |
 |---|---|
-| Page background | `oklch(24% 0.05 280)` (`var(--color-brand-purple)`) |
+| Page background | `oklch(24% 0.04 130)` (`var(--color-brand-purple)`) |
 | Card surface | `#1c2128` |
 | Sheet / panel surface | `#0f1a0a` |
 | Avatar fallback gradient | `from-[#2d4a1a] to-[#1a2d0f]` |
@@ -200,7 +200,7 @@ Used on recommended items, filter chips, day tabs — any horizontal scroller:
 className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 
 // Fade mask overlay (mobile only, inside a relative parent)
-<div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[oklch(24%_0.05_280)] to-transparent md:hidden" />
+<div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[var(--color-brand-purple)] to-transparent md:hidden" />
 ```
 
 ---

@@ -88,7 +88,7 @@ export function TeacherSearchClient({
             </button>
           ))}
         </div>
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[oklch(24%_0.05_280)] to-transparent md:hidden" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[var(--color-brand-purple)] to-transparent md:hidden" />
       </div>
 
       {/* Results */}
