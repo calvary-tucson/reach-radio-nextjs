@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Sun, Moon } from 'lucide-react'
 import { useScrollHide } from '@/lib/hooks/useScrollHide'
 import { ContactSheet } from '@/components/about/ContactSheet'
 import { ReachRadioLogo } from '@/components/layout/ReachRadioLogo'
+import { useTheme } from '@/components/theme/ThemeProvider'
 
 const navItems = [
   { href: '/', label: 'Listen' },
@@ -18,6 +20,7 @@ export function Header() {
   const pathname = usePathname()
   const ref = useScrollHide<HTMLElement>()
   const [contactOpen, setContactOpen] = useState(false)
+  const { setTheme } = useTheme()
 
   return (
     <header
@@ -58,6 +61,15 @@ export function Header() {
       </nav>
 
       <div className="flex items-center gap-6">
+        <button
+          type="button"
+          onClick={() => setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light')}
+          aria-label="Toggle color theme"
+          className="w-7 text-slate-300 light:text-gray-500 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded cursor-pointer"
+        >
+          <Moon className="h-5 w-5 mx-auto light:hidden" aria-hidden="true" />
+          <Sun className="h-5 w-5 mx-auto hidden light:block" aria-hidden="true" />
+        </button>
         <a
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"

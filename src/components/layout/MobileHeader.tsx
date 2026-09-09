@@ -2,13 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Sun, Moon } from 'lucide-react'
 import { useScrollHide } from '@/lib/hooks/useScrollHide'
 import { ContactSheet } from '@/components/about/ContactSheet'
 import { ReachRadioLogo } from '@/components/layout/ReachRadioLogo'
+import { useTheme } from '@/components/theme/ThemeProvider'
 
 export function MobileHeader() {
   const ref = useScrollHide<HTMLElement>()
   const [contactOpen, setContactOpen] = useState(false)
+  const { setTheme } = useTheme()
 
   return (
     <header
@@ -20,6 +23,15 @@ export function MobileHeader() {
         <ReachRadioLogo className="h-8 w-auto" />
       </Link>
       <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light')}
+          aria-label="Toggle color theme"
+          className="w-11 min-h-[44px] flex items-center justify-center text-slate-300 light:text-gray-500 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded cursor-pointer"
+        >
+          <Moon className="h-6 w-6 light:hidden" aria-hidden="true" />
+          <Sun className="h-6 w-6 hidden light:block" aria-hidden="true" />
+        </button>
         <a
           href="https://www.facebook.com/reachradiotucson"
           target="_blank"
