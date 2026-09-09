@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useScrollHide } from '@/lib/hooks/useScrollHide'
 import { ContactSheet } from '@/components/about/ContactSheet'
+import { ReachRadioLogo } from '@/components/layout/ReachRadioLogo'
 
 export function MobileHeader() {
   const ref = useScrollHide<HTMLElement>()
@@ -17,14 +17,7 @@ export function MobileHeader() {
       className="md:hidden fixed top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200 will-change-transform"
     >
       <Link href="/" aria-label="Reach Radio home" className="w-[clamp(180px,40vw,250px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
-        <Image
-          src="/reach_radio_logo.svg"
-          alt=""
-          width={248}
-          height={58}
-          className="h-8 w-auto"
-          priority
-        />
+        <ReachRadioLogo className="h-8 w-auto" />
       </Link>
       <div className="flex items-center gap-3">
         <a

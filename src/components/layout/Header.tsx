@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useScrollHide } from '@/lib/hooks/useScrollHide'
 import { ContactSheet } from '@/components/about/ContactSheet'
+import { ReachRadioLogo } from '@/components/layout/ReachRadioLogo'
 
 const navItems = [
   { href: '/', label: 'Listen' },
@@ -28,14 +28,7 @@ export function Header() {
       className="hidden md:flex fixed top-0 z-50 w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6 will-change-transform"
     >
       <Link href="/" aria-label="Reach Radio home" className="flex items-center w-[clamp(130px,16vw,186px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
-        <Image
-          src="/reach_radio_logo.svg"
-          alt=""
-          width={248}
-          height={58}
-          className="h-10 w-auto"
-          priority
-        />
+        <ReachRadioLogo className="h-10 w-auto" />
       </Link>
 
       <nav aria-label="Primary navigation" className="flex items-center">
