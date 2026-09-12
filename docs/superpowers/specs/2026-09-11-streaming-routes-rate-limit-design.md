@@ -27,7 +27,11 @@ Two independent defects, both discovered during go-to-prod review
    `stream-info-sse` return a long-lived streamed `Response` body. Without an
    explicit `maxDuration` export, a Next.js route on Vercel Pro silently
    inherits the project's *default* max function duration — 300 seconds (5
-   minutes), confirmed against current Vercel docs (2026-09-11). This means:
+   minutes), confirmed both against current Vercel docs and empirically:
+   `curl -N -m 400 -w "%{http_code} %{time_total}"` against the live
+   production routes (2026-09-11) confirmed both are cut off right at that
+   ceiling: `audio-stream` at `time_total=301.99s`, `stream-info-sse` at
+   `time_total=300.51s`. This means:
    - `stream-info-sse`'s own code assumes a 30-minute connection lifetime
      (`MAX_CONNECTION_MS`) that has never actually been reachable in
      production — every connection is really being cut at 5 minutes.
@@ -172,14 +176,21 @@ a requirement.
   `tests/unit/action-contact.test.ts` is unrelated (contact-form limiting is
   a separate mechanism, untouched) and needs no change.
 - Manual verification after deploy:
-  - `stream-info-sse`: hold a connection open past 5 minutes, confirm it
-    survives (proves `maxDuration` took effect) and reconnects cleanly at
-    its jittered boundary.
-  - `audio-stream`: play continuously past 5 minutes, confirm no audible
-    gap.
+  - `stream-info-sse`: hold a connection open past 5 minutes (proves
+    `maxDuration` took effect — the old, unintentional ceiling), then keep
+    watching through the new ~10-12 minute jittered boundary and confirm
+    it reconnects cleanly there.
+  - `audio-stream`: play continuously past 5 minutes (uneventful, proves
+    `maxDuration` took effect), then through the ~13-minute mark — this is
+    the boundary that actually matters, since recovery there depends on
+    `AudioProvider.tsx`'s `onError`-only reconnect path (see Open risks).
+    Confirm explicitly whether the reconnect is a brief gap or a silence
+    that never recovers.
   - Firewall rules: confirm a burst above each threshold gets a 429 from
-    the edge (not from the app), and that normal single-session usage never
-    trips them.
+    the edge, and that normal single-session usage never trips them. Do
+    this again after the in-app limiter is fully removed, not just once
+    while both are still active — otherwise the in-app limiter's lower
+    threshold masks whether Firewall's own threshold is what's enforcing.
 
 ## Open risks / follow-ups (not built here)
 
@@ -189,3 +200,10 @@ a requirement.
 - Firewall rule thresholds are unvalidated starting points — first real
   traffic window after the `reach.radio` DNS cutover is the actual test;
   revisit numbers from Firewall's logs then.
+- `maxDuration = 780` relocates the forced cutoff, it does not remove it.
+  A live radio stream is unbounded, so every `audio-stream` and
+  `stream-info-sse` listener still gets a forced reconnect every ~13
+  minutes, forever — just deliberately and infrequently instead of
+  accidentally and every 5 minutes. Worth recording so nobody later reads
+  "fixed" and stops looking for why a stream still briefly hiccups
+  periodically.
