@@ -85,11 +85,17 @@ to Vercel Firewall custom rules (Project Settings → Firewall in the
 dashboard — a manual step, not something committed to the repo), one rule
 per route:
 
-| Route | Match | Metric | Starting limit | Action |
-|---|---|---|---|---|
-| `/api/audio-stream` | path equals | requests per IP | 60 per 60s | Deny (429) |
-| `/api/stream-info` | path equals | requests per IP | 60 per 60s | Deny (429) |
-| `/api/stream-info-sse` | path equals | requests per IP (= connection opens, not ongoing traffic) | 30 per 5 min | Deny (429) |
+Confirmed against current Vercel docs (2026-09-11): on the Pro plan, the
+only available counting algorithm is **Fixed Window** (Token Bucket is
+Enterprise-only), the counting window must be between 10s and 10 minutes,
+and available counting keys are IP address or JA4 digest. All three rules
+below fit within those constraints.
+
+| Route | Condition | Algorithm | Time Window | Request Limit | Key | Then (exceeded) |
+|---|---|---|---|---|---|---|
+| `/api/audio-stream` | Path equals `/api/audio-stream` | Fixed Window | 60s | 60 | IP Address | Deny |
+| `/api/stream-info` | Path equals `/api/stream-info` | Fixed Window | 60s | 60 | IP Address | Deny |
+| `/api/stream-info-sse` | Path equals `/api/stream-info-sse` | Fixed Window | 5 min | 30 | IP Address | Deny |
 
 These numbers are intentionally looser than today's in-app values (10/60s,
 30/60s) — the previous thresholds were never validated against real traffic
@@ -99,9 +105,15 @@ Firewall's dashboard logs/analytics let them be tuned up or down after real
 listener traffic arrives, with no code change or redeploy required.
 
 Because Firewall enforcement happens at the edge, before a request reaches
-a function instance, this also fixes defect 1's under-protection half: the
-count is correct regardless of how many concurrent instances Vercel is
-running, since it isn't instance-local.
+a function instance, this fixes most of defect 1's under-protection half —
+but not all of it. Per Vercel's own docs, rate-limit counters are tracked
+**per region**, not globally: traffic matching the same key (IP) across
+multiple regions can still exceed the configured limit in aggregate. This
+is a real caveat, not a rounding error, but it's a much coarser and more
+stable unit than the in-app limiter's per-lambda-instance counting (a
+handful of regions vs. however many concurrent function instances Vercel
+happens to be running), so it's still a meaningful improvement, not a full
+fix to a single global counter.
 
 ### 2. Explicit `maxDuration` on both streaming routes
 
@@ -137,6 +149,17 @@ Since Firewall rules are dashboard configuration, not code, the plan (next
 step after this spec) will separate "code changes I make" from "dashboard
 steps you do," in that order — code first, so the routes are already
 limiter-free before the Firewall rules take over enforcement.
+
+Per Vercel's own documented best practice, each rule should be created with
+a **Log** action first, its 10-minute live traffic view checked to confirm
+it's matching the intended requests, and only then switched to **Deny** —
+rather than going straight to Deny and finding out afterward that the
+condition was wrong. Vercel also supports describing a rule in natural
+language (e.g. "Rate limit /api/audio-stream to 60 requests per minute per
+IP") and having it generate the condition/algorithm/window/key
+configuration automatically — the plan's dashboard task will give the exact
+field values from the table above either way, so this is a convenience, not
+a requirement.
 
 ## Testing
 
