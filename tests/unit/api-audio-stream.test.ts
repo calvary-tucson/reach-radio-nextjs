@@ -13,6 +13,11 @@ describe('GET /api/audio-stream', () => {
     expect(res.status).toBe(502)
   })
 
+  it('sets maxDuration to 780 seconds', async () => {
+    const { maxDuration } = await import('@/app/api/audio-stream/route')
+    expect(maxDuration).toBe(780)
+  })
+
   it('returns stream response with correct content-type on success', async () => {
     const mockBody = new ReadableStream()
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({

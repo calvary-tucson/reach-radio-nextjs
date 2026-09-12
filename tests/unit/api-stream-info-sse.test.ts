@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 vi.mock('@/lib/teacherCache', () => ({
   resolveArtist: vi.fn().mockResolvedValue({ imageUrl: null, resolvedArtist: null }),
@@ -18,6 +18,11 @@ describe('GET /api/stream-info-sse', () => {
     const { GET } = await import('@/app/api/stream-info-sse/route')
     const res = await GET()
     expect(res.headers.get('content-type')).toContain('text/event-stream')
+  })
+
+  it('sets maxDuration to 780 seconds', async () => {
+    const { maxDuration } = await import('@/app/api/stream-info-sse/route')
+    expect(maxDuration).toBe(780)
   })
 
   it('emits parsed title and artist in SSE data event', async () => {
@@ -47,5 +52,31 @@ describe('GET /api/stream-info-sse', () => {
     const res = await GET()
     expect(res.status).toBe(200)
     expect(res.headers.get('content-type')).toContain('text/event-stream')
+  })
+
+  describe('connection timeout jitter', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('schedules the connection-close timeout within the jittered 10-12 minute window', async () => {
+      // Never resolves, so the poll's own async continuation (which schedules
+      // its own setTimeout via schedulePoll) can't land before we inspect —
+      // isolates the connectionTimeout call, set synchronously before `await poll()`.
+      vi.stubGlobal('fetch', vi.fn().mockImplementation(() => new Promise(() => {})))
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout')
+
+      const { GET } = await import('@/app/api/stream-info-sse/route')
+      await GET()
+
+      const connectionTimeoutCall = setTimeoutSpy.mock.calls.find(
+        (call) => typeof call[1] === 'number' && call[1] >= 600_000 && call[1] < 720_000
+      )
+      expect(connectionTimeoutCall).toBeDefined()
+    })
   })
 })
