@@ -1,22 +1,7 @@
-import { createRateLimiter } from '@/lib/rate-limit'
 import { RADIOJAR_URL } from '@/lib/constants'
 import { resolveArtist } from '@/lib/teacherCache'
 
-const limiter = createRateLimiter({ windowMs: 60_000, max: 30 })
-
-export async function GET(request: Request): Promise<Response> {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const result = limiter.check(ip)
-  if (!result.success) {
-    return new Response('Too Many Requests', {
-      status: 429,
-      headers: {
-        'Retry-After': String(result.retryAfter),
-        'Content-Type': 'text/plain',
-      },
-    })
-  }
-
+export async function GET(): Promise<Response> {
   try {
     const res = await fetch(RADIOJAR_URL, {
       signal: AbortSignal.timeout(5_000),

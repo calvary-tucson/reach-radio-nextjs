@@ -1,25 +1,17 @@
-import { createRateLimiter } from '@/lib/rate-limit'
 import { RADIOJAR_URL } from '@/lib/constants'
 import { resolveArtist } from '@/lib/teacherCache'
 
-const limiter = createRateLimiter({ windowMs: 60_000, max: 10 })
+export const maxDuration = 780
 
 const MAX_POLL_BACKOFF_MS = 5 * 60_000
-const MAX_CONNECTION_MS = 30 * 60_000
+const MIN_CONNECTION_MS = 10 * 60_000
+const CONNECTION_JITTER_MS = 2 * 60_000
 
-export async function GET(request: Request): Promise<Response> {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const result = limiter.check(ip)
-  if (!result.success) {
-    return new Response('Too Many Requests', {
-      status: 429,
-      headers: {
-        'Retry-After': String(result.retryAfter),
-        'Content-Type': 'text/plain',
-      },
-    })
-  }
+function getConnectionTimeoutMs(): number {
+  return MIN_CONNECTION_MS + Math.random() * CONNECTION_JITTER_MS
+}
 
+export async function GET(): Promise<Response> {
   const encoder = new TextEncoder()
   let pollTimer: ReturnType<typeof setTimeout> | undefined
   let keepaliveInterval: ReturnType<typeof setInterval> | undefined
@@ -77,14 +69,16 @@ export async function GET(request: Request): Promise<Response> {
         }
       }, 15_000)
 
-      // Absolute connection timeout — forces client reconnect after 30 min
+      // Forces a client reconnect after a jittered 10-12 minute window, so
+      // connections opened around the same time (e.g. at broadcast start)
+      // don't all reconnect in the same instant.
       connectionTimeout = setTimeout(() => {
         cancelled = true
         clearTimeout(pollTimer)
         clearInterval(keepaliveInterval)
         abortController.abort()
         try { controller.close() } catch { /* already closed */ }
-      }, MAX_CONNECTION_MS)
+      }, getConnectionTimeoutMs())
 
       await poll()
     },
