@@ -651,9 +651,11 @@ Deny — no code consumers remain after the previous three tasks."
 **Interfaces:**
 - Consumes: the deployed `maxDuration = 780` change (Tasks 2 and 4) and the Firewall rules with the in-app limiter now removed (Task 1 + Task 5).
 - Produces: confirmation that both streaming routes survive past the old
-  5-minute ceiling, that reconnection across the new ~780s boundary
-  actually works, and that Firewall alone (not a leftover in-app limiter)
-  is what's enforcing the rate limit. No code or commit.
+  5-minute ceiling and that `maxDuration = 780` is actually honored in
+  production, and that Firewall alone (not a leftover in-app limiter) is
+  what's enforcing the rate limit. No code or commit. Native app reconnect
+  behavior across the 780s boundary is explicitly out of scope for this
+  step — see Step 2's note.
 
 - [ ] **Step 1: Verify `stream-info-sse` survives past 5 minutes**
 
@@ -667,27 +669,42 @@ would previously have been cut off), until it closes on its own somewhere
 in the 10-12 minute jittered window (`-m 900` caps curl's own wait at 15
 minutes so it doesn't hang forever if something is wrong).
 
-- [ ] **Step 2: Verify `audio-stream` survives and recovers across the new ~780s boundary**
+- [ ] **Step 2: Verify `audio-stream` survives past the new ~780s boundary**
 
-This is the test that actually matters, not the old 5-minute mark: the
-route now runs up to ~780s before Vercel forces a cutoff, so the
-interesting moment moved from ~5 minutes to ~13 minutes, and recovery from
-that cutoff depends on the client's `AudioProvider.tsx` reconnect logic,
-which only triggers from the `<audio>` element's `onError` event (an
-unverified assumption — see spec's Open Risks).
+> **Revised 2026-09-11** (final whole-branch review): the original version
+> of this step called for a 14-minute browser playback test and attributed
+> reconnection to `AudioProvider.tsx`'s `onError` handler. That assumption
+> doesn't hold — the web player plays a direct upstream URL
+> (`FALLBACK_STREAM_URL`, or the CMS's `radioAudioURL` if set in Sanity)
+> and does not necessarily route through `/api/audio-stream` at all, so a
+> browser test could pass without ever exercising this route. This step
+> now tests the route directly instead.
 
-Play the stream continuously in a real browser tab for at least 14
-minutes, watching (not just listening) continuously through the ~13-minute
-mark:
-- Confirm playback is uninterrupted well past 5 minutes (this part should
-  now be silent/uneventful — if it isn't, `maxDuration` isn't taking
-  effect, see Step 3).
-- At the ~13-minute mark, note explicitly whether there is an audible gap
-  when the connection cycles: a brief, seconds-long gap while it
-  reconnects is the acceptable case; **silence that never recovers** means
-  the `onError` event isn't firing the way `AudioProvider.tsx` assumes,
-  and that follow-up (flagged, not built, in the spec's Open Risks) needs
-  to be picked up before this is considered done.
+```bash
+curl -N -m 900 https://reach-radio-nextjs.vercel.app/api/audio-stream \
+  -o /dev/null -w "\nHTTP %{http_code}, %{time_total}s, %{size_download} bytes\n"
+```
+
+Expected: the connection stays open and streams audio bytes past the old
+5-minute (300s) cutoff — where it previously would have died silently —
+until Vercel closes it at ~780s. `time_total` should land close to 780s,
+not ~300s (`-m 900` caps curl's own wait at 15 minutes so it doesn't hang
+forever if something is wrong). If it cuts at ~300s instead, see Step 3.
+
+If you also want to confirm the browser path specifically, first check
+whether Sanity's `radioAudioURL` field is set to `/api/audio-stream` — if
+it isn't, a browser test proves nothing about this change and can be
+skipped.
+
+This step does not test native-app reconnect behavior. The route's
+confirmed real consumer is the native iOS/Android app (it hardcodes
+`/api/audio-stream` — see `docs/native-webview-bridge.md` and
+`docs/architecture.md`), and per this repo's own tracked status, native
+`main` on both platforms is not yet pointed at this Vercel deployment (it
+still targets the old `reach-radio-web.pages.dev`). There is currently no
+way to exercise native's reconnect behavior across the 780s cutoff against
+this backend. Track that as a follow-up once native ships against this
+deployment — don't block this step on it.
 
 - [ ] **Step 3: If either stream is still cut at ~5 minutes**
 
