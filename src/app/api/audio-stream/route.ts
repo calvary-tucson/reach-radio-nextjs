@@ -1,18 +1,8 @@
-import { createRateLimiter } from '@/lib/rate-limit'
 import { FALLBACK_STREAM_URL } from '@/lib/constants'
 
-const limiter = createRateLimiter({ windowMs: 60_000, max: 10 })
+export const maxDuration = 780
 
-export async function GET(request: Request): Promise<Response> {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const result = limiter.check(ip)
-  if (!result.success) {
-    return new Response('Too Many Requests', {
-      status: 429,
-      headers: { 'Retry-After': String(result.retryAfter) },
-    })
-  }
-
+export async function GET(): Promise<Response> {
   const controller = new AbortController()
   const connectTimeout = setTimeout(() => controller.abort(), 10_000)
 
