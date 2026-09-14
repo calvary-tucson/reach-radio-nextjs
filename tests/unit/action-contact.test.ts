@@ -1,8 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { headers } from 'next/headers'
 
 vi.mock('next/headers', () => ({
   headers: vi.fn().mockResolvedValue({ get: vi.fn().mockReturnValue(null) }),
 }))
+
+function mockMobileAppHeaders() {
+  vi.mocked(headers).mockResolvedValueOnce({
+    get: (key: string) => (key === 'mobile-app' ? 'true' : null),
+  } as unknown as Awaited<ReturnType<typeof headers>>)
+}
 
 describe('submitContact Server Action', () => {
   beforeEach(() => {
@@ -112,5 +119,51 @@ describe('submitContact Server Action', () => {
     // If reCAPTCHA were NOT skipped, it would return error 'reCAPTCHA verification required.'
     // because no recaptchaToken is set. success=true proves the skip path fired.
     expect(result.success).toBe(true)
+  })
+
+  it('rejects mobile-app traffic without a reCAPTCHA token', async () => {
+    mockMobileAppHeaders()
+    const { submitContact } = await import('@/actions/contact')
+    const formData = new FormData()
+    formData.set('name', 'John')
+    formData.set('email', 'john@example.com')
+    formData.set('message', 'Hello there, this is a test message for the contact form.')
+    formData.set('gdprConsent', 'on')
+    const result = await submitContact({ success: false }, formData)
+    // The mobile-app header/cookie is unauthenticated and must never bypass verification outright.
+    expect(result.success).toBe(false)
+    expect(result.error).toContain('verification')
+  })
+
+  it('grades mobile-app traffic against RECAPTCHA_SCORE_THRESHOLD_APP instead of skipping verification', async () => {
+    process.env.RECAPTCHA_SCORE_THRESHOLD = '0.7'
+    process.env.RECAPTCHA_SCORE_THRESHOLD_APP = '0.3'
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, score: 0.5 }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mockMobileAppHeaders()
+    const { submitContact } = await import('@/actions/contact')
+    const formData = new FormData()
+    formData.set('name', 'Alice')
+    formData.set('email', 'alice@gmail.com')
+    formData.set('message', 'Hello from Reach Radio fan, this is a nice message!')
+    formData.set('gdprConsent', 'on')
+    formData.set('timestamp', String(Date.now() - 10_000))
+    formData.set('recaptchaToken', 'valid-token')
+    formData.set('dryRun', '1')
+    const result = await submitContact({ success: false }, formData)
+    // Score 0.5 is below the normal 0.7 threshold but above the app threshold of 0.3 —
+    // succeeding here proves the app threshold is actually applied, not just that
+    // verification runs. Asserting the siteverify fetch fired at all rules out the
+    // old bypass path, which would also return success:true but without ever calling it.
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://www.google.com/recaptcha/api/siteverify',
+      expect.anything()
+    )
+    expect(result.success).toBe(true)
+    delete process.env.RECAPTCHA_SCORE_THRESHOLD
+    delete process.env.RECAPTCHA_SCORE_THRESHOLD_APP
   })
 })

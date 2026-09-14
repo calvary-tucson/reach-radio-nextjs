@@ -65,39 +65,44 @@ export async function submitContact(
   const dryRun = formData.get('dryRun') === '1'
   const headersList = await headers()
 
+  // The mobile-app header/cookie is unauthenticated and client-controlled — it must
+  // never skip reCAPTCHA verification outright. It only selects which score threshold
+  // in-app WebView traffic is graded against, since WebViews can produce lower scores
+  // than a full browser.
   const isMobileApp =
     headersList.get('mobile-app') === 'true' ||
     headersList.get('cookie')?.includes('mobile-app=true')
 
-  if (!isMobileApp) {
-    if (!process.env.RECAPTCHA_SECRET_KEY) {
-      if (process.env.NODE_ENV === 'production') {
-        return { success: false, error: 'Server configuration error.' }
-      }
-      // dev/test: skip reCAPTCHA
-    } else {
-      if (!recaptchaToken || typeof recaptchaToken !== 'string') {
-        return { success: false, error: 'reCAPTCHA verification required.' }
-      }
+  if (!process.env.RECAPTCHA_SECRET_KEY) {
+    if (process.env.NODE_ENV === 'production') {
+      return { success: false, error: 'Server configuration error.' }
+    }
+    // dev/test: skip reCAPTCHA
+  } else {
+    if (!recaptchaToken || typeof recaptchaToken !== 'string') {
+      return { success: false, error: 'reCAPTCHA verification required.' }
+    }
 
-      try {
-        const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            secret: process.env.RECAPTCHA_SECRET_KEY,
-            response: recaptchaToken,
-          }),
-        })
-        const verifyData = await verifyRes.json() as { success: boolean; score?: number }
+    try {
+      const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+        }),
+      })
+      const verifyData = await verifyRes.json() as { success: boolean; score?: number }
 
-        const threshold = parseFloat(process.env.RECAPTCHA_SCORE_THRESHOLD ?? '0.5')
-        if (!verifyData.success || (verifyData.score !== undefined && verifyData.score < threshold)) {
-          return { success: false, error: 'reCAPTCHA verification failed. Please try again.' }
-        }
-      } catch {
-        return { success: false, error: 'Service unavailable. Please try again later.' }
+      const thresholdEnvVar = isMobileApp
+        ? process.env.RECAPTCHA_SCORE_THRESHOLD_APP ?? process.env.RECAPTCHA_SCORE_THRESHOLD ?? '0.5'
+        : process.env.RECAPTCHA_SCORE_THRESHOLD ?? '0.5'
+      const threshold = parseFloat(thresholdEnvVar)
+      if (!verifyData.success || (verifyData.score !== undefined && verifyData.score < threshold)) {
+        return { success: false, error: 'reCAPTCHA verification failed. Please try again.' }
       }
+    } catch {
+      return { success: false, error: 'Service unavailable. Please try again later.' }
     }
   }
 
