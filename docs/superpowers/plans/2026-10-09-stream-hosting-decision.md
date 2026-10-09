@@ -99,6 +99,14 @@ These must change together with the DNS switch (details: `docs/sanity-schema-and
 - `src/components/home/TodaySchedule.tsx:45` caches with tag `schedule`, which no webhook path revalidates (`api/revalidate/route.ts` `TAG_MAP` yields only `teachers`, `siteSettings`, `appSettings`). Schedule edits can show stale for up to the `days` cache life. Fix: use tag `teachers`.
 - `siteSettingsQuery` reads `siteKeywords`, `twitterHandle`, `facebookPage`, which are not in the Sanity schema (null live).
 - Soft 404 on the new site (see companion doc §3).
+- iOS v4 has no `AVPlayerItemDidPlayToEndTime` handler (grep, case-insensitive, 2026-10-09). A clean end-of-stream at Vercel's 780s cut may stop playback silently with no retry. Unverified on device; test T0 in `2026-10-09-ios-v4-stream-redirect-test.md`.
+
+## 7b. Decisions and constraints recorded 2026-10-09
+
+- Target stack is the new Next.js site + iOS v4 (Android later).
+- Vercel preview URLs are SSO-gated (302 to `vercel.com/sso-api`), so AVPlayer cannot use them as a test host. The iOS test uses a local dev server behind the dev tunnel plus a DEBUG-only stream override in the iOS app.
+- User accepts leaving `reach-radio-web.pages.dev` running. If option B is chosen it needs a **long-term Cloudflare Pages ownership plan** (updates, maintenance, deploy trigger, monitoring, retirement path; consider moving only the stream endpoint to a standalone Worker). Not yet written.
+- iOS test plan: `2026-10-09-ios-v4-stream-redirect-test.md`.
 
 ## 8. Execution (fresh session)
 
