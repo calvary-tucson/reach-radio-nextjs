@@ -57,6 +57,26 @@ Whether the iOS/Android players reconnect automatically after a cut is **UNKNOWN
 
 **Working recommendation (not decided):** test B first (cheapest), fall back to A. Add E for v4/web. Send D as a long-term cleanup. Keep live apps on pages.dev/Astro (already the plan).
 
+### 4b. Option B detail (read-only checks run 2026-10-09)
+
+VERIFIED:
+- `GET https://reach-radio-web.pages.dev/api/audio-stream` → `HTTP/2 200`, `content-type: audio/mpeg`, `server: cloudflare`, **no `access-control-allow-origin`**. `reach.radio/api/audio-stream` (current Astro) returns the same shape. Vercel's own route returns 200 with `access-control-allow-origin: *`, `cache-control: no-cache, no-store`.
+- Web player uses a plain `<audio src>` (`src/components/AudioProvider.tsx:50,87-89`); no `crossOrigin`, no Web Audio/`createMediaElementSource` in `src` → **CORS not needed** for a redirect target.
+- **CSP blocks the redirect hop:** `next.config.ts:37` `media-src 'self' https://*.radiojar.com https://reach.radio`. CSP is enforced on each redirect hop, so `https://reach-radio-web.pages.dev` must be added to `media-src` (INFERRED from CSP spec behavior; test in a browser).
+- Radiojar: `https://stream.radiojar.com/g4d600bv6p5tv` → `302` to `http://nNN.radiojar.com/g4d600bv6p5tv?rj-ttl=5&rj-tok=…` (plain http, tokenized). Confirms option X risk.
+- Reconnect behavior on stream end:
+  - **iOS v4:** `AVPlayerItemFailedToPlayToEndTime` → retry up to `maxRetries = 5`, backoff `min(3·2^n, 30)s` (`AudioStreamingManager.swift:80,1157-1213`) plus an 8s stall watchdog (`:83`). Watch app recreates the player on each play (`WatchAudioPlayer.swift:59`); its end-of-stream handling not read.
+  - **Web:** `onError` → backoff reconnect, max 10 attempts (`AudioProvider.tsx:25-58,98-103`). **No `onEnded`/`onStalled` handler** → if the browser reports a clean server close as `ended`, playback stops silently (INFERRED, untested).
+  - **Android:** `onPlayerError` → `recoverFromPlaybackError()` re-prepares and resumes (`PlaybackService.kt:183-215`); `STATE_ENDED` only logs. Not affected by B today (pages.dev).
+
+INFERRED / UNKNOWN:
+- Next.js `redirects()` in `next.config.ts` run before filesystem routes and are handled at the routing layer (no function, no stream bandwidth through Vercel). Verify on a preview deploy.
+- Pages/Workers has no wall-clock cap (docs) but the pages.dev stream's real max session length is untested.
+- AVPlayer/ExoPlayer/`<audio>` follow a 307 on a live stream: standard, untested here.
+- Cloudflare Pages auto-deploy of the Astro repo `master`: UNKNOWN.
+
+Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audio-stream', destination: 'https://reach-radio-web.pages.dev/api/audio-stream', permanent: false }` (307, so nothing caches it) + add the pages.dev host to CSP `media-src`. Keep `route.ts` for one-commit rollback. Later, swap the destination to a custom hostname (e.g. `stream.reach.radio` on the Pages project) with no client change.
+
 ## 5. Tests that decide it (read-only first)
 
 1. `curl -sI https://reach-radio-web.pages.dev/api/audio-stream` — status, content-type, CORS, redirect chain (B/A viability).
