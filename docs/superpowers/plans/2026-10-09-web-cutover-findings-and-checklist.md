@@ -27,7 +27,7 @@ Supplements `GO-TO-PRODUCTION.md` (not edited; it has uncommitted edits from ano
 
 ## 3. Findings
 
-- **Audio proxy cap.** `src/app/api/audio-stream/route.ts` sets `maxDuration = 780`, fetches the radiojar stream. VERIFIED. Plan requirement (Pro) and bandwidth cost: UNKNOWN.
+- **Audio proxy cap.** `src/app/api/audio-stream/route.ts` sets `maxDuration = 780`, fetches the radiojar stream. VERIFIED. Vercel plan is Pro (800s max; VERIFIED 2026-10-09), so 780s is valid but listeners are cut every ~13 min. Bandwidth cost: UNKNOWN. See `2026-10-09-stream-hosting-decision.md`.
 - **Soft 404.** `curl https://reach-radio-nextjs.vercel.app/not-a-page` → **200**. `reach.radio/not-a-page` → 404. VERIFIED. Cause: INFERRED — `src/app/@modal/[...catchAll]/page.tsx` returns `null`, so unknown paths match the modal slot. Do not just delete it; it likely supports modal close. Fix and verify on a preview.
 - **Sanity `hostURL` is stale** (`https://reach-radio.webapp-0a8.workers.dev/`). VERIFIED. Impact low: iOS v4 uses it only if `webUrl` is missing, and `native-config` always sends `webUrl` (`route.ts:17`). Android: grep for `hostURL` in `*.kt` returned no matches. VERIFIED.
 - **`NEXT_PUBLIC_SITE_URL` defaults to the vercel.app host** (`src/lib/constants.ts:1`), so `webUrl`, canonicals, OG and JSON-LD would be wrong in production until set. VERIFIED.
@@ -44,9 +44,9 @@ Supplements `GO-TO-PRODUCTION.md` (not edited; it has uncommitted edits from ano
 
 ## 5. Decisions needed (user)
 
-- [ ] **Audio approach.** Recommended: set Sanity `radioAudioURL` to `https://stream.radiojar.com/g4d600bv6p5tv` (direct). Alternative: keep the proxy and confirm a Vercel plan that supports 780s. The Sanity change takes effect immediately on the old site for browser listeners and is reversible. **Not made yet; needs approval.**
+- [ ] **Audio approach.** See `2026-10-09-stream-hosting-decision.md`. **Superseded:** the earlier recommendation to point `radioAudioURL` straight at radiojar is NOT safe. Radiojar's HTTPS URL redirects to a tokenized plain-http node (INFERRED to break iOS ATS and Android `usesCleartextTraffic="false"`; untested on device). Do not change the Sanity field until the decision doc's tests pass. The field also drives the Astro desktop player and iOS v4.
 - [ ] **`reachradiotucson.com` role.** Second canonical host (duplicate content) or 301 → `reach.radio`.
-- [ ] **Vercel plan** (dashboard).
+- [x] **Vercel plan:** Pro, active (VERIFIED 2026-10-09 via Vercel API; team `calvary-tucson-s-team`). 800s max duration, so `maxDuration = 780` is valid, but the stream is still cut every ~13 min.
 
 ## 6. Checklist
 
@@ -89,9 +89,9 @@ Supplements `GO-TO-PRODUCTION.md` (not edited; it has uncommitted edits from ano
 
 | Unknown | How |
 |---|---|
-| Cloudflare proxy toggle state | Cloudflare dashboard |
-| Vercel plan and function limits | Vercel dashboard |
-| Subdomain MX records | `dig MX` from a real terminal |
+| ~~Cloudflare proxy toggle state~~ | RESOLVED: apex and `www` A records resolve to Cloudflare proxy IPs (user's `dig`, 2026-10-09) = proxied |
+| ~~Vercel plan and function limits~~ | RESOLVED: Pro, 800s max (Vercel API, 2026-10-09) |
+| ~~Subdomain MX records~~ | RESOLVED: no MX, DMARC, mail/smtp/autodiscover records on either domain; TXT is only `google-site-verification` (user's `dig`, 2026-10-09) |
 | Cloudflare Pages auto-deploys master | Cloudflare dashboard |
 | `mobile-app` header on every request | On-device network capture |
 | Cause of soft 404 | Test fix on a Vercel preview |
