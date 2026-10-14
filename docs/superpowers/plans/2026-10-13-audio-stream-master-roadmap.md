@@ -11,7 +11,7 @@ Features are dropped only when the user says so.
 | 3 | T0 control (Vercel proxy cut) | test plan Task 5 | 2 | Done 2026-10-12 | same |
 | 4 | T1 cold start/prefetch through the 307 | test plan Task 6 | 1, 2 | Pending | same |
 | 5 | T2 ≥60 min soak, T3 network flap, T4 system integration (real device) | test plan Task 7 | 4 | Pending, user-run | same |
-| 6 | 60-min `pages.dev` max-session curl | test plan Task 1 step 3 | — | Not started | same |
+| 6 | 60-min `pages.dev` max-session curl | test plan Task 1 step 3 | — | Done 2026-10-14: held 61m40s, 59.3 MB, no cut (run 1 stalled at 14m11s inside sandbox proxy, see decision §4d) | same |
 | 7 | Land B on `main` and delete `route.ts` (same change) | decision §4d | 1, 4 | Pending | none yet |
 | 8 | Cutover audio gate in cutover checklist | cutover checklist §6 | 7 | Recorded | cutover checklist |
 | 9 | Worker repo `reach-radio-audio-stream-worker` (passthrough, no Icy-MetaData, clear timeout, `no-store`) | decision §4d | 6 | Not started | none yet |

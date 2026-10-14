@@ -139,8 +139,13 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
 - `stream-info-sse` stays on Vercel: tiny payloads, closes itself after a jittered 10–12 min (under `maxDuration = 780`), client reconnects. Estimated ~44k reconnects/day at 1000 listeners × 8 h ≈ $0.03/day in invocations; memory is the larger but still small part (estimate, check the Vercel usage page). Scaling risk is upstream: each connection polls Radiojar every 30 s with no shared cache (~33 req/s at 1000 listeners).
 - `/api/stream-info` has no callers in the Next.js source, iOS repo (Watch included), Android repo or Astro source. Candidate for deletion (`chore(api)`) after checking Vercel request logs for external hits (not yet checked).
 
+**pages.dev stream hold (2026-10-13/14) — VERIFIED, 2 runs**
+- Run 2 (outside the sandbox proxy, `caffeinate` running): `curl` on `reach-radio-web.pages.dev/api/audio-stream` held **61m40s** (18:54:02Z–19:55:42Z), 59,276,643 bytes at ~16 KB/s (≈128 kbps, real time), HTTP 200. It ended only because of the test's own `-m 3700` limit (curl exit 28), not a server close. So Cloudflare Pages Functions held a stream for over an hour with no cut.
+- Run 1 (inside the sandbox proxy, no sleep guard) ended at 14m11s with `curl: (18) partial file` after only 4.13 MB (~4.9 KB/s, far below real time). INFERRED: the connection stalled for most of that time (Mac sleep or the sandbox proxy), not a Cloudflare cut. Not proven which.
+- Still untested: multi-hour holds, a `wrangler deploy` mid-stream, and anything over cellular.
+
 **Not verified / open**
-- 60-minute (and multi-hour) hold on Cloudflare; the 307 being free of function and bandwidth billing on Vercel; AVPlayer, ExoPlayer and `<audio>` following the 307 on a live stream (T1); web player on silent stall (no `onEnded`/`onStalled`); CarPlay/lock-screen behaviour through the redirect.
+- Multi-hour hold on Cloudflare; the 307 being free of function and bandwidth billing on Vercel; AVPlayer, ExoPlayer and `<audio>` following the 307 on a live stream (T1); web player on silent stall (no `onEnded`/`onStalled`); CarPlay/lock-screen behaviour through the redirect.
 - Whether a Sanity field description/https validation should be added to `radioAudioURL` (not requested).
 - The running plan `2026-10-09-ios-v4-stream-redirect-test.md` tests B only; it needs a Worker-oriented follow-up before A.
 
