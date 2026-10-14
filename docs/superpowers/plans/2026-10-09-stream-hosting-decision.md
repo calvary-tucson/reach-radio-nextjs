@@ -55,7 +55,7 @@ Whether the iOS/Android players reconnect automatically after a cut is **UNKNOWN
 | G | Worker route on the apex (orange-cloud `reach.radio`) | none | Single hostname | Contradicts the DNS-only step in `GO-TO-PRODUCTION.md`; Vercel does not recommend; must be a deliberate choice |
 | X | **Point `radioAudioURL` straight at radiojar** (earlier recommendation) | none | Simple | **Likely breaks iOS/Android** (http redirect). Do not apply untested. Also hits Astro desktop + v4 at once |
 
-**Working recommendation (not decided):** test B first (cheapest), fall back to A. Add E for v4/web. Send D as a long-term cleanup. Keep live apps on pages.dev/Astro (already the plan).
+**Superseded by §4d (decided 2026-10-13): B now, A (Worker) later, in parallel; Vercel never serves audio.** Earlier working recommendation, kept for history: test B first (cheapest), fall back to A. Add E for v4/web. Send D as a long-term cleanup. Keep live apps on pages.dev/Astro (already the plan).
 
 ### 4b. Option B detail (read-only checks run 2026-10-09)
 
@@ -84,9 +84,9 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
 **DECISION (user, 2026-10-13): Vercel will NOT carry the audio stream. Audio runs on Cloudflare only.**
 - Reasons: the 13-minute cut (`maxDuration` ceiling), Vercel data-transfer/duration billing risk at growth, and Flat Rate CDN terms that exclude bulk media delivery.
 - Consequences:
-  - The Vercel proxy `src/app/api/audio-stream/route.ts` is never to serve production audio after the `reach.radio` DNS cutover. It is kept only as a short-lived rollback while B is verified, then deleted.
+  - The Vercel proxy `src/app/api/audio-stream/route.ts` is never to serve production audio. It is deleted in the same change that lands B on `main`, before the DNS cutover. It may remain on the test branch only (nothing in production uses that branch). Rollback of B means removing or re-pointing the redirect, never restoring the proxy.
   - Until the Worker exists, audio for the new site and iOS v4 is served by the legacy Astro function on Cloudflare via the B redirect; after the Worker, by `stream.reach.radio`.
-  - Not a decision about the redirect itself: a 307 sends no audio bytes through Vercel, but it still reaches Vercel's routing layer, and its billing is unverified (INFERRED free). If zero Vercel involvement is required, clients must call the Cloudflare hostname directly (A) and the Vercel redirect stays only for the Watch app's hardcoded `reach.radio/api/audio-stream`.
+  - Not a decision about the redirect itself: a 307 sends no audio bytes through Vercel, but it still reaches Vercel's routing layer, and its billing is unverified (INFERRED free). If zero Vercel involvement is required, clients must call the Cloudflare hostname directly (A) and the Vercel redirect stays only for hardcoded `reach.radio/api/audio-stream` callers (Watch app, iOS v4 `fallbackStreamURL`).
   - No fallback to Vercel for audio, including as an error path.
 
 **Which URL the clients actually play (VERIFIED)**
@@ -119,9 +119,9 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
           (Sanity radioAudioURL flipped; no app release)
 ```
 
-1. **B first:** the redirect on the new site (branch `test/stream-redirect-b`, commit 369b14a: 307 + `media-src` + pages.dev). No DNS or Sanity change. `route.ts` is left for rollback; `redirects()` run before filesystem routes, so it is dead code while the redirect is live (INFERRED, verify locally). Delete `route.ts` once B is proven.
+1. **B first:** the redirect on the new site (branch `test/stream-redirect-b`, commit 369b14a: 307 + `media-src` + pages.dev). No DNS or Sanity change. On the test branch `route.ts` is untouched; `redirects()` run before filesystem routes, so it is dead code while the redirect is live (INFERRED, verify locally). When B lands on `main`, `route.ts` is deleted in the same change (see the decision above).
 2. **Build the Worker in parallel** (A): new repo `reach-radio-audio-stream-worker`, not inside this repo (Vercel would rebuild on every Worker change; tsc/eslint/vitest would pick it up; different deploy flow) and not in the legacy repo (being retired). Contents: `wrangler.toml`, `src/index.ts` (~15 lines), small test, README noting the Radiojar stream ID.
-3. **Then** flip Sanity `radioAudioURL` to `https://stream.reach.radio/...` (user's edit), re-point the Vercel redirect to the Worker so the Watch app's hardcoded URL keeps working, and add `stream.reach.radio` to CSP `media-src`.
+3. **Then** flip Sanity `radioAudioURL` to `https://stream.reach.radio/...` (user's edit), re-point the Vercel redirect to the Worker, and add `stream.reach.radio` to CSP `media-src`. The redirect must stay for as long as anything hardcodes `reach.radio/api/audio-stream`: the Watch app, and iOS v4's own `fallbackStreamURL` (§4 table, option A row).
 4. **Retire the legacy project** only when published Android and iOS 3.2 are gone and the Watch app no longer needs the old path. Record the date when decided.
 
 **Worker requirements**
@@ -178,5 +178,6 @@ These must change together with the DNS switch (details: `docs/sanity-schema-and
 ## 8. Execution (fresh session)
 
 CLI: `cd ~/Documents/Development/reach-radio-nextjs && claude`
-Prompt: `Read docs/superpowers/plans/2026-10-09-stream-hosting-decision.md. Run the read-only tests in section 5 (steps 1-4), report results, then recommend A or B. Do not change Sanity, DNS, or code without my approval.`
+Prompt: `Read docs/superpowers/plans/2026-10-09-stream-hosting-decision.md, especially §4d (decision already made 2026-10-13: B now, Worker later, Vercel never serves audio). Continue from the open items listed there. Do not change Sanity, DNS, or push without my approval.`
+(Original prompt, superseded: run §5 tests 1-4 and recommend A or B.)
 Vercel CLI needs `--scope calvary-tucson-s-team`; sandbox needs `allowed_domains` for `api.vercel.com`; login may require me to run `! vercel login`.

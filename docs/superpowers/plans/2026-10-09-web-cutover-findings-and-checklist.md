@@ -51,6 +51,11 @@ Supplements `GO-TO-PRODUCTION.md` (not edited; it has uncommitted edits from ano
 ## 6. Checklist
 
 ### Pre-cutover
+- [ ] **Audio gate (decision 2026-10-13, `2026-10-09-stream-hosting-decision.md` §4d: Vercel never serves the audio stream). Do not start the DNS change until all four hold:**
+  - [ ] Option B redirect (`/api/audio-stream` → Cloudflare) is merged to `main` and deployed, and `src/app/api/audio-stream/route.ts` is deleted in the same change. Rollback = remove or re-point the redirect, never restore the proxy.
+  - [ ] `curl -sI https://<vercel-host>/api/audio-stream` returns a 307 to the Cloudflare host (not a 200 from Vercel), and the web player plays through it in a browser.
+  - [ ] `reach.radio` stays on Cloudflare nameservers. The apex is a DNS-only record to Vercel; do not move nameservers (a future `stream.reach.radio` Worker needs them).
+  - [ ] `reach.radio` and `www` (and the `reachradiotucson.com` equivalents) are detached from the Pages project's custom domains, otherwise the Pages binding conflicts with the new record. `pages.dev` itself stays.
 - [ ] Apply the approved audio change in Sanity; verify old site playback in a browser, and the live iOS and Android apps still play (native players, expected unchanged).
 - [ ] Update Sanity `hostURL` to the production URL.
 - [ ] Set `NEXT_PUBLIC_SITE_URL=https://reach.radio` in Vercel Production.
