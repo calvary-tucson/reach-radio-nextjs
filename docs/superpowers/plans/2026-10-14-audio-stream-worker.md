@@ -25,8 +25,10 @@
 
 - `package.json`, `tsconfig.json`, `vitest.config.ts`, `.gitignore`: tooling.
 - `wrangler.toml`: Worker name, entry, compatibility date, custom domain route.
-- `src/index.ts`: the Worker (`export default { fetch }`) plus the exported `handle` function used by tests.
-- `src/index.test.ts`: unit tests with a stubbed `fetch`.
+- `src/handler.ts`: `handle` and `UPSTREAM_URL`, imported by tests. Kept out of the entry module because workerd requires the entry module to export only the default.
+- `src/index.ts`: entry module, `export default { fetch }` only, delegating to `handle`.
+- `src/handler.test.ts`: unit tests with a stubbed `fetch`.
+- `src/index.test.ts`: entry module test.
 - `README.md`: purpose, deploy steps, the 3-places note.
 
 ---
@@ -102,10 +104,10 @@ Add to `package.json` scripts: `"test": "vitest run"`, `"typecheck": "tsc"`, `"d
 
 - [ ] **Step 3: Write the failing tests**
 
-`src/index.test.ts`:
+`src/handler.test.ts`:
 ```ts
 import { describe, expect, it, vi } from 'vitest'
-import { handle, UPSTREAM_URL } from './index'
+import { handle, UPSTREAM_URL } from './handler'
 
 const req = (method = 'GET') => new Request('https://stream.reach.radio/', { method })
 
@@ -203,7 +205,7 @@ Expected: FAIL, `./index` has no exports.
 
 - [ ] **Step 5: Write the implementation**
 
-`src/index.ts`:
+`src/handler.ts`:
 ```ts
 export const UPSTREAM_URL = 'http://stream.radiojar.com/g4d600bv6p5tv'
 const CONNECT_TIMEOUT_MS = 10_000
@@ -247,6 +249,12 @@ export async function handle(
     },
   })
 }
+
+```
+
+`src/index.ts` (entry module, default export only):
+```ts
+import { handle } from './handler'
 
 export default {
   fetch: (request: Request): Promise<Response> => handle(request),
@@ -294,7 +302,7 @@ Pure passthrough of `http://stream.radiojar.com/g4d600bv6p5tv`; no Vercel involv
 - Never fall back to Vercel for audio.
 
 ## Radiojar stream ID lives in 3 places
-1. `src/index.ts` (`UPSTREAM_URL`) in this repo
+1. `src/handler.ts` (`UPSTREAM_URL`) in this repo
 2. `reach-radio-web/src/pages/api/audio-stream.ts` (legacy Astro function)
 3. `reach-radio-nextjs/src/lib/constants.ts` (`RADIOJAR_URL` and `FALLBACK_STREAM_URL`)
 
