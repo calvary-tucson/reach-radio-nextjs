@@ -77,6 +77,65 @@ INFERRED / UNKNOWN:
 
 Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audio-stream', destination: 'https://reach-radio-web.pages.dev/api/audio-stream', permanent: false }` (307, so nothing caches it) + add the pages.dev host to CSP `media-src`. Keep `route.ts` for one-commit rollback. Later, swap the destination to a custom hostname (e.g. `stream.reach.radio` on the Pages project) with no client change.
 
+### 4d. Findings and decisions recorded 2026-10-13
+
+(§4c is reserved for the iOS v4 test results, plan Task 8.) Legend as above. Nothing in Sanity, DNS or Vercel was changed to produce this.
+
+**Which URL the clients actually play (VERIFIED)**
+- Live Sanity `appSettings.radioAudioURL` = `https://reach.radio/api/audio-stream` (public CDN GET, project `bk05c6rl`, dataset `production`, 2026-10-13). `hostURL` is still the stale workers.dev value.
+- Web player (`layout.tsx:108-117` → `<AudioProvider streamUrl>` → `<audio src>`), iOS v4 (bridge `loaded` handshake `BridgeInit.tsx:114` and `/api/native-config`), and the legacy Astro player all read that one Sanity value. `FALLBACK_STREAM_URL` (direct Radiojar HTTPS, `constants.ts:3`) is used only if the field is empty or the fetch fails.
+- Published Android and iOS 3.2 hardcode `reach-radio-web.pages.dev`. The iOS Watch app hardcodes `reach.radio/api/audio-stream`.
+- The Studio schema (`sanity-cms-administration/studios/reach-radio/schemas/appSettings`) types `radioAudioURL` as a bare `string`: no https validation, no description, no singleton enforcement.
+- **Cutover risk:** today `reach.radio/api/audio-stream` resolves to the legacy Astro function on Cloudflare. After `reach.radio` DNS moves to Vercel it resolves to the Vercel proxy (`route.ts`, `maxDuration = 780`), silently moving web, iOS v4 and the Watch app onto the route that is cut every ~13 min. B (or A) must be in place before the DNS move.
+- Radiojar direct is not a drop-in: the 302 to a tokenized plain-`http` node is VERIFIED in §4b; that this breaks iOS ATS / Android cleartext is INFERRED, untested.
+
+**T0 control (iOS v4 simulator, Vercel proxy via `-streamURLOverride`) — VERIFIED, one run**
+- Cut at 13m06s (play 18:45:01, paused 18:58:07). No failed/end event logged. The 8 s stall watchdog fired at 18:58:15, retry 1/5 after 3 s, playback resumed at 18:58:20.66. Silence ≈ 13.3 s; UI label stayed "Pause radio" throughout.
+- Not shown: whether the retry counter resets after a successful recovery, behaviour on cellular, or CarPlay/lock screen during the gap. Candidate iOS ticket: no `DidPlayToEnd` handler; no visible stalled state during the gap.
+
+**Cost and limits (from vendor docs read 2026-10-12; usage figures are estimates)**
+- Vercel Pro: Fast Data Transfer $0.15–$0.35/GB, 1 TB included via Flat Rate CDN, whose terms exclude bulk media delivery as the majority of bandwidth (Vercel may move the project to Flex CDN, require another plan, or limit service). Fluid compute: Provisioned Memory $0.0106/GB-hr (bills during I/O wait), Active CPU $0.128/hr (pauses on I/O), invocations $0.60/M. Pro max duration 800 s.
+- Cloudflare free plan (Workers and Pages Functions share it): 100k requests/day (reset 00:00 UTC; Error 1027 over), 10 ms CPU/request excluding I/O wait (Error 1102), no hard wall-clock while the client stays connected, 50 subrequests, static assets free. "No egress charge" is from memory, NOT verified in the docs fetched. Workers Paid $5/month, 10M requests included.
+- Observed on the `reach.radio` zone, `/api/audio-stream`, last 3 days (GraphQL analytics, read-only token): 2,432 requests (~810/day, ~1% of the cap), 8.875 GB (~3 GB/day, ~90 GB/month ≈ 1,500 listener-hours/month at 128 kbps). Roughly 1,040 of the 2,432 requests (12% of bytes) are bots/relays from hosting IPs (radiotune-proxy on GTHost, ORB HisBot on Hetzner, other Hetzner/OVH/Contabo/AWS/GCP). Decision: do nothing (a WAF rule only covers the reach.radio hostname; pages.dev direct bypasses it).
+- At today's volume Vercel stays inside Pro's included transfer, so cost is not the driver. Growth is: 1000 listeners × 8 h ≈ 150× today.
+
+**Decision recorded (user, 2026-10-13): both stream hosts run in parallel until the legacy mobile apps are retired**
+
+```text
+ B now:   client -> reach.radio/api/audio-stream (Vercel)
+                      | 307
+                      v
+                 pages.dev/api/audio-stream (legacy Astro, Cloudflare) -> Radiojar
+
+ A later: client -> stream.reach.radio (new Worker, Cloudflare) -> Radiojar
+          (Sanity radioAudioURL flipped; no app release)
+```
+
+1. **B first:** the redirect on the new site (branch `test/stream-redirect-b`, commit 369b14a: 307 + `media-src` + pages.dev). No DNS or Sanity change. `route.ts` is left for rollback; `redirects()` run before filesystem routes, so it is dead code while the redirect is live (INFERRED, verify locally). Delete `route.ts` once B is proven.
+2. **Build the Worker in parallel** (A): new repo `reach-radio-audio-stream-worker`, not inside this repo (Vercel would rebuild on every Worker change; tsc/eslint/vitest would pick it up; different deploy flow) and not in the legacy repo (being retired). Contents: `wrangler.toml`, `src/index.ts` (~15 lines), small test, README noting the Radiojar stream ID.
+3. **Then** flip Sanity `radioAudioURL` to `https://stream.reach.radio/...` (user's edit), re-point the Vercel redirect to the Worker so the Watch app's hardcoded URL keeps working, and add `stream.reach.radio` to CSP `media-src`.
+4. **Retire the legacy project** only when published Android and iOS 3.2 are gone and the Watch app no longer needs the old path. Record the date when decided.
+
+**Worker requirements**
+- Pure passthrough of `upstream.body`: no TransformStream or per-chunk work (10 ms CPU budget).
+- Do NOT send `Icy-MetaData: 1` upstream; Radiojar would interleave metadata bytes into the audio. The existing proxies do not send it.
+- Clear the 10 s connect timeout as soon as headers arrive; the abort signal stays bound to the body and would kill the stream mid-play.
+- `Cache-Control: no-store`; follow Radiojar's 302 to the tokenized http node (server-side fetch, so ATS does not apply).
+- `reach.radio` must stay on Cloudflare nameservers for a Worker custom domain: at cutover point the apex at Vercel with a DNS-only record; do not move nameservers.
+- The Radiojar stream ID `g4d600bv6p5tv` lives in three places (Astro function, Worker, and `RADIOJAR_URL`/`FALLBACK_STREAM_URL` in this repo). Update all if Radiojar changes it.
+- The 100k/day cap is account-wide: every Astro page view and bot request counts until the site leaves Cloudflare. Over the cap the stream is down until midnight UTC. Workers Paid ($5/month) is optional insurance (user's call).
+- Soak: several hours against the deployed Worker, with one `wrangler deploy` mid-stream to watch clients reconnect. The 60-minute `pages.dev` curl (Task 1 step 3) is still unrun.
+
+**Now-playing metadata (VERIFIED in code)**
+- Metadata does not travel in the audio stream. It comes from Radiojar's separate API (`RADIOJAR_URL`, `constants.ts:10`), polled by the Vercel routes `/api/stream-info-sse` (web `useNowPlaying.ts:39`, iOS v4 `NowPlayingService.swift:71`, legacy Astro `MediaBarContainer.astro:126`) and `/api/stream-info`. The Worker needs nothing for metadata.
+- `stream-info-sse` stays on Vercel: tiny payloads, closes itself after a jittered 10–12 min (under `maxDuration = 780`), client reconnects. Estimated ~44k reconnects/day at 1000 listeners × 8 h ≈ $0.03/day in invocations; memory is the larger but still small part (estimate, check the Vercel usage page). Scaling risk is upstream: each connection polls Radiojar every 30 s with no shared cache (~33 req/s at 1000 listeners).
+- `/api/stream-info` has no callers in the Next.js source, iOS repo (Watch included), Android repo or Astro source. Candidate for deletion (`chore(api)`) after checking Vercel request logs for external hits (not yet checked).
+
+**Not verified / open**
+- 60-minute (and multi-hour) hold on Cloudflare; the 307 being free of function and bandwidth billing on Vercel; AVPlayer, ExoPlayer and `<audio>` following the 307 on a live stream (T1); web player on silent stall (no `onEnded`/`onStalled`); CarPlay/lock-screen behaviour through the redirect.
+- Whether a Sanity field description/https validation should be added to `radioAudioURL` (not requested).
+- The running plan `2026-10-09-ios-v4-stream-redirect-test.md` tests B only; it needs a Worker-oriented follow-up before A.
+
 ## 5. Tests that decide it (read-only first)
 
 1. `curl -sI https://reach-radio-web.pages.dev/api/audio-stream` — status, content-type, CORS, redirect chain (B/A viability).
