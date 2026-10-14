@@ -23,4 +23,4 @@ Features are dropped only when the user says so.
 | 15 | Web player `onEnded`/`onStalled` handlers | decision §4b | — | Not started | none yet |
 | 16 | iOS ticket: no `DidPlayToEnd` handler, no stalled-state UI in the ~13 s gap, retry-counter reset unverified | T0 result | — | Not filed | none yet |
 | 17 | Shared Radiojar poll cache for `stream-info-sse` (~33 req/s upstream at 1000 listeners) | decision §4d | growth | Deferred | none yet |
-| 18 | Housekeeping: delete `/tmp/cf-token` and revoke the Cloudflare read-only token | session | — | `/tmp/cf-token` deleted 2026-10-14; token revoke pending (user, Cloudflare dashboard → My Profile → API Tokens) | — |
+| 18 | Housekeeping: delete `/tmp/cf-token` and revoke the Cloudflare read-only token | session | — | `/tmp/cf-token` deleted 2026-10-14; token revoke dropped by user decision 2026-10-14 (token stays live) | — |
