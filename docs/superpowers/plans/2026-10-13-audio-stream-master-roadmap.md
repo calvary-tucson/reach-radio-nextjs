@@ -14,13 +14,13 @@ Features are dropped only when the user says so.
 | 6 | 60-min `pages.dev` max-session curl | test plan Task 1 step 3 | — | Done 2026-10-14: held 61m40s, 59.3 MB, no cut (run 1 stalled at 14m11s inside sandbox proxy, see decision §4d) | same |
 | 7 | Land B on `main` and delete `route.ts` (same change) | decision §4d | 1, 4 | Pending | none yet |
 | 8 | Cutover audio gate in cutover checklist | cutover checklist §6 | 7 | Recorded | cutover checklist |
-| 9 | Worker repo `reach-radio-audio-stream-worker` (passthrough, no Icy-MetaData, clear timeout, `no-store`) | decision §4d | 6 | Not started | none yet |
-| 10 | Multi-hour Worker soak incl. one `wrangler deploy` mid-stream | decision §4d | 9 | Not started | none yet |
-| 11 | Flip Sanity `radioAudioURL` to `stream.reach.radio`, re-point redirect, CSP `media-src` (user edits Sanity) | decision §4d | 10 | Not started | none yet |
+| 9 | Worker repo `reach-radio-audio-stream-worker` (passthrough, no Icy-MetaData, clear timeout, `no-store`) | decision §4d | 6 | Not started | `2026-10-14-audio-stream-worker.md` |
+| 10 | Multi-hour Worker soak incl. one `wrangler deploy` mid-stream | decision §4d | 9 | Not started | `2026-10-14-audio-stream-worker.md` |
+| 11 | Flip Sanity `radioAudioURL` to `stream.reach.radio`, re-point redirect, CSP `media-src` (user edits Sanity) | decision §4d | 10 | Not started | `2026-10-14-audio-stream-worker.md` |
 | 12 | Long-term ownership and sunset plan for the legacy `pages.dev` Astro project (retire when published Android/iOS 3.2 and Watch/v4 hardcodes are gone) | decision §7b | — | Unwritten | none yet |
 | 13 | Delete `/api/stream-info` after a Vercel log check (no callers found) | decision §4d | log check | Pending | none yet |
 | 14 | Sanity `radioAudioURL` field: description + https validation (studio `appSettings`) | decision §4d | — | Not requested | none yet |
 | 15 | Web player `onEnded`/`onStalled` handlers | decision §4b | — | Not started | none yet |
 | 16 | iOS ticket: no `DidPlayToEnd` handler, no stalled-state UI in the ~13 s gap, retry-counter reset unverified | T0 result | — | Not filed | none yet |
 | 17 | Shared Radiojar poll cache for `stream-info-sse` (~33 req/s upstream at 1000 listeners) | decision §4d | growth | Deferred | none yet |
-| 18 | Housekeeping: delete `/tmp/cf-token` and revoke the Cloudflare read-only token | session | — | Open | — |
+| 18 | Housekeeping: delete `/tmp/cf-token` and revoke the Cloudflare read-only token | session | — | `/tmp/cf-token` deleted 2026-10-14; token revoke pending (user, Cloudflare dashboard → My Profile → API Tokens) | — |

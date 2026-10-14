@@ -140,7 +140,7 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
 - `reach.radio` must stay on Cloudflare nameservers for a Worker custom domain: at cutover point the apex at Vercel with a DNS-only record; do not move nameservers.
 - The Radiojar stream ID `g4d600bv6p5tv` lives in three places (Astro function, Worker, and `RADIOJAR_URL`/`FALLBACK_STREAM_URL` in this repo). Update all if Radiojar changes it.
 - The 100k/day cap is account-wide: every Astro page view and bot request counts until the site leaves Cloudflare. Over the cap the stream is down until midnight UTC. Workers Paid ($5/month) is optional insurance (user's call).
-- Soak: several hours against the deployed Worker, with one `wrangler deploy` mid-stream to watch clients reconnect. The 60-minute `pages.dev` curl (Task 1 step 3) is still unrun.
+- Soak: several hours against the deployed Worker, with one `wrangler deploy` mid-stream to watch clients reconnect. The 60-minute `pages.dev` curl ran 2026-10-14 and passed (see the hold results below); the Worker itself still needs its own soak.
 
 **Now-playing metadata (VERIFIED in code)**
 - Metadata does not travel in the audio stream. It comes from Radiojar's separate API (`RADIOJAR_URL`, `constants.ts:10`), polled by the Vercel routes `/api/stream-info-sse` (web `useNowPlaying.ts:39`, iOS v4 `NowPlayingService.swift:71`, legacy Astro `MediaBarContainer.astro:126`) and `/api/stream-info`. The Worker needs nothing for metadata.
