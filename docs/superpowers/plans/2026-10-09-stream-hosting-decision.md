@@ -81,6 +81,14 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
 
 (§4c is reserved for the iOS v4 test results, plan Task 8.) Legend as above. Nothing in Sanity, DNS or Vercel was changed to produce this.
 
+**DECISION (user, 2026-10-13): Vercel will NOT carry the audio stream. Audio runs on Cloudflare only.**
+- Reasons: the 13-minute cut (`maxDuration` ceiling), Vercel data-transfer/duration billing risk at growth, and Flat Rate CDN terms that exclude bulk media delivery.
+- Consequences:
+  - The Vercel proxy `src/app/api/audio-stream/route.ts` is never to serve production audio after the `reach.radio` DNS cutover. It is kept only as a short-lived rollback while B is verified, then deleted.
+  - Until the Worker exists, audio for the new site and iOS v4 is served by the legacy Astro function on Cloudflare via the B redirect; after the Worker, by `stream.reach.radio`.
+  - Not a decision about the redirect itself: a 307 sends no audio bytes through Vercel, but it still reaches Vercel's routing layer, and its billing is unverified (INFERRED free). If zero Vercel involvement is required, clients must call the Cloudflare hostname directly (A) and the Vercel redirect stays only for the Watch app's hardcoded `reach.radio/api/audio-stream`.
+  - No fallback to Vercel for audio, including as an error path.
+
 **Which URL the clients actually play (VERIFIED)**
 - Live Sanity `appSettings.radioAudioURL` = `https://reach.radio/api/audio-stream` (public CDN GET, project `bk05c6rl`, dataset `production`, 2026-10-13). `hostURL` is still the stale workers.dev value.
 - Web player (`layout.tsx:108-117` → `<AudioProvider streamUrl>` → `<audio src>`), iOS v4 (bridge `loaded` handshake `BridgeInit.tsx:114` and `/api/native-config`), and the legacy Astro player all read that one Sanity value. `FALLBACK_STREAM_URL` (direct Radiojar HTTPS, `constants.ts:3`) is used only if the field is empty or the fetch fails.
