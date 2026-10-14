@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
               `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com https://www.gstatic.com`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://cdn.sanity.io data: blob: https://www.google.com",
-              "media-src 'self' https://*.radiojar.com https://reach.radio https://reach-radio-web.pages.dev",
+              "media-src 'self' https://*.radiojar.com https://reach.radio https://reach-radio-web.pages.dev https://stream.reach.radio",
               "connect-src 'self' https://api.sanity.io https://cdn.sanity.io https://*.radiojar.com https://www.google.com",
               "font-src 'self'",
               "object-src 'none'",

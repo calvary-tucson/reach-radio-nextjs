@@ -20,4 +20,12 @@ describe('next.config audio stream', () => {
       .find((h) => h.key === 'Content-Security-Policy')?.value
     expect(csp).toMatch(new RegExp(`media-src[^;]*${PAGES_DEV.replace(/\./g, '\\.')}`))
   })
+
+  it('allows the stream.reach.radio Worker host in CSP media-src', async () => {
+    const headers = await nextConfig.headers?.()
+    const csp = headers
+      ?.flatMap((h) => h.headers)
+      .find((h) => h.key === 'Content-Security-Policy')?.value
+    expect(csp).toMatch(/media-src[^;]*https:\/\/stream\.reach\.radio/)
+  })
 })
