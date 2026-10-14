@@ -10,9 +10,9 @@ Features are dropped only when the user says so.
 | 2 | iOS v4 stream override + soak harness | test plan Tasks 3–4 | — | Override committed (f16966e); soak UI test uncommitted | same |
 | 3 | T0 control (Vercel proxy cut) | test plan Task 5 | 2 | Done 2026-10-12 | same |
 | 4 | T1 cold start/prefetch through the 307 | test plan Task 6 | 1, 2 | Done 2026-10-14 (decision §4c) | same |
-| 5 | T2 ≥60 min soak, T3 network flap, T4 system integration (real device) | test plan Task 7 | 4 | Pending, user-run | same |
+| 5 | T2 ≥60 min soak, T3 network flap, T4 system integration (real device) | test plan Task 7 | 4 | T2 skipped by user decision 2026-10-14 (simulator soak aborted at 33 min when the dev server on :3000 went away, not a stream failure; `pages.dev` already held 61m40s via item 6). T3, T4 pending, user-run on real device | same |
 | 6 | 60-min `pages.dev` max-session curl | test plan Task 1 step 3 | — | Done 2026-10-14: held 61m40s, 59.3 MB, no cut (run 1 stalled at 14m11s inside sandbox proxy, see decision §4d) | same |
-| 7 | Land B on `main` and delete `route.ts` (same change) | decision §4d | 1, 4 | Pending | none yet |
+| 7 | Land B on `main` and delete `route.ts` (same change) | decision §4d | 1, 4 | Committed locally on `main` 0fb8718 (redirect + CSP, `route.ts` removed, config test); not pushed; local 307 curl and deploy-time 307 check pending | none yet |
 | 8 | Cutover audio gate in cutover checklist | cutover checklist §6 | 7 | Recorded | cutover checklist |
 | 9 | Worker repo `reach-radio-audio-stream-worker` (passthrough, no Icy-MetaData, clear timeout, `no-store`) | decision §4d | 6 | Not started | `2026-10-14-audio-stream-worker.md` |
 | 10 | Multi-hour Worker soak incl. one `wrangler deploy` mid-stream | decision §4d | 9 | Not started | `2026-10-14-audio-stream-worker.md` |
