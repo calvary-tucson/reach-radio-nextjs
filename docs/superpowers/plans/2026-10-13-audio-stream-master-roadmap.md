@@ -24,3 +24,4 @@ Features are dropped only when the user says so.
 | 16 | iOS ticket: no `DidPlayToEnd` handler, no stalled-state UI in the ~13 s gap, retry-counter reset unverified | T0 result | — | Not filed | none yet |
 | 17 | Shared Radiojar poll cache for `stream-info-sse` (~33 req/s upstream at 1000 listeners) | decision §4d | growth | Deferred | none yet |
 | 18 | Housekeeping: delete `/tmp/cf-token` and revoke the Cloudflare read-only token | session | — | `/tmp/cf-token` deleted 2026-10-14; token revoke dropped by user decision 2026-10-14 (token stays live) | — |
+| 19 | Worker deployed and live at `https://stream.reach.radio/` (verified 2026-10-14: HTTP/2 200, `audio/mpeg`, `no-store`, bytes flowing); deployer not recorded. Client compatibility tests: web CSP + real-page check, Android throwaway-branch ExoPlayer test, iOS override harness | decision §4d | 9 | Plan saved 2026-10-14, not started | `2026-10-14-stream-reach-radio-client-compat-tests.md` |
