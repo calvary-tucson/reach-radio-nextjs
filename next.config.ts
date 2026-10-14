@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
               `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com https://www.gstatic.com`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://cdn.sanity.io data: blob: https://www.google.com",
-              "media-src 'self' https://*.radiojar.com https://reach.radio",
+              "media-src 'self' https://*.radiojar.com https://reach.radio https://reach-radio-web.pages.dev",
               "connect-src 'self' https://api.sanity.io https://cdn.sanity.io https://*.radiojar.com https://www.google.com",
               "font-src 'self'",
               "object-src 'none'",
@@ -51,6 +51,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: '/speakers/:slug*', destination: '/teachers/:slug*', permanent: true },
+      {
+        source: '/api/audio-stream',
+        destination: 'https://reach-radio-web.pages.dev/api/audio-stream',
+        permanent: false,
+      },
     ]
   },
 }
