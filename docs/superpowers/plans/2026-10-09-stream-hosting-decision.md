@@ -77,6 +77,14 @@ INFERRED / UNKNOWN:
 
 Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audio-stream', destination: 'https://reach-radio-web.pages.dev/api/audio-stream', permanent: false }` (307, so nothing caches it) + add the pages.dev host to CSP `media-src`. Keep `route.ts` for one-commit rollback. Later, swap the destination to a custom hostname (e.g. `stream.reach.radio` on the Pages project) with no client change.
 
+### 4c. iOS v4 test results (plan Task 8)
+
+**T1 — cold start + prefetch through the 307 (2026-10-14, simulator, VERIFIED).** Override URL `https://dev.calvarytucson.com/api/audio-stream` (Next dev, branch `test/stream-redirect-b`, 307 → `reach-radio-web.pages.dev/api/audio-stream`, confirmed by curl in the same session).
+- Prefetch created AVPlayer; `play()` reused it. PlayerItem `readyToPlay`, `timeControlStatus → playing`, tap-to-audio 2.664 s.
+- UI label flipped to "Pause radio" 1.1 s after tap; held 120 s, app foregrounded, no stall, error or retry in the audio log.
+- Conclusion: AVPlayer follows the 307 to the Cloudflare host on cold start and prefetch; no ATS or redirect failure.
+- Not covered: T2 (≥60 min soak), T3 (network flap), T4 (system integration/lock screen), real device, cellular. Dev server request log did not list the redirect hit (not relied on; the 307 was verified by curl).
+
 ### 4d. Findings and decisions recorded 2026-10-13
 
 (§4c is reserved for the iOS v4 test results, plan Task 8.) Legend as above. Nothing in Sanity, DNS or Vercel was changed to produce this.

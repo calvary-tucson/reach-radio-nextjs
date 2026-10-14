@@ -9,7 +9,7 @@ Features are dropped only when the user says so.
 | 1 | B redirect on the new site (307 → pages.dev, CSP `media-src`) | decision §4b/§4d | — | Built on `test/stream-redirect-b` (369b14a); local 307 verify pending user dev server | `2026-10-09-ios-v4-stream-redirect-test.md` |
 | 2 | iOS v4 stream override + soak harness | test plan Tasks 3–4 | — | Override committed (f16966e); soak UI test uncommitted | same |
 | 3 | T0 control (Vercel proxy cut) | test plan Task 5 | 2 | Done 2026-10-12 | same |
-| 4 | T1 cold start/prefetch through the 307 | test plan Task 6 | 1, 2 | Pending | same |
+| 4 | T1 cold start/prefetch through the 307 | test plan Task 6 | 1, 2 | Done 2026-10-14 (decision §4c) | same |
 | 5 | T2 ≥60 min soak, T3 network flap, T4 system integration (real device) | test plan Task 7 | 4 | Pending, user-run | same |
 | 6 | 60-min `pages.dev` max-session curl | test plan Task 1 step 3 | — | Done 2026-10-14: held 61m40s, 59.3 MB, no cut (run 1 stalled at 14m11s inside sandbox proxy, see decision §4d) | same |
 | 7 | Land B on `main` and delete `route.ts` (same change) | decision §4d | 1, 4 | Pending | none yet |
