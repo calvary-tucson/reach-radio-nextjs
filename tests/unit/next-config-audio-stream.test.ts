@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import nextConfig from '../../next.config'
 
@@ -11,6 +13,10 @@ describe('next.config audio stream', () => {
       destination: `${PAGES_DEV}/api/audio-stream`,
       permanent: false,
     })
+  })
+
+  it('has no route.ts that the redirect would silently shadow', () => {
+    expect(existsSync(join(process.cwd(), 'src/app/api/audio-stream/route.ts'))).toBe(false)
   })
 
   it('allows the pages.dev host in CSP media-src', async () => {
