@@ -85,6 +85,9 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
 - Conclusion: AVPlayer follows the 307 to the Cloudflare host on cold start and prefetch; no ATS or redirect failure.
 - Not covered: T2 (≥60 min soak), T3 (network flap), T4 (system integration/lock screen), real device, cellular. Dev server request log did not list the redirect hit (not relied on; the 307 was verified by curl).
 
+**Client compatibility vs `https://stream.reach.radio/` (plan 2026-10-14-stream-reach-radio-client-compat-tests).**
+- Web (localhost, 2026-10-16): stream.reach.radio PASS; violations=0, currentTime=7.83s, events loadstart→loadeddata→canplay→playing, errorCode=null. Served CSP `media-src` includes the host (commit 9c749fc). No CORS issue with plain `<audio src>`.
+
 ### 4d. Findings and decisions recorded 2026-10-13
 
 (§4c is reserved for the iOS v4 test results, plan Task 8.) Legend as above. Nothing in Sanity, DNS or Vercel was changed to produce this.
