@@ -87,6 +87,8 @@ Sketch (not applied): `next.config.ts` `redirects()` entry `{ source: '/api/audi
 
 **Client compatibility vs `https://stream.reach.radio/` (plan 2026-10-14-stream-reach-radio-client-compat-tests).**
 - Web (localhost, 2026-10-16): stream.reach.radio PASS; violations=0, currentTime=7.83s, events loadstart→loadeddata→canplay→playing, errorCode=null. Served CSP `media-src` includes the host (commit 9c749fc). No CORS issue with plain `<audio src>`.
+- iOS sim 5 min (2026-10-16): PASS. `PLAY_STATE flipped=true`, five HOLD lines each `label=Pause radio`, `** TEST SUCCEEDED **` (soak harness commit 70861aa, branch `test/stream-override`).
+- Android (2026-10-16): compile-verified only. `ConfigTest` passes and `assembleDebugAndroidTest` builds (branch `test/stream-reach-radio`, aa7edb1). Playback test `StreamReachRadioTest` NOT yet run: no emulator/device (A2 pending).
 
 ### 4d. Findings and decisions recorded 2026-10-13
 
