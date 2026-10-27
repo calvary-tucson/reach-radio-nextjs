@@ -1,5 +1,6 @@
 'use client'
 
+import { useSyncExternalStore } from 'react'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { useTheme } from '@/components/theme/ThemeProvider'
 import type { Theme } from '@/components/theme/ThemeProvider'
@@ -11,8 +12,13 @@ const OPTIONS: { value: Theme; label: string; Icon: React.FC<{ className?: strin
   { value: 'system', label: 'System', Icon: Monitor },
 ]
 
+const subscribe = () => () => {}
+
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme: savedTheme, setTheme } = useTheme()
+  // Server HTML always renders the default (dark); show the saved theme only after hydration.
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false)
+  const theme: Theme = mounted ? savedTheme : 'dark'
 
   return (
     <div role="group" aria-label="Color theme" className="inline-flex items-center rounded-lg bg-white/5 light:bg-gray-100 p-0.5 gap-0.5">
