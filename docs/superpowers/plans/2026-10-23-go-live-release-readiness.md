@@ -111,11 +111,11 @@ Legend: **O** = owner only (dashboards, Sanity, stores, device). **C** = Claude 
 | Step | Who | Action | Verify | Rollback |
 |---|---|---|---|---|
 | A1 | C | Push local docs commit | `git status` clean of ahead | n/a (needs your yes) |
-| A2 | O+C | Read Vercel env: is `NEXT_PUBLIC_SITE_URL` set in Production? | value shown | n/a |
+| A2 | O+C | Read Vercel env: is `NEXT_PUBLIC_SITE_URL` set in Production? | **DONE 2026-10-27**: set (created 111 d ago, value encrypted). Live build emits `https://reach-radio-nextjs.vercel.app` in `/api/native-config` `webUrl`, canonical and `og:url`, so the value is the vercel.app host | n/a |
 | A3 | O | Record ALL current DNS records for both domains (screenshot/export from Cloudflare) | saved file | this IS the rollback |
 | A4 | O | Lower TTL to 300 s, one day ahead | Cloudflare shows 5 min | restore TTL |
-| A5 | C | Fix soft 404 on a branch/preview (explicit not-found for unmatched paths; keep modal close working) | `curl -s -o /dev/null -w %{http_code}` on preview returns 404; modals still open/close; unit+e2e green | revert commit |
-| A6 | C | Step 3 cache work: fix `/api/revalidate` (3 bugs), per-slug tags, `schedule` tag to `teachers` | unit tests; manual POST with secret returns ok | revert commit |
+| A5 | C | **DONE 2026-10-27 (15eca2e, pushed)**. Fix soft 404 on a branch/preview (explicit not-found for unmatched paths; keep modal close working) | `curl -s -o /dev/null -w %{http_code}` on preview returns 404; modals still open/close; unit+e2e green | revert commit |
+| A6 | C | **DONE 2026-10-27**: `/api/revalidate` was already fixed in code (revalidateTag 'max', tag map, timingSafeEqual, replay window; the "3 bugs" in GO-TO-PRODUCTION are stale). `schedule` tag fixed in efbb2a8 (pushed). Per-slug tags skipped: `teachers` tag already covers all teacher pages. Original scope: fix `/api/revalidate` (3 bugs), per-slug tags, `schedule` tag to `teachers` | unit tests; manual POST with secret returns ok | revert commit |
 | A7 | O | Cloudflare dashboard: check whether Pages auto-deploys `reach-radio-web` master (UNKNOWN) | note answer | n/a |
 | A8 | O | On-device check: live apps send `mobile-app` on every request (UNKNOWN) | capture | n/a |
 
@@ -123,7 +123,7 @@ Legend: **O** = owner only (dashboards, Sanity, stores, device). **C** = Claude 
 
 | Step | Who | Action | Verify | Rollback |
 |---|---|---|---|---|
-| B1 | O | Set `NEXT_PUBLIC_SITE_URL=https://reach.radio` in Vercel Production | env listed | remove var, redeploy |
+| B1 | O | Set `NEXT_PUBLIC_SITE_URL=https://reach.radio` in Vercel Production. **Do this at cutover time, not before**: until DNS moves, reach.radio still serves Astro, so canonical/OG on the Vercel site would point at the old site and v4 would get a `webUrl` that is not this site | env listed | remove var, redeploy |
 | B2 | C | Redeploy prod (needed: build-time var) | `/api/native-config` `webUrl` = `https://reach.radio`; page canonical + OG use reach.radio | unset var, redeploy |
 | B3 | O | Add `reach.radio`, `www.reach.radio`, `reachradiotucson.com`, `www.reachradiotucson.com` in Vercel (DNS unchanged yet; they show "invalid configuration", expected) | domains listed | remove domains |
 | B4 | O | Add reCAPTCHA domains and Sanity CORS origins for `reach.radio` | contact form works on preview/prod later | remove |
@@ -247,3 +247,7 @@ In-session:
 ```
 Read docs/superpowers/plans/2026-10-23-go-live-release-readiness.md and walk me through it item by item, starting with section 5. Stop and ask before any Sanity write, Vercel env change, DNS change, or push.
 ```
+
+## 12. Progress log
+
+- 2026-10-27: D1-D6 accepted as recommended. Pushed d263a79, efbb2a8, 15eca2e. A2, A5, A6 done. A5 caveat: HTTP status stays 200 for unmatched paths (Next streaming limit; prod already does this for `/teachers/zzz-nope`), page shows 404 content plus `noindex`, so `curl` 404 check in §6 C5 should be read as "404 page content + noindex", not status 404. Open: footer `ThemeToggle` hydration mismatch (dev console error, server `System` vs client `Dark`), not fixed.
