@@ -42,7 +42,7 @@ export async function TodaySchedule() {
     title: string
     photo: string | null
     schedule: { day: string; times: { startTime: string; endTime: string }[] }[]
-  }[]>(scheduleQuery, { day }, { tags: ['schedule'] })
+  }[]>(scheduleQuery, { day }, { tags: ['teachers'] })
 
   const rawSlots: SlotItem[] = []
   for (const t of raw) {
