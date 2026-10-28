@@ -199,3 +199,6 @@ CLI: `cd ~/Documents/Development/reach-radio-nextjs && claude`
 Prompt: `Read docs/superpowers/plans/2026-10-09-stream-hosting-decision.md, especially §4d (decision already made 2026-10-13: B now, Worker later, Vercel never serves audio). Continue from the open items listed there. Do not change Sanity, DNS, or push without my approval.`
 (Original prompt, superseded: run §5 tests 1-4 and recommend A or B.)
 Vercel CLI needs `--scope calvary-tucson-s-team`; sandbox needs `allowed_domains` for `api.vercel.com`; login may require me to run `! vercel login`.
+
+### 4d addendum 2026-10-28: iOS hardcoded fallbacks
+Unreleased iOS v4 (`AppConfig.fallbackStreamURL`) and Watch (`watchStandaloneStreamURL`) hardcoded `https://reach.radio/api/audio-stream`. Being repointed at `https://stream.reach.radio/` (plan `2026-10-28-ios-stream-url-to-worker.md`, CAL-139). Runtime URL still comes from Sanity `radioAudioURL`; flip that to the Worker at Phase F so fallback and runtime match (otherwise iOS rebuilds its prefetched AVPlayer on first play).
