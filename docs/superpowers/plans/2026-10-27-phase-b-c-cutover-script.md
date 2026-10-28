@@ -2,6 +2,41 @@
 
 Date: 2026-10-27. Companion to `2026-10-23-go-live-release-readiness.md` (§6 Phases B and C). Follow top to bottom. Each step says **who**, **what to do**, **expected result**, **if not, stop**. Paste the result of any "send back" line to Claude; Claude verifies with `curl`/`dig`.
 
+## Status (updated 2026-10-27)
+
+**Done**
+- Docs: runbook, this script (local commit `43a256d`, not pushed). Earlier fixes pushed through `8abbb6b` (A2, A5, A6, theme hydration).
+- Vercel CLI usable: logged in as `calvary-tucson`; default team set to `calvary-tucson-s-team` (`vercel switch`). Linked project already pointed at the right team; only account-level commands used the wrong default.
+- B1/B2 (add four domains): done via `vercel api /v10/projects/prj_WDyZFddcaawGJGS3B1eyJkcz1hcr/domains -X POST -F name=<host> --scope calvary-tucson-s-team`. `vercel domains add` fails with 403 `domain_not_owned`; do not use it, never `domains buy`.
+- All four are `verified:false`: they wait on the TXT records below. No traffic, DNS, env var, Sanity or webhook change has been made. reach.radio and reachradiotucson.com still serve Cloudflare Pages (Astro).
+
+**TXT records to add in Cloudflare (additive; do not touch apex/www records)**
+
+| Zone | Type | Name | Value |
+|---|---|---|---|
+| `reach.radio` | TXT | `_vercel` | `vc-domain-verify=reach.radio,b408ff59d7dbe791da1a` |
+| `reach.radio` | TXT | `_vercel` | `vc-domain-verify=www.reach.radio,0d848425b4ae72bdd160` |
+| `reachradiotucson.com` | TXT | `_vercel` | `vc-domain-verify=reachradiotucson.com,890586d96483dcdbd040` |
+| `reachradiotucson.com` | TXT | `_vercel` | `vc-domain-verify=www.reachradiotucson.com,19c6cef7e9bf6b968249` |
+
+Two separate TXT records per zone on the same `_vercel` name. Remove them to undo. Values come from Vercel; if verification fails, re-fetch with `vercel api /v9/projects/prj_WDyZFddcaawGJGS3B1eyJkcz1hcr/domains/<host> --scope calvary-tucson-s-team`.
+
+**End state**: nameservers and DNS stay on Cloudflare; apex/`www` become DNS-only (grey) records to Vercel at cutover; audio stays on Cloudflare (`reach-radio-web.pages.dev`, later the Worker); Astro on pages.dev stays alive for live iOS v3.2 and Android.
+
+**Remaining**
+
+| # | Who | Item |
+|---|---|---|
+| 1 | Owner | Part 0.1-0.3: export DNS for both zones, lower apex/`www` TTL to 5 min; answer 0.5 (Pages auto-deploy) |
+| 2 | Owner | Add the four TXT records, reply "TXT added" |
+| 3 | Claude | Verify domains via API and `dig`; before-snapshot (0.4); log it |
+| 4 | Owner | B4 reCAPTCHA domains, B5 Sanity CORS, B6 webhook (vercel.app host first), B7 test edit |
+| 5 | Owner | Push `43a256d` ("push" to Claude) |
+| 6 | Both | Pick a cutover day; run Part C preconditions; C1-C12; B8/B9 (hostURL, `NEXT_PUBLIC_SITE_URL`) happen only here |
+| 7 | Later | Phase D (48 h watch), E (iOS v4, real-device tests), F (audio Worker flip), G (Android, Astro sunset); D6 delete `/api/stream-info` after log check; A7, A8 owner checks |
+
+Note: B1/B2 below are already done; ignore the "add" instructions in them.
+
 Rules for the whole script:
 - Stop at the first unexpected result. Do not improvise. Rollback is in §R.
 - `reach-radio-web.pages.dev` is never touched, edited, or detached.
