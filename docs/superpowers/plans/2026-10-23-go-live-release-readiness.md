@@ -126,7 +126,7 @@ Legend: **O** = owner only (dashboards, Sanity, stores, device). **C** = Claude 
 | B1 | O | Set `NEXT_PUBLIC_SITE_URL=https://reach.radio` in Vercel Production. **Do this at cutover time, not before**: until DNS moves, reach.radio still serves Astro, so canonical/OG on the Vercel site would point at the old site and v4 would get a `webUrl` that is not this site | env listed | remove var, redeploy |
 | B2 | C | Redeploy prod (needed: build-time var) | `/api/native-config` `webUrl` = `https://reach.radio`; page canonical + OG use reach.radio | unset var, redeploy |
 | B3 | C (done 2026-10-27) | Add `reach.radio`, `www.reach.radio`, `reachradiotucson.com`, `www.reachradiotucson.com` in Vercel (DNS unchanged yet; they show "invalid configuration", expected). Done via project-level API; each needs a `_vercel` TXT record to verify (see cutover script "Status") | domains listed, `verified:false` until TXT added | remove domains |
-| B4 | O | Add reCAPTCHA domains and Sanity CORS origins for `reach.radio` | contact form works on preview/prod later | remove |
+| B4 | O (done 2026-10-27) | reCAPTCHA already lists `reach.radio`, `reachradiotucson.com`, `localhost`, vercel.app (site key matches). Sanity CORS NOT needed: all Sanity queries are server-side. Reach Radio Sanity project is `bk05c6rl` | contact form works on preview/prod later | remove |
 | B5 | O | Update Sanity `appSettings.hostURL` to `https://reach.radio` | query shows new value | restore old value |
 | B6 | O | Register Sanity webhook to `https://reach.radio/api/revalidate` (needs live host, so can only be tested after Phase C; may register to vercel.app first) | webhook delivers 200 | disable webhook |
 
