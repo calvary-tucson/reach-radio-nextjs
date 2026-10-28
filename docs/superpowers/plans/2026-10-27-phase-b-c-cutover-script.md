@@ -8,7 +8,7 @@ Date: 2026-10-27. Companion to `2026-10-23-go-live-release-readiness.md` (§6 Ph
 - Docs: runbook, this script (local commit `43a256d`, not pushed). Earlier fixes pushed through `8abbb6b` (A2, A5, A6, theme hydration).
 - Vercel CLI usable: logged in as `calvary-tucson`; default team set to `calvary-tucson-s-team` (`vercel switch`). Linked project already pointed at the right team; only account-level commands used the wrong default.
 - B1/B2 (add four domains): done via `vercel api /v10/projects/prj_WDyZFddcaawGJGS3B1eyJkcz1hcr/domains -X POST -F name=<host> --scope calvary-tucson-s-team`. `vercel domains add` fails with 403 `domain_not_owned`; do not use it, never `domains buy`.
-- All four are `verified:false`: they wait on the TXT records below. No traffic, DNS, env var, Sanity or webhook change has been made. reach.radio and reachradiotucson.com still serve Cloudflare Pages (Astro).
+- TXT records added by owner; all four domains now `verified:true` (2026-10-27). Still serving Astro (`server: cloudflare`). Remaining below starts at item 1 (TXT item 2 is done). Before that they were `verified:false`. No traffic, DNS, env var, Sanity or webhook change has been made. reach.radio and reachradiotucson.com still serve Cloudflare Pages (Astro).
 
 **TXT records to add in Cloudflare (additive; do not touch apex/www records)**
 
