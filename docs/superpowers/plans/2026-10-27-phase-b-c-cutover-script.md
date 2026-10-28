@@ -37,6 +37,19 @@ Two separate TXT records per zone on the same `_vercel` name. Remove them to und
 
 Note: B1/B2 below are already done; ignore the "add" instructions in them.
 
+**Baseline DNS (owner screenshots 2026-10-28), restore values for §R:**
+
+| Zone | Name | Type | Content | Proxy | TTL |
+|---|---|---|---|---|---|
+| `reach.radio` | `@` | CNAME | `reach-radio-web.pages.dev` | Proxied | Auto |
+| `reach.radio` | `www` | CNAME | `reach-radio-web.pages.dev` | Proxied | Auto |
+| `reachradiotucson.com` | `@` | CNAME | `reach-radio-web.pages.dev` | Proxied | Auto |
+| `reachradiotucson.com` | `www` | CNAME | `reach-radio-web.pages.dev` | Proxied | Auto |
+
+- 0.3 done: Auto = 300 s, no TTL change needed.
+- Untouched at cutover: `stream.reach.radio` (Worker custom domain, Proxied), `google-site-verification` TXT records, `_vercel` TXT records. Any MX/other records not seen in screenshots: confirm via export.
+- Apex/`www` rows are Pages-managed (info icon), so they cannot be edited while attached: C1 (detach) then C2/C3 (add Vercel records). Do C2 within 1-2 min of C1; the sites are unresolved in between.
+
 Rules for the whole script:
 - Stop at the first unexpected result. Do not improvise. Rollback is in §R.
 - `reach-radio-web.pages.dev` is never touched, edited, or detached.
