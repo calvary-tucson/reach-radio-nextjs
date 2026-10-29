@@ -23,7 +23,9 @@ Two separate TXT records per zone on the same `_vercel` name. Remove them to und
 
 **End state**: nameservers and DNS stay on Cloudflare; apex/`www` become DNS-only (grey) records to Vercel at cutover; audio stays on Cloudflare (`reach-radio-web.pages.dev`, later the Worker); Astro on pages.dev stays alive for live iOS v3.2 and Android.
 
-**Remaining**
+**CURRENT STATUS as of 2026-10-28 evening (the table below is the old list; rows 1-5 are ALL DONE, do not redo them):** Part 0 done, TXT records added and domains verified, Phase B done, commits pushed. Only row 6 (cutover day) and row 7 (later phases) remain. **To run the cutover, jump to "Scripted path" at the bottom of this file.** The manual C1-C12 table above it is the fallback if the scripts fail.
+
+**Remaining (old list, mostly done)**
 
 | # | Who | Item |
 |---|---|---|
@@ -182,3 +184,11 @@ Files: `scripts/cutover/cf_cutover.py` (Cloudflare), `scripts/cutover/verify.sh`
 3. 48 h watch (Phase D): Vercel 504 rate vs the baselines above, `/api/stream-info-sse` usage and memory (earlier OOM history), function usage and bandwidth.
 4. D3 revisit: readiness doc §13 (temporary 307 redirect first, after the iOS config test and a clean 48 h).
 5. Later phases: D6 log check then delete `/api/stream-info`; iOS v4 device tests T3/T4; Phase F audio flip; Phase G Android and Astro sunset.
+
+### Exact values for C7 and C9 (added 2026-10-28)
+
+- **Cold start for a fresh session:** the Cloudflare token is NOT saved anywhere (only pasted in the 2026-10-28 chat). If it is gone or expired, the owner makes a new one: Cloudflare profile > API Tokens > Create Custom Token, `Zone / DNS / Edit` on `reach.radio` + `reachradiotucson.com`, `Account / Cloudflare Pages / Edit`, short expiry. Then `export CF_API_TOKEN=...` in the shell that runs the script. Cloudflare account id `0a8e48b3e091dedab060a87d59d8218c`.
+- **Run order sanity check before `--apply`:** `snapshot` must show 4 CNAMEs to `reach-radio-web.pages.dev` (proxied) and 4 Pages domains. If it shows anything else, someone already changed DNS: stop and compare with the baseline table above.
+- **C7 (Vercel env):** project `prj_WDyZFddcaawGJGS3B1eyJkcz1hcr`, team `team_ScWb7I5wN1e1PtCCk2xTwGwA` (scope `calvary-tucson-s-team`). Set Production `NEXT_PUBLIC_SITE_URL` to `https://reach.radio` (dashboard, or `vercel env rm` then `vercel env add NEXT_PUBLIC_SITE_URL production`), then redeploy the latest production deployment. The var is build-time, so a redeploy is required. Previous value: `https://reach-radio-nextjs.vercel.app` (rollback value).
+- **C9 (Sanity):** project `bk05c6rl`, dataset `production`, document `appSettings` id `a2939b52-e844-45f4-ba97-c335991cea4b`. **Current `hostURL` = `https://reach-radio.webapp-0a8.workers.dev/` (rollback value).** Set to `https://reach.radio`. `radioAudioURL` stays `https://reach.radio/api/audio-stream` (Phase F changes it later, not now).
+- Read it back: `sanity documents query --project-id bk05c6rl --dataset production '*[_type=="appSettings"]{_id,hostURL,radioAudioURL}'`
