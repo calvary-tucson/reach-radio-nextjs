@@ -16,7 +16,10 @@ case "${1:-}" in
         printf '%-28s ' "$p"; curl -s -o /dev/null --max-time 20 -w '%{http_code} %{time_total}s\n' "https://$h$p"
       done
       printf '%-28s ' "/api/audio-stream"; curl -s -o /dev/null --max-time 20 -w '%{http_code} -> %{redirect_url}\n' "https://$h/api/audio-stream"
-    done ;;
+    done
+    echo "== pages.dev unchanged (live iOS store build loads it)"
+    printf '%-28s ' "/"; curl -s -o /dev/null --max-time 20 -w '%{http_code}\n' "https://reach-radio-web.pages.dev/"
+    printf '%-28s ' "/api/audio-stream"; curl -s -o /dev/null --max-time 20 -w '%{http_code}\n' "https://reach-radio-web.pages.dev/api/audio-stream" ;;
   canon)
     for h in reach.radio reachradiotucson.com; do
       echo "== $h"

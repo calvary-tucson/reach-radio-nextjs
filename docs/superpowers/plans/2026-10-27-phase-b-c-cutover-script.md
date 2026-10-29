@@ -199,3 +199,11 @@ Files: `scripts/cutover/cf_cutover.py` (Cloudflare), `scripts/cutover/verify.sh`
 - **Why safe:** `hostURL` is only returned by Next.js `/api/native-config` (`src/app/api/native-config/route.ts:16`). iOS v4 (unreleased) reads `webUrl` first and uses `hostURL` only if `webUrl` is missing (`Reach_Radio_NativeApp.swift:70`); `webUrl` comes from `NEXT_PUBLIC_SITE_URL` (C7). Native git history: no store build reads it. iOS config fetch was added in `627803f` on 2026-06-17 and the store build candidate `3fbf6e0` (2025-04-04) predates it; Android has never referenced `native-config`, `hostURL`, `webUrl` or `workers.dev`. Caveat: neither repo has release tags, so the store build is inferred; owner can confirm via App Store Connect "Date submitted" (before 2026-06-17 proves it).
 - **When to do it:** at Phase E, before iOS v4 is submitted: set `hostURL` to `https://reach.radio` (doc id `a2939b52-e844-45f4-ba97-c335991cea4b`, project `bk05c6rl`, dataset `production`). Rollback value: `https://reach-radio.webapp-0a8.workers.dev/`. Do it earlier if the workers.dev site is ever retired.
 - **The real store-app dependency in this cutover** is not `hostURL`. iOS store build `3fbf6e0` loads `https://reach-radio-web.pages.dev/` (`ContentView.swift:200`) and streams `https://reach.radio/api/audio-stream` (line 207). After cutover that stream URL is a Vercel 307 to `pages.dev`. Verify with C6 (307 then 200 `audio/mpeg`) and C12 (play in the live iOS and Android apps).
+
+
+## Final audit additions (2026-10-28)
+- Before running `cutover --apply`: owner audits Cloudflare Rules on both zones (see readiness doc section 14, item 1). Grey records bypass them.
+- Donate is a plain Pushpay link, no iframe: no CSP change needed.
+- `verify.sh smoke` also checks pages.dev unchanged (C6).
+- After 48 h clean: restore TTL (D5), delete both tokens, D1 webhook test, D2 contact form test, Search Console for both hosts.
+- C9 skipped (Phase E). R13 resolved by D3 Option B.

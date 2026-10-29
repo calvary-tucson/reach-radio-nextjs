@@ -79,8 +79,8 @@ Facts (all VERIFIED unless tagged):
 | R10 | iOS v4: no `DidPlayToEnd` handler, silent stall gap | Low-Med | T0 showed ~13 s recovery via watchdog. Candidate ticket (roadmap 16). Mostly moot with Cloudflare (no 13-min cut) |
 | R11 | Cloudflare free plan caps (100k req/day account-wide, 10 ms CPU) | Medium | ~810 req/day on audio today (~1%). Every Astro page view counts too. Over cap = stream down until 00:00 UTC. Workers Paid $5/mo is optional insurance (owner call) |
 | R12 | Radiojar stream ID `g4d600bv6p5tv` hardcoded in 3 places | Low | Astro fn, Worker, `constants.ts`. Update all if it changes |
-| R13 | `reachradiotucson.com` duplicate content | Medium | Decide: 301 to `reach.radio` or second canonical |
-| R14 | Sanity `hostURL` stale (workers.dev) | Low | iOS v4 uses only if `webUrl` missing (never). Update anyway at cutover |
+| R13 | `reachradiotucson.com` duplicate content | Medium | RESOLVED 2026-10-28 by D3 Option B: serve both, canonicals point to `reach.radio`. Redirect deferred (section 13) |
+| R14 | Sanity `hostURL` stale (workers.dev) | Low | iOS v4 uses only if `webUrl` missing (never). DECIDED 2026-10-28: skip at cutover, change in Phase E (store iOS build predates config fetch; rollback value is the workers.dev site) |
 | R15 | Sanity `radioAudioURL` flip is global | Medium | One field drives web, Astro player, iOS v4. Flip only after Worker soak. Instant rollback = restore old value |
 | R16 | Android build: `main` pages.dev, branch diverged | High (for Android release) | Not a go-live blocker for web/iOS. Separate project |
 | R17 | Bot/relay traffic on stream (~12% of bytes) | Low | Decided: do nothing |
@@ -127,7 +127,7 @@ Legend: **O** = owner only (dashboards, Sanity, stores, device). **C** = Claude 
 | B2 | C | Redeploy prod (needed: build-time var) | `/api/native-config` `webUrl` = `https://reach.radio`; page canonical + OG use reach.radio | unset var, redeploy |
 | B3 | C (done 2026-10-27) | Add `reach.radio`, `www.reach.radio`, `reachradiotucson.com`, `www.reachradiotucson.com` in Vercel (DNS unchanged yet; they show "invalid configuration", expected). Done via project-level API; each needs a `_vercel` TXT record to verify (see cutover script "Status") | domains listed, `verified:false` until TXT added | remove domains |
 | B4 | O (done 2026-10-27) | reCAPTCHA already lists `reach.radio`, `reachradiotucson.com`, `localhost`, vercel.app (site key matches). Sanity CORS NOT needed: all Sanity queries are server-side. Reach Radio Sanity project is `bk05c6rl` | contact form works on preview/prod later | remove |
-| B5 | O | Update Sanity `appSettings.hostURL` to `https://reach.radio` | query shows new value | restore old value |
+| B5 | O | DEFERRED to Phase E (see R14): update Sanity `appSettings.hostURL` to `https://reach.radio` | query shows new value | restore old value |
 | B6 | O | Register Sanity webhook to `https://reach.radio/api/revalidate` (needs live host, so can only be tested after Phase C; may register to vercel.app first) | webhook delivers 200 | disable webhook |
 
 ### Phase C — DNS cutover (low-traffic hours)
@@ -271,3 +271,17 @@ Decided 2026-10-28: at cutover `reachradiotucson.com` and `www.reachradiotucson.
 | After | Submit change of address in Google Search Console if used; watch 404s; update printed or QR material over time |
 | Rollback | Remove the redirect in Vercel Domains (instant for new visitors; browsers that cached a permanent redirect keep following it, which is why 307 comes first) |
 | Owner | Revisit at Phase D review (about 2026-10-31 to 2026-11-01) |
+
+
+## 14. Final audit additions (2026-10-28)
+Pre-cutover checks added after a full re-read. None block "go" except item 1.
+1. OWNER, read-only, before cutover: in Cloudflare dashboard, both zones, list Redirect Rules, Page Rules, Cache Rules, Transform Rules, Configuration Rules, Workers Routes. Grey (DNS only) records bypass all of them, so any redirect or header rule stops applying. Anything needed must be recreated in `next.config.ts` or Vercel. Send the list back. (`stream.reach.radio` Worker custom domain is separate and stays proxied.)
+2. Donate page: plain outbound link to Pushpay (`PUSHPAY_GIVING_URL`), no iframe. CSP `frame-src` (google.com only) is not a risk. Verified 2026-10-28. Still click-test the link on both hosts after cutover.
+3. `src/proxy.ts` has no host-specific logic. `www.*` hosts serve the full site; canonical handles SEO.
+4. Sitemap `BASE_URL`, robots and JSON-LD are hardcoded to `https://reach.radio`. Both hosts emit the same sitemap. Fine under D3 B. Add both hosts in Search Console after cutover.
+5. D1 (after C10): publish a test Sanity edit, confirm webhook delivery 200 and the page updates.
+6. D2: submit the contact form on `reach.radio`, confirm the email arrives.
+7. D5 (after 48 h clean): raise TTL on the 4 Vercel CNAMEs from 300 to auto/3600.
+8. Delete both Cloudflare tokens when done: `claude-cutover-dns` and the earlier read-only analytics token.
+9. R11 (Cloudflare free cap) improves after cutover: traffic stops flowing through Pages Functions.
+10. `verify.sh smoke` now also checks `reach-radio-web.pages.dev` is unchanged (the live iOS store build loads it).
