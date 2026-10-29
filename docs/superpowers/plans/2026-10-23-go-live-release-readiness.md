@@ -287,3 +287,16 @@ Pre-cutover checks added after a full re-read. None block "go" except item 1.
 10. `verify.sh smoke` now also checks `reach-radio-web.pages.dev` is unchanged (the live iOS store build loads it).
 
 - 2026-10-28 (night): Item 1 of section 14 DONE. Owner checked the Cloudflare dashboard: no Redirect, Cache, Transform or Configuration rules and no Workers Routes on `reach.radio` or `reachradiotucson.com`. Nothing to recreate. (Token `claude-cutover-dns` cannot read rules, 403; not needed.)
+
+## 15. CUTOVER EXECUTED 2026-10-29 (Arizona, about 10:35 to 11:15 am)
+- C1 to C3 DONE via `cf_cutover.py cutover --apply`: 4 Pages domains detached, 4 CNAMEs now `32eebd4ba8fac32a.vercel-dns-016.com`, grey, TTL 300. All calls ok. No visible downtime caught; all 4 hosts returned 200 `server: Vercel` within about 2 minutes.
+- C6 smoke DONE: `/donate /about /about/privacy-policy /api/native-config /sitemap.xml /robots.txt` 200 on both hosts. `/` and `/teachers` gave one transient `000` on reach.radio, then 200 x3. `/api/audio-stream` is a 307 to pages.dev as designed. pages.dev `/` and `/api/audio-stream` unchanged (200).
+- Known, not a regression: `/not-a-page` returns 200 (same on vercel.app). Soft-404; look at it later.
+- C7 DONE: Vercel production `NEXT_PUBLIC_SITE_URL` = `https://reach.radio` (env id `EyZw28cz3NJ2zywH`, sensitive; set by PATCH `/v9/projects/<id>/env/<envId>` with `vercel api`), redeployed `dpl_FFmhSa1pTXyvmiQSAxpaLVxEynuk` (commit `d81bad6`) with `vercel redeploy --scope calvary-tucson-s-team`. Rollback value `https://reach-radio-nextjs.vercel.app`.
+- C8 DONE: `webUrl`, canonical, `og:url` = `https://reach.radio` on both hosts.
+- C9 skipped (Phase E). C10 (webhook URL change) now OPTIONAL: current vercel.app URL works.
+- D1 DONE: Sanity publish at 18:05:09Z, webhook `POST /api/revalidate` 200 at 18:05:10Z (Vercel logs).
+- C11 DONE: owner hears audio on reach.radio.
+- Pre-cutover traffic check: reach.radio spike was a bot scanner (Korea, `.env` probes, 79% 404), not users. Traffic check method: Cloudflare GraphQL `httpRequestsAdaptiveGroups` (needs an analytics-capable token).
+- STILL OPEN: C12 (live iOS and Android apps), D2 contact form, Search Console for both hosts, 48 h watch (504 rate vs baseline 16% and 12%), D5 TTL restore, Vercel Firewall rate limit and Spend Management, delete `claude-cutover-dns` and the analytics token, delete `~/.cf_tmp_token`.
+- Token gotcha: clipboard held the analytics token first (no DNS access). Confirm the right one with `cf_cutover.py snapshot` before "go".
