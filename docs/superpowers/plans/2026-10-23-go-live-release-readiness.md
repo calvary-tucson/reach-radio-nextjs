@@ -285,3 +285,5 @@ Pre-cutover checks added after a full re-read. None block "go" except item 1.
 8. Delete both Cloudflare tokens when done: `claude-cutover-dns` and the earlier read-only analytics token.
 9. R11 (Cloudflare free cap) improves after cutover: traffic stops flowing through Pages Functions.
 10. `verify.sh smoke` now also checks `reach-radio-web.pages.dev` is unchanged (the live iOS store build loads it).
+
+- 2026-10-28 (night): Item 1 of section 14 DONE. Owner checked the Cloudflare dashboard: no Redirect, Cache, Transform or Configuration rules and no Workers Routes on `reach.radio` or `reachradiotucson.com`. Nothing to recreate. (Token `claude-cutover-dns` cannot read rules, 403; not needed.)
