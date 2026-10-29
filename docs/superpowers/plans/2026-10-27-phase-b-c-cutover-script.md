@@ -151,3 +151,34 @@ curl -s https://reach.radio/api/native-config
 curl -s https://reach.radio/ | grep -oE '<link rel="canonical"[^>]*>'
 ```
 Network calls from the sandbox need `allowed_domains` for each host.
+
+## Scripted path (added 2026-10-28; use this instead of the manual dashboard steps C1-C3)
+
+Files: `scripts/cutover/cf_cutover.py` (Cloudflare), `scripts/cutover/verify.sh` (read-only checks). Token: env `CF_API_TOKEN` (`claude-cutover-dns`: DNS Edit on both zones + Pages Edit, expires 2026-11-28; never saved to a file). Backup JSON: `.cutover-backup/cf-snapshot.json` (uncommitted).
+
+| Step | Command (from repo root) | Writes? |
+|---|---|---|
+| Pre-check | `python3 -I scripts/cutover/cf_cutover.py snapshot`; Vercel home 200; `/api/audio-stream` 307; live hosts 200 | no |
+| Dry run | `python3 -I scripts/cutover/cf_cutover.py cutover` (no `--apply`) | no |
+| C1-C3 | `python3 -I scripts/cutover/cf_cutover.py cutover --apply` (per host: detach from Pages, then PUT record to CNAME `32eebd4ba8fac32a.vercel-dns-016.com`, grey, TTL 300; stops on first failure) | YES, owner "go" first |
+| C4 | `scripts/cutover/verify.sh dns` (Vercel IPs, `server: Vercel`, valid cert; 1-5 min, if still Cloudflare after 10 min stop) | no |
+| C5 | Vercel domains show valid: `vercel api /v6/domains/<host>/config?projectIdOrName=prj_WDyZFddcaawGJGS3B1eyJkcz1hcr&teamId=team_ScWb7I5wN1e1PtCCk2xTwGwA` expect `misconfigured:false` | no |
+| C6 | `scripts/cutover/verify.sh smoke` (both hosts, 9 URLs + audio 307) | no |
+| C7 | Vercel Production env `NEXT_PUBLIC_SITE_URL=https://reach.radio`, then redeploy | YES, owner "go" |
+| C8 | `scripts/cutover/verify.sh canon` (`webUrl`, canonical, `og:url` = `https://reach.radio` on BOTH hosts) | no |
+| C9 | Sanity CLI (authed, sees `bk05c6rl`): set `appSettings.hostURL` = `https://reach.radio`; confirm the doc id read-only first | YES, owner "go" |
+| C10 | Owner: Sanity webhook URL to `https://reach.radio/api/revalidate`, publish a trivial edit, check 200 in webhook log | owner |
+| C11, C12 | Owner: play audio 30 s on reach.radio; open live iOS v3.2 and Android apps | owner |
+
+**Rollback (scripted):** `python3 -I scripts/cutover/cf_cutover.py rollback --apply` (restores the 4 proxied CNAMEs to `reach-radio-web.pages.dev` TTL auto, then re-attaches the 4 Pages domains). About 5 min. Other rollbacks in §R still apply.
+
+**Known risks:** (1) each host has a 1-5 min gap between Pages detach and Vercel cert; (2) Cloudflare may refuse to edit a Pages-managed record right after detach (script stops; run rollback); (3) D3 = Option B, so do NOT add a redirect on `reachradiotucson.com` (readiness doc §13).
+
+**Baselines to compare after cutover (Cloudflare analytics, 24 h before cutover):** `reach.radio` 442 of 2,824 requests were 504 (16%); `reachradiotucson.com` 874 of 7,253 (12%). Traffic about 120 req/h on `reach.radio`, about 265 req/h on `reachradiotucson.com`. Quietest hours Arizona: 1 am, 10 pm, 9 am, noon, 7 pm. Bot spike 3-4 am.
+
+**After cutover (do not forget):**
+1. Delete the `claude-cutover-dns` Cloudflare token (it was pasted into a chat transcript).
+2. Vercel Firewall: add a rate-limit custom rule on `/api/*`, look at the bot protection ruleset, check Spend Management. Reason: apex/`www` are grey (Vercel docs, 2026-09-18, advise against a proxy in front), so Cloudflare no longer absorbs bot traffic and Vercel bills what it serves.
+3. 48 h watch (Phase D): Vercel 504 rate vs the baselines above, `/api/stream-info-sse` usage and memory (earlier OOM history), function usage and bandwidth.
+4. D3 revisit: readiness doc §13 (temporary 307 redirect first, after the iOS config test and a clean 48 h).
+5. Later phases: D6 log check then delete `/api/stream-info`; iOS v4 device tests T3/T4; Phase F audio flip; Phase G Android and Astro sunset.
