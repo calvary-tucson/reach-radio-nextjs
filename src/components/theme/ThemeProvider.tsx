@@ -2,8 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { isTheme, pickTheme, resolveTheme, type Theme } from '@/lib/theme/resolve-theme'
 
-export type Theme = 'light' | 'dark' | 'system'
+export type { Theme }
 
 interface ThemeContextValue {
   theme: Theme
@@ -25,10 +26,11 @@ function setThemeCookie(theme: Theme) {
   document.cookie = `theme=${theme};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax`
 }
 
+const LIGHT_QUERY = '(prefers-color-scheme: light)'
+
 function applyTheme(theme: Theme) {
   const html = document.documentElement
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  const resolved = theme === 'system' ? (prefersDark ? 'dark' : 'light') : theme
+  const resolved = resolveTheme(theme, window.matchMedia(LIGHT_QUERY).matches)
   html.classList.remove('light', 'dark')
   html.classList.add(resolved)
 }
@@ -39,34 +41,17 @@ function ThemeInit({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const param = searchParams?.get('theme') ?? null
-    if (param === 'light' || param === 'dark' || param === 'system') {
-      setThemeCookie(param)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- this and the other setThemeState calls below coordinate theme state with cookie/DOM mutations to prevent theme-flash on paint
-      setThemeState(param)
-      applyTheme(param)
-      return
-    }
+    if (isTheme(param)) setThemeCookie(param)
 
-    const cookie = getThemeCookie()
+    const isNativeApp = document.documentElement.classList.contains('native-app')
+    const chosen = pickTheme({ param, cookie: getThemeCookie(), isNativeApp })
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- coordinates theme state with cookie/DOM mutations to prevent theme-flash on paint
+    setThemeState(chosen)
+    applyTheme(chosen)
+    if (chosen !== 'system') return
 
-    if (!cookie && document.body.dataset.app === 'true') {
-      setThemeState('dark')
-      document.documentElement.classList.remove('light', 'dark')
-      document.documentElement.classList.add('dark')
-      return
-    }
-
-    const effectiveTheme: Theme = cookie ?? 'system'
-    setThemeState(effectiveTheme)
-
-    if (effectiveTheme !== 'system') {
-      applyTheme(effectiveTheme)
-      return
-    }
-
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const mq = window.matchMedia(LIGHT_QUERY)
     const apply = () => applyTheme('system')
-    apply()
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
   }, [searchParams])
