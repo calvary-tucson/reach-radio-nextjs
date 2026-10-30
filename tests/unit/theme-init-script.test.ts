@@ -52,6 +52,12 @@ describe('THEME_INIT_SCRIPT', () => {
   it('web, ?theme param beats cookie', () => {
     expect(run({ scheme: 'light', cookie: 'theme=light', search: '?theme=dark' }).contains('dark')).toBe(true)
   })
+  it('web, invalid ?theme=lightx is ignored and cookie wins', () => {
+    expect(run({ scheme: 'light', cookie: 'theme=dark', search: '?theme=lightx' }).contains('dark')).toBe(true)
+  })
+  it('web, ?theme=light followed by & still matches', () => {
+    expect(run({ scheme: 'dark', cookie: 'theme=dark', search: '?theme=light&x=1' }).contains('light')).toBe(true)
+  })
   it('native app via window.inNativeApp: dark even with system light and saved light', () => {
     ;(window as { inNativeApp?: boolean }).inNativeApp = true
     const cl = run({ scheme: 'light', cookie: 'theme=light' })
