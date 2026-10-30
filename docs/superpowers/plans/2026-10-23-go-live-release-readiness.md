@@ -300,3 +300,29 @@ Pre-cutover checks added after a full re-read. None block "go" except item 1.
 - Pre-cutover traffic check: reach.radio spike was a bot scanner (Korea, `.env` probes, 79% 404), not users. Traffic check method: Cloudflare GraphQL `httpRequestsAdaptiveGroups` (needs an analytics-capable token).
 - STILL OPEN: C12 (live iOS and Android apps), D2 contact form, Search Console for both hosts, 48 h watch (504 rate vs baseline 16% and 12%), D5 TTL restore, Vercel Firewall rate limit and Spend Management, delete `claude-cutover-dns` and the analytics token, delete `~/.cf_tmp_token`.
 - Token gotcha: clipboard held the analytics token first (no DNS access). Confirm the right one with `cf_cutover.py snapshot` before "go".
+
+## 16. Open items checklist (as of 2026-10-30)
+Single list so nothing is lost. Mark `[x]` with date when done.
+
+**Done since section 15**
+- [x] 2026-10-29 C12 iOS: owner tested the live App Store iOS app, works. (It still loads `reach-radio-web.pages.dev`, which is unchanged.)
+- [x] 2026-10-30 Default-dark theme shipped (CAL-163, plan `2026-10-30-default-dark-theme.md`, commits `397333a..0387160`, pushed, live on both hosts): web is dark unless the system is light or a saved choice exists; the native app is always dark; `?theme=` stays an explicit override. Store apps load pages.dev, so they see it only after a build pointing at reach.radio ships.
+- [x] 2026-10-30 Commit `e609453` pushed.
+
+**Owner**
+- [ ] C12 Android app check (Android `main` also loads pages.dev; confirm it still works).
+- [ ] D2: submit the contact form on `reach.radio`, confirm the email arrives.
+- [ ] Search Console: add both `reach.radio` and `reachradiotucson.com`, submit the sitemap.
+- [ ] Vercel Firewall rate limit (needs owner go) and Spend Management (needs owner go).
+- [ ] Delete the Cloudflare tokens in the dashboard: `claude-cutover-dns` (expires 2026-11-28) and the analytics-only token.
+- [ ] `! rm ~/.cf_tmp_token` (the sandbox cannot delete it).
+- [ ] Say "apply" for the pending patches to `GO-TO-PRODUCTION.md` (your uncommitted edits there are untouched).
+- [ ] Optional: real-device check of the theme default on `reach.radio` with the phone in light and dark mode.
+
+**Claude**
+- [ ] 48 h watch (until about 2026-10-31 11:00 AZ): compare 504 rate vs baselines (16% and 12%).
+- [ ] D5: after 48 h clean, raise TTL on the 4 Vercel CNAMEs from 300 to auto/3600 (needs owner go, DNS change).
+- [ ] Phase E: change `hostURL` (deferred, see `71a6499`), D6 and later phases.
+- [ ] Follow-up: `/not-a-page` returns 200 (soft-404).
+- [ ] C10 webhook URL change is optional; current vercel.app URL works.
+- [ ] Theme follow-up: no real-browser check of light-system on production yet (Playwright MCP browser not installed in this session; local e2e passed).
