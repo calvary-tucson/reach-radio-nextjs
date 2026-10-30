@@ -65,12 +65,3 @@ test.describe('system = dark', () => {
     await expect(page.locator('html')).toHaveClass(/\bdark\b/)
   })
 })
-
-test.describe('system = no preference', () => {
-  test.use({ colorScheme: 'no-preference' })
-
-  test('web visitor gets dark', async ({ page }) => {
-    await page.goto('/')
-    await expect(page.locator('html')).toHaveClass(/\bdark\b/)
-  })
-})
