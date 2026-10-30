@@ -290,3 +290,10 @@ Focus:      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-w
 Motion:     motion-safe: prefix on all animations
 Cursor:     cursor-pointer on every interactive element
 ```
+
+## Theme
+
+- Default on the web: dark, unless the visitor's system asks for light (`prefers-color-scheme: light`). "No preference" is dark.
+- A saved choice (footer toggle, `theme` cookie) overrides the system. `?theme=light|dark|system` overrides both.
+- Native app: always dark (detected by `html.native-app`); the saved cookie is ignored; the three theme toggles are not rendered in the app. `?theme=` still overrides, for testing.
+- Rules live in `src/lib/theme/resolve-theme.ts`; the pre-paint script is `src/lib/theme/init-script.ts` and must stay in sync with it (tests: `tests/unit/theme-*.test.ts*`, `tests/e2e/theme-default.spec.ts`).
