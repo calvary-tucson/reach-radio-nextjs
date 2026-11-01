@@ -32,7 +32,7 @@ export function ThemeToggle() {
             'flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 rounded-md text-xs font-medium motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             theme === value
               ? 'bg-[#84b84f] text-[#0a1305]'
-              : 'text-white/60 hover:text-white/90 light:text-gray-500 light:hover:text-gray-900'
+              : 'text-white/60 hover:text-white/90 light:text-gray-600 light:hover:text-gray-900'
           )}
         >
           <Icon className="h-3.5 w-3.5" aria-hidden="true" />
