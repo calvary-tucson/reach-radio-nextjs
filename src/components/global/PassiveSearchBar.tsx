@@ -88,13 +88,13 @@ export function PassiveSearchBar({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-white/40 light:text-gray-500 shrink-0"
+        className="text-white/50 light:text-gray-500 shrink-0"
         aria-hidden="true"
       >
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.35-4.35" />
       </svg>
-      <span className="text-white/40 light:text-gray-500">{placeholder}</span>
+      <span className="text-white/60 light:text-gray-600">{placeholder}</span>
     </button>
   )
 }

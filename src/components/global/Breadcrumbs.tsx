@@ -60,7 +60,7 @@ export default function Breadcrumbs({
                   <Link href={crumb.url}>{crumb.name}</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator aria-hidden="true" className="text-white/60 light:text-gray-400" />
+              <BreadcrumbSeparator aria-hidden="true" className="text-white/60 light:text-gray-500" />
             </Fragment>
           ))}
           <BreadcrumbItem>

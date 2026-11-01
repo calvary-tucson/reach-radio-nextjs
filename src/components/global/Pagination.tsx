@@ -40,7 +40,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
       )}
       {pages.map((item, i) =>
         item === 'ellipsis' ? (
-          <span key={`e${i}`} className="px-2 text-white/60 light:text-gray-400">...</span>
+          <span key={`e${i}`} className="px-2 text-white/60 light:text-gray-600">...</span>
         ) : (
           <Link
             key={item}
