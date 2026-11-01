@@ -44,7 +44,7 @@ export default function Image() {
         </div>
         <div
           style={{
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgba(255,255,255,0.8)',
             fontSize: 24,
             marginTop: 8,
           }}

@@ -95,7 +95,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           <div
             style={{
               position: 'absolute', bottom: 40, right: 48,
-              color: 'rgba(255,255,255,0.45)', fontSize: 20,
+              color: 'rgba(255,255,255,0.7)', fontSize: 20,
             }}
           >
             Reach Radio
