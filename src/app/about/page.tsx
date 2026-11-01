@@ -200,7 +200,7 @@ async function AboutContent({ searchParams }: { searchParams: Promise<Record<str
             <p className="text-white/90 light:text-gray-500 text-xs mt-1">How we collect and protect your information</p>
           </div>
           <svg
-            className="w-4 h-4 text-white/40 light:text-gray-400 group-hover:text-white/70 motion-safe:transition-colors flex-shrink-0 ml-4"
+            className="w-4 h-4 text-white/50 light:text-gray-500 group-hover:text-white/70 motion-safe:transition-colors flex-shrink-0 ml-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
