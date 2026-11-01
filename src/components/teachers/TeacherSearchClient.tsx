@@ -62,7 +62,7 @@ export function TeacherSearchClient({
   const chipBase =
     'min-h-[44px] flex items-center shrink-0 rounded-full px-3 text-xs font-medium border motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
   const chipActive =
-    'bg-[rgba(132,184,79,0.15)] border-[rgba(132,184,79,0.3)] text-[#84b84f]'
+    'bg-[rgba(132,184,79,0.15)] border-[rgba(132,184,79,0.3)] text-[#84b84f] light:text-green-700'
   const chipInactive =
     'bg-white/5 light:bg-gray-50 border-white/10 light:border-gray-200 text-white/90 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white light:can-hover:hover:border-gray-300'
 
@@ -132,13 +132,13 @@ export function TeacherSearchClient({
                       <p className="text-xs text-white/90 light:text-gray-500 truncate">{teacher.title}</p>
                     )}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-white/20 shrink-0" aria-hidden="true" />
+                  <ChevronRight className="h-4 w-4 text-white/50 light:text-gray-500 shrink-0" aria-hidden="true" />
                 </TeacherModalLink>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-white/90 light:text-gray-400 py-12">
+          <p className="text-sm text-white/90 light:text-gray-600 py-12">
             No teachers found. Try a different search.
           </p>
         )}

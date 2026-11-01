@@ -40,7 +40,7 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm md:text-sm font-semibold capitalize motion-safe:transition-colors cursor-pointer border-b-2 -mb-px ${
               activeTab === tab
-                ? 'text-[#84b84f] light:text-green-600 border-[#84b84f] light:border-green-600'
+                ? 'text-[#84b84f] light:text-green-700 border-[#84b84f] light:border-green-600'
                 : 'text-white/55 light:text-gray-500 border-transparent hover:text-white/75 light:hover:text-gray-900'
             }`}
           >
@@ -55,10 +55,10 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/55 light:text-gray-500">
               All Teachers
             </p>
-            <span className="text-[12px] md:text-sm text-white/50 light:text-gray-400">{teachers.length}</span>
+            <span className="text-[12px] md:text-sm text-white/60 light:text-gray-600">{teachers.length}</span>
           </div>
           {teachers.length === 0 && (
-            <p className="text-white/50 light:text-gray-400 text-sm py-8 text-center">No teachers found.</p>
+            <p className="text-white/70 light:text-gray-600 text-sm py-8 text-center">No teachers found.</p>
           )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[9px] md:gap-3">
             {teachers.map((teacher, index) => (

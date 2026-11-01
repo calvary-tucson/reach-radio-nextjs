@@ -45,7 +45,7 @@ export function TeacherSortControl() {
       <button
         type="button"
         onClick={clearAll}
-        className={`${baseClass} text-white/90 light:text-gray-400 can-hover:hover:text-white light:can-hover:hover:text-gray-900`}
+        className={`${baseClass} text-white/90 light:text-gray-600 can-hover:hover:text-white light:can-hover:hover:text-gray-900`}
         aria-label="Clear all filters"
       >
         Clear all
