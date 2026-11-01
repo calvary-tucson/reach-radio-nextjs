@@ -17,7 +17,7 @@ interface Props {
 export function ScheduleCardList({ slots, currentTime, onSelect, compact = false }: Props) {
   if (slots.length === 0) {
     return (
-      <p className="text-white/50 light:text-gray-400 text-sm text-center py-8">No shows scheduled for this day.</p>
+      <p className="text-white/70 light:text-gray-600 text-sm text-center py-8">No shows scheduled for this day.</p>
     )
   }
 
@@ -38,8 +38,8 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
               data-testid="music-gap"
               className="bg-white/[0.025] light:bg-gray-50 rounded-lg px-4 py-3 flex items-center gap-2"
             >
-              <span className="text-white/25 light:text-gray-400 text-xs italic">♪ Music</span>
-              <span className="text-white/20 light:text-gray-300 text-xs">
+              <span className="text-white/70 light:text-gray-600 text-xs italic">♪ Music</span>
+              <span className="text-white/60 light:text-gray-600 text-xs">
                 {formatTimeMinutes(slot.startMinutes)} – {formatTimeMinutes(slot.endMinutes)}
               </span>
             </div>
@@ -77,15 +77,15 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
                 <p className={`text-white light:text-gray-900 font-semibold truncate ${compact ? 'text-xs' : 'text-sm'}`}>
                   {slot.teacher.name}
                 </p>
-                <p className={`${compact ? 'text-[10px]' : 'text-xs'} ${isActive ? 'text-[#84b84f]' : 'text-white/55 light:text-gray-500'}`}>
+                <p className={`${compact ? 'text-[10px]' : 'text-xs'} ${isActive ? 'text-[#84b84f] light:text-green-700' : 'text-white/60 light:text-gray-600'}`}>
                   {formatTimeMinutes(slot.startMinutes)} – {formatTimeMinutes(slot.endMinutes)}
                 </p>
               </div>
               {!compact && (
                 <span className={`text-xs font-medium px-2 py-1 rounded-md flex-shrink-0 ${
                   isActive
-                    ? 'text-[#84b84f] bg-[rgba(132,184,79,0.15)]'
-                    : 'text-white/30 light:text-gray-400 bg-white/[0.06] light:bg-gray-100'
+                    ? 'text-[#a3d46a] light:text-green-700 bg-[rgba(132,184,79,0.15)]'
+                    : 'text-white/60 light:text-gray-600 bg-white/[0.06] light:bg-gray-100'
                 }`}>
                   {formatDuration(slot.startMinutes, slot.endMinutes)}
                 </span>

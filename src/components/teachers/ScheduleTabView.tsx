@@ -98,7 +98,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
           className="flex items-center gap-2 mb-4 px-4 py-[7px] rounded-full bg-[#262d34] light:bg-gray-100 border border-white/20 light:border-gray-300 text-white light:text-gray-900 text-sm font-semibold cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <span>{selectedDay === today ? `Today — ${selectedDay}` : selectedDay}</span>
-          <ChevronDown className="h-3.5 w-3.5 text-white/50 light:text-gray-400" aria-hidden="true" />
+          <ChevronDown className="h-3.5 w-3.5 text-white/60 light:text-gray-500" aria-hidden="true" />
         </button>
 
         <ScheduleCardList
@@ -113,7 +113,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
           ariaLabel="Pick a day"
         >
           <div className="px-4 pb-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40 light:text-gray-400 mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/60 light:text-gray-600 mb-3">
               Pick a day
             </p>
             <ul
@@ -135,12 +135,12 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
                     className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-sm font-medium cursor-pointer motion-safe:transition-colors hover:bg-white/5 light:hover:bg-gray-50 active:bg-white/10 light:active:bg-gray-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   >
                     <Check
-                      className={`h-4 w-4 shrink-0 text-[#84b84f] motion-safe:transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}
+                      className={`h-4 w-4 shrink-0 text-[#84b84f] light:text-green-700 motion-safe:transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}
                       aria-hidden="true"
                     />
                     <span className={selectedDay === day ? 'text-white light:text-gray-900' : 'text-white/60 light:text-gray-500'}>
                       {day}
-                      {day === today && <span className="ml-2 text-[#84b84f] text-xs">Today</span>}
+                      {day === today && <span className="ml-2 text-[#84b84f] light:text-green-700 text-xs">Today</span>}
                     </span>
                   </button>
                 </li>

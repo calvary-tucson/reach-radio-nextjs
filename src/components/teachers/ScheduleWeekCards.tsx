@@ -35,8 +35,8 @@ export function ScheduleWeekCards({ scheduleTeachers, currentTime, today, onSele
             <div
               className={`text-center text-[11px] font-bold pb-2 mb-2 border-b ${
                 isToday
-                  ? 'text-[#84b84f] border-[rgba(132,184,79,0.25)]'
-                  : 'text-white/40 light:text-gray-400 border-white/[0.06] light:border-gray-200'
+                  ? 'text-[#84b84f] light:text-green-700 border-[rgba(132,184,79,0.25)]'
+                  : 'text-white/60 light:text-gray-600 border-white/[0.06] light:border-gray-200'
               }`}
             >
               {DAY_LABELS[day]}
