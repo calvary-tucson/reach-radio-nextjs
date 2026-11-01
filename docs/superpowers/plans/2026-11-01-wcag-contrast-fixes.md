@@ -28,7 +28,7 @@
 | 2 | `src/components/teachers/ScheduleCardList.tsx`, `ScheduleWeekCards.tsx`, `ScheduleTabView.tsx` |
 | 3 | `src/components/teachers/TeachersClientView.tsx`, `TeacherSortControl.tsx`, `TeacherSearchClient.tsx`, `TeacherSearchBar.tsx`, `RecommendedTeachers.tsx`, `primitives/TeacherInfoChip.tsx` |
 | 4 | `src/components/global/Pagination.tsx`, `Breadcrumbs.tsx`, `PassiveSearchBar.tsx`, `src/app/about/page.tsx`, `src/app/teachers/error.tsx`, `src/app/teachers/search/error.tsx`, `src/app/teachers/[slug]/error.tsx` |
-| 5 | `src/components/layout/Footer.tsx`, `src/components/media-bar/NowPlayingInfo.tsx`, `src/components/media-bar/SleepTimerIndicator.tsx`, `src/app/teachers/[slug]/opengraph-image.tsx`, `src/app/opengraph-image.tsx` |
+| 5 | `src/components/layout/Footer.tsx`, `src/components/theme/ThemeToggle.tsx`, `src/components/media-bar/NowPlayingInfo.tsx`, `src/components/media-bar/SleepTimerIndicator.tsx`, `src/app/teachers/[slug]/opengraph-image.tsx`, `src/app/opengraph-image.tsx` |
 | 6 | Create `tests/e2e/contrast.spec.ts` |
 | 7 | none (verification, report status update in the audit doc) |
 
@@ -123,7 +123,7 @@ git commit -m "test: guard against low-contrast text classes" -- tests/unit/cont
 - Modify: `src/components/teachers/ScheduleWeekCards.tsx` (lines 38, 39)
 - Modify: `src/components/teachers/ScheduleTabView.tsx` (lines 101, 116, 138, 143)
 
-Findings: T1-01 to T1-12, T2-05.
+Findings: T1-01 to T1-12, T1-32, T2-05.
 
 - [ ] **Step 1: Edit `ScheduleCardList.tsx`**
 
@@ -131,7 +131,7 @@ Line 20: `text-white/50 light:text-gray-400` -> `text-white/70 light:text-gray-6
 Line 41: `text-white/25 light:text-gray-400` -> `text-white/70 light:text-gray-600`
 Line 42: `text-white/20 light:text-gray-300` -> `text-white/60 light:text-gray-600`
 Line 80: `'text-[#84b84f]'` (active branch) -> `'text-[#84b84f] light:text-green-700'`; non-active `'text-white/55 light:text-gray-500'` -> `'text-white/60 light:text-gray-600'`
-Line 87: `'text-[#84b84f] bg-[rgba(132,184,79,0.15)]'` -> `'text-[#84b84f] light:text-green-700 bg-[rgba(132,184,79,0.15)]'`
+Line 87: `'text-[#84b84f] bg-[rgba(132,184,79,0.15)]'` -> `'text-[#a3d46a] light:text-green-700 bg-[rgba(132,184,79,0.15)]'` (dark `#84b84f` measured 4.40 in the browser; `#a3d46a` is already used in `TeacherCard.tsx`)
 Line 88: `'text-white/30 light:text-gray-400 bg-white/[0.06] light:bg-gray-100'` -> `'text-white/60 light:text-gray-600 bg-white/[0.06] light:bg-gray-100'`
 
 - [ ] **Step 2: Edit `ScheduleWeekCards.tsx`**
@@ -231,13 +231,14 @@ git commit -m "fix(teachers): raise error digest and chevron contrast to meet WC
 
 ### Task 5: Footer, media bar, sleep timer icon, OG images
 
-**Files:** `src/components/layout/Footer.tsx`, `src/components/media-bar/NowPlayingInfo.tsx`, `src/components/media-bar/SleepTimerIndicator.tsx`, `src/app/teachers/[slug]/opengraph-image.tsx`, `src/app/opengraph-image.tsx`.
+**Files:** `src/components/layout/Footer.tsx`, `src/components/theme/ThemeToggle.tsx`, `src/components/media-bar/NowPlayingInfo.tsx`, `src/components/media-bar/SleepTimerIndicator.tsx`, `src/app/teachers/[slug]/opengraph-image.tsx`, `src/app/opengraph-image.tsx`.
 
-Findings: T2-01 to T2-03, T3-01, T3-02.
+Findings: T2-01 to T2-03, T2-06, T3-01, T3-02.
 
 - [ ] **Step 1: Edit**
 
 `Footer.tsx:9` and `:30`: `light:text-gray-500` -> `light:text-gray-600` (keep the dark `text-gray-400` / `text-gray-300`, they pass at 5.24 / 9.26)
+`ThemeToggle.tsx:35`: inactive `light:text-gray-500 light:hover:text-gray-900` -> `light:text-gray-600 light:hover:text-gray-900` (keep the dark classes)
 `NowPlayingInfo.tsx:34`: `text-white/70 light:text-gray-500` -> `text-white/70 light:text-gray-600`
 `SleepTimerIndicator.tsx:28`: `text-white light:text-gray-900` -> `text-gray-900`
 `teachers/[slug]/opengraph-image.tsx:98`: `rgba(255,255,255,0.45)` -> `rgba(255,255,255,0.7)`
@@ -250,11 +251,13 @@ Expected: pass. If a test asserts the old icon class string, update that asserti
 
 - [ ] **Step 3: Verify and commit**
 
-Run: `npx tsc --noEmit`, `npx eslint` on the five files, `npx vitest run`.
+Run: `npx tsc --noEmit`, `npx eslint` on the six files, `npx vitest run`.
 
 ```bash
 git add src/components/layout/Footer.tsx
 git commit -m "fix(layout): raise footer text contrast on gray-100 to meet WCAG AA" -- src/components/layout/Footer.tsx
+git add src/components/theme/ThemeToggle.tsx
+git commit -m "fix(theme): raise inactive toggle label contrast on gray-100 to meet WCAG AA" -- src/components/theme/ThemeToggle.tsx
 git add src/components/media-bar/NowPlayingInfo.tsx src/components/media-bar/SleepTimerIndicator.tsx
 git commit -m "fix(player): raise artist text and sleep timer icon contrast to meet WCAG AA" -- src/components/media-bar/NowPlayingInfo.tsx src/components/media-bar/SleepTimerIndicator.tsx
 git add src/app/teachers/[slug]/opengraph-image.tsx src/app/opengraph-image.tsx
@@ -282,11 +285,17 @@ The in-page measurer walks visible text nodes, takes the computed `color` (resol
 import { expect, test, type Page } from '@playwright/test'
 
 const MEASURE = () => {
+  const cv = document.createElement('canvas')
+  cv.width = cv.height = 1
+  const cx = cv.getContext('2d', { willReadFrequently: true })!
+  // Canvas resolves any CSS color (oklch, color-mix, rgb) to RGBA. Do not regex rgb().
   const parse = (s: string): [number, number, number, number] => {
-    const m = s.match(/rgba?\(([^)]+)\)/)
-    if (!m) return [0, 0, 0, 0]
-    const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number)
-    return [p[0], p[1], p[2], p[3] ?? 1]
+    cx.clearRect(0, 0, 1, 1)
+    cx.fillStyle = '#000'
+    cx.fillStyle = s
+    cx.fillRect(0, 0, 1, 1)
+    const d = cx.getImageData(0, 0, 1, 1).data
+    return [d[0], d[1], d[2], d[3] / 255]
   }
   const over = (fg: number[], bg: number[]) => {
     const a = fg[3]
@@ -313,7 +322,9 @@ const MEASURE = () => {
     if (!text || !el) continue
     const cs = getComputedStyle(el)
     const r = el.getBoundingClientRect()
-    if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0 || r.width === 0 || r.height === 0) continue
+    if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0 || r.width <= 1 || r.height <= 1) continue // <=1px = sr-only
+    const dlg = document.querySelector('[role=dialog]')
+    if (dlg && !dlg.contains(el)) continue // dialog open: measure only inside it
     const bg = bgOf(el)
     const fg = over(parse(cs.color), bg)
     const l1 = lum(fg), l2 = lum(bg)
@@ -343,16 +354,16 @@ for (const theme of ['light', 'dark'] as const) {
     await page.getByRole('tab', { name: /schedule/i }).click()
     await page.waitForLoadState('networkidle')
     expect(await page.evaluate(MEASURE), 'schedule tab').toEqual([])
-    const picker = page.getByRole('button', { name: /day|monday|tuesday|wednesday|thursday|friday|saturday|sunday/i }).first()
-    if (await picker.isVisible()) {
-      await picker.click()
-      expect(await page.evaluate(MEASURE), 'day picker open').toEqual([])
-    }
+    // Day picker trigger exists only below the lg breakpoint (ScheduleTabView.tsx:92).
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.locator('button[aria-haspopup=listbox]').click()
+    await page.waitForSelector('[role=dialog]')
+    expect(await page.evaluate(MEASURE), 'day picker open').toEqual([])
   })
 }
 ```
 
-Notes for the implementer: the day-picker trigger selector is a best guess; open `src/components/teachers/ScheduleTabView.tsx` and use its real button name or `data-testid`. Reuse the existing helper style in `tests/e2e/theme-default.spec.ts` for emulating color scheme if `?theme=` handling differs there. Elements covered by a photo or gradient (avatars, hero art) have no solid background and will be measured against white; add an inline `data-contrast-skip` attribute on those if they show up as false positives, and list each skip in the report.
+Notes for the implementer: the day-picker trigger is `button[aria-haspopup=listbox]` at a 390px viewport (verified against production). Also add a mobile-viewport pass of the Schedule tab and a teacher-modal-open pass (`button[aria-label*=" to "]` then `[role=dialog]`); production runs of both already showed the failures to expect. Reuse the existing helper style in `tests/e2e/theme-default.spec.ts` for emulating color scheme if `?theme=` handling differs there. The measurer must skip elements whose box is 1px or clipped (`sr-only`, e.g. the footer "(opens in new tab)") and, when a `[role=dialog]` is open, measure only inside it (the production run showed page text under an open sheet gets counted otherwise). Resolve colors through a 1x1 canvas (`ctx.fillStyle = cssColor; fillRect; getImageData`), NOT a regex on `rgb()`: Chromium returns Tailwind v4 colors as `oklch(...)`, and an rgb-only parser silently reports ratio 1.0. Elements covered by a photo or gradient (avatars, hero art) have no solid background and will be measured against white; add an inline `data-contrast-skip` attribute on those if they show up as false positives, and list each skip in the report.
 
 - [ ] **Step 2: Run against the fixed code**
 

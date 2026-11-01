@@ -9,14 +9,14 @@ Trigger: owner report that light-theme schedule "music" entries (esp. times) are
 - Resolved real colors: Tailwind 4.2.4 oklch gray/green/amber scale; `--color-brand-purple` = oklch(24% .04 130) = `rgb(25,35,14)` (dark page); `brand-gray` oklch(30% .02 280); modal/dialog `gray-800`; sheets `#0f1a0a`; light page `white`; light rows `gray-50`/`gray-100`.
 - Computed WCAG relative-luminance ratios, alpha-white blended onto the actual surface each class sits on.
 - Thresholds: 4.5:1 normal text, 3:1 large text (>=24px, or >=18.66px bold) and non-text UI (icons, focus rings). All failing text here is under 18px, so none gets the 3:1 allowance.
-- NOT measured in a real browser. Class-level static analysis only; the fix plan adds an automated in-browser check.
+- Then measured in a real browser (see "Browser verification" below). The fix plan adds the same measurement as an automated test.
 
 ## Summary
 
 | Tier | Meaning | Findings |
 |---|---|---|
-| 1 | Hard fail, text or icon far below threshold | 31 sites in 15 files |
-| 2 | Fails only on `gray-100`/`gray-200` surfaces (4.39 / 3.91) | 5 sites in 4 files |
+| 1 | Hard fail, text or icon far below threshold | 32 sites in 15 files |
+| 2 | Fails only on `gray-100`/`gray-200` surfaces (4.39 / 3.91) | 6 sites in 5 files |
 | 3 | Non-text and image issues | 2 sites |
 | 4 | Passes WCAG but breaks the repo's own stricter AGENTS.md rule | owner decision, no fix proposed |
 
@@ -89,6 +89,8 @@ L = light theme, D = dark theme. "Fix" is the proposed class.
 | T1-30 | `app/teachers/search/error.tsx:8` | Error digest | D `white/40` | D 3.7 | D `white/60` |
 | T1-31 | `app/teachers/[slug]/error.tsx:8` | Error digest | D `white/40` | D 3.7 | D `white/60` |
 
+| T1-32 | `ScheduleCardList.tsx:87` | Active duration chip text on green tint, **dark theme** (found by browser measurement; class grep rated it 5.3) | D `#84b84f` on tint over row | D 4.40 | D `text-[#a3d46a]` (9.4 on dark), keep `light:text-green-700` |
+
 ## Tier 2: gray-500 on gray-100 (4.39, fails 4.5)
 
 | ID | File:line | Element | Now | Fix |
@@ -98,6 +100,7 @@ L = light theme, D = dark theme. "Fix" is the proposed class.
 | T2-03 | `media-bar/NowPlayingInfo.tsx:34` | Artist line in media bar (xs, on `gray-100`) | L `gray-500` | L `gray-600` |
 | T2-04 | `teachers/primitives/TeacherInfoChip.tsx:12` | "dim" chip (on `gray-100`), also D `white/50` = 4.67 on chip | L `gray-500`, D `white/50` | L `gray-600`, D `white/60` |
 | T2-05 | `ScheduleCardList.tsx:80` | Non-active show time (10px compact; hover bg `gray-100`) | L `gray-500` | L `gray-600`; keep 10px size unless owner approves a size bump |
+| T2-06 | `theme/ThemeToggle.tsx:35` | Footer theme toggle labels "Dark" / "System" (inactive, on `gray-100`), measured 4.39 | L `gray-500` | L `gray-600` |
 
 ## Tier 3: non-text and images
 
@@ -118,9 +121,29 @@ Reviewed explicitly: `@modal/layout.tsx`, `SheetChrome`, `TeacherPanelChrome`, `
 
 AGENTS.md says "text must be `text-white/90` minimum on dark, never `text-white/50`". Current usage: `/50` x6 (all pass 4.6 to 5.3 but borderline), `/55` x5, `/60` x11, `/70` x5, `/75` x2, `/80` x16. All of `/55` and up pass AA with margin (5.3 to 9.3). `/50` passes barely. Recommendation: keep WCAG as the gate, change the AGENTS.md rule to "dark text: `white/60` minimum, `/50` allowed only for icons, never below". Enforcing literal `/90` would flatten the visual hierarchy. The plan bumps the `/50` text uses to `/60` as a safety margin. Nothing else.
 
+## Browser verification (2026-11-01)
+
+Headless Chromium against production `reach.radio` (same code as local `main` for these files), light and dark via `?theme=`. Desktop 1280x900 and mobile 390x844. Walked every visible text node, resolved real computed colors through a canvas (handles Tailwind v4 `oklch`), blended translucent backgrounds, computed WCAG ratios. Pages: home, teachers, teachers Schedule tab, about, donate; plus, on mobile, day-picker sheet open, after picking Wednesday (music rows), teacher modal open, search sheet open.
+
+Result: **every audited number matched the browser to the second decimal** (music time 1.41, music label 2.49, duration chip 2.36, brand green 2.35 / 2.17 / 1.95, tab label 3.52, count 2.60, footer 4.39).
+
+| Page | Light fails (text nodes) | Dark fails |
+|---|---|---|
+| Home | 7 (footer + media bar only) | 0 |
+| Teachers | 9 | 1 (search placeholder 3.58) |
+| Teachers, Schedule tab | 47 (desktop), 25 (mobile) | 35 (desktop), 15 (mobile) |
+| About, Donate | 7 (footer + media bar only) | 0 |
+
+- **Site-wide in light, every page:** footer ("Appearance", "Dark", "System", "Sanity.io") and the media bar artist line are `gray-500` on `gray-100` = 4.39. Same 7 nodes on every page. Fixed by T2-01 to T2-04, T2-06.
+- **Dark theme is clean** on home, about, donate. Dark failures are confined to the schedule tab and the search placeholder.
+- **Modals and sheets:** the day-picker sheet adds "Pick a day" (light 2.6, dark 3.8) and "Today" (light 2.35). The teacher modal and search sheet added no failures of their own. Sleep timer sheet and hover states were not opened.
+- **New from the browser, not in the class grep:** T1-32 (dark green chip 4.40) and T2-06 (theme toggle). Both are now in the tables above.
+- **False positives to ignore:** the "(opens in new tab)" footer text is visually hidden (`sr-only`, 1px box). The measurer also ignores sheet overlays, so page text under an open sheet is still counted. Both are handled in the plan's e2e helper (skip elements with a clipped 1px box; measure only inside `[role=dialog]` when one is open).
+- **Scratch tooling:** measurement scripts lived in the sandbox temp dir, not in the repo. The plan's Task 6 turns the same logic into a committed e2e test.
+
 ## Not verified / limits
 
-- No real-browser pixel measurement yet (plan Task 5 adds it).
+- Real-browser measurement covered the pages above only. Not opened: sleep timer sheet, hover/focus states.
 - `TeacherAvatar` fallback initials (`rgba(132,184,79,.8)`): 4.95 on dark; light-mode surface not confirmed.
 - Hover/focus/pressed color variants; native app webview chrome; Donate iframe (third-party content); Sanity rich text colors (typography plugin defaults, not inspected).
 - Ratios for alpha blends use the nominal surface color. Photos behind text (none found) would need per-image checks.
@@ -128,4 +151,4 @@ AGENTS.md says "text must be `text-white/90` minimum on dark, never `text-white/
 
 ## Fixes count
 
-38 findings (31 + 5 + 2) across 22 files, some lines with 2 edits, plus one regression guard test and one in-browser contrast check.
+40 findings (32 + 6 + 2) across 23 files, some lines with 2 edits, plus one regression guard test and one in-browser contrast check.
