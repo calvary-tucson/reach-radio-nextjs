@@ -3,6 +3,8 @@
 Date: 2026-11-01. Scope: all of `src/` (pages, schedule, teachers, modals/sheets, tabs, media bar, layout, global, ui, error pages, OG images).
 Trigger: owner report that light-theme schedule "music" entries (esp. times) are unreadable.
 
+**Status: fixed 2026-11-01** on branch `worktree-wcag-contrast-fixes` (commits `d3d7b10`..`1d40b57`). Verified: lint, tsc, 391 unit tests, production build, and `tests/e2e/contrast.spec.ts` (12/12 in light and dark) all pass. Guard tests: `tests/unit/contrast-classes.test.ts` and `tests/e2e/contrast.spec.ts`.
+
 ## Method
 
 - Grepped every text color class in `src/**/*.tsx|css` (`text-white/N`, `light:text-gray-N`, `text-[#84b84f]`, `light:text-green-N`, placeholders, inline styles).
