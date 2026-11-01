@@ -25,7 +25,7 @@ export function SleepTimerIndicator() {
           aria-expanded={sleepTimerSheetOpen}
           className="rounded-full w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer bg-amber-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
-          <MoonZzzIcon className="w-5 h-5 text-white light:text-gray-900" />
+          <MoonZzzIcon className="w-5 h-5 text-gray-900" />
         </button>
       </TooltipTrigger>
       <TooltipContent>Sleep Timer (Active)</TooltipContent>

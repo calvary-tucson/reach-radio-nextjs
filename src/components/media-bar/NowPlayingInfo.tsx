@@ -31,7 +31,7 @@ export function NowPlayingInfo() {
       <div className="min-w-0">
         <p className="text-white light:text-gray-900 font-semibold text-sm truncate">{title}</p>
         {artist && (
-          <p className="text-white/70 light:text-gray-500 text-xs truncate">{artist}</p>
+          <p className="text-white/70 light:text-gray-600 text-xs truncate">{artist}</p>
         )}
       </div>
     </div>
