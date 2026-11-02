@@ -10,6 +10,7 @@ Two hardcoded stream URLs in unreleased iOS code point at `https://reach.radio/a
 - `notifyBridgeReady()` -> `prefetchPlayerIfNeeded()` (`AudioStreamingManager.swift:283`) pre-builds an AVPlayer for `currentStreamURL` and sets `playerURL`. `play()` compares the requested url to `playerURL` and, on mismatch, tears the player down and rebuilds (lines ~531-551).
 - So fallback != Sanity URL is safe (wasted prefetch, slightly slower first tap) but not free. The clean end state is both on the Worker, which happens at the Phase F flip (Sanity `radioAudioURL` -> `https://stream.reach.radio/`). That flip is gated on the Android A2 playback test because Astro also reads `radioAudioURL`.
 - **Therefore: implement and test the change now, but do not merge it into the v4 release branch until the Phase F flip is decided with the parent session** (or the owner explicitly accepts the wasted prefetch). Say so in the report.
+- **Update 2026-11-01:** commit `0daf905` is on `origin/main` (pushed 2026-10-28). The owner confirmed this was intended, so the merge gate above is lifted and the wasted prefetch (until the Phase F flip) is accepted. Remaining owner-only step: T3 real-device playback, CarPlay and Watch.
 
 ## Scope (explicit file allowlist, nothing else)
 1. `Reach Radio Native/Config/AppConfig.swift:10` `fallbackStreamURL` -> `"https://stream.reach.radio/"`
