@@ -118,6 +118,27 @@ test.describe('Teachers', () => {
     await expect(page.locator('[data-panel-ghost]')).toHaveCount(0)
   })
 
+  test('swap resets scroll to the top; no animations replay after settling (swap and Back)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 600 })
+    const panel = await openPanel(page)
+    const live = panel.locator('[data-panel-content]')
+    const firstUrl = page.url()
+    const scrolled = await live.evaluate((el) => { el.scrollTop = el.scrollHeight; return el.scrollTop })
+    expect(scrolled).toBeGreaterThan(0)
+
+    await swapTeacher(page, panel)
+    await expect(page).not.toHaveURL(firstUrl)
+    await expect(page.locator('[data-panel-ghost]')).toHaveCount(0)
+    expect(await live.evaluate((el) => el.scrollTop)).toBe(0)
+    // Nothing running on the dialog shell once settled (no replay from Next hide/un-hide).
+    expect(await panel.evaluate((el) => el.getAnimations({ subtree: false }).filter((a) => a.playState === 'running').length)).toBe(0)
+
+    await visibleBack(page).first().click()
+    await expect(page).toHaveURL(firstUrl)
+    await expect(page.locator('[data-panel-ghost]')).toHaveCount(0)
+    expect(await panel.evaluate((el) => el.getAnimations({ subtree: false }).filter((a) => a.playState === 'running').length)).toBe(0)
+  })
+
   test('mobile sheet sizes to its content (stage does not collapse the panel)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     const panel = await openPanel(page)
