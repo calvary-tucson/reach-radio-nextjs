@@ -65,6 +65,10 @@ function createGhost(live: HTMLElement): HTMLElement {
   ghost.setAttribute('aria-hidden', 'true')
   ghost.setAttribute('data-panel-ghost', '')
   ghost.removeAttribute('data-panel-content')
+  // The live layer is in flow (it sizes the mobile sheet to its content); the
+  // ghost overlays it exactly.
+  ghost.style.position = 'absolute'
+  ghost.style.inset = '0'
   ghost.style.zIndex = '2'
   ghost.style.pointerEvents = 'none'
   return ghost
@@ -214,11 +218,11 @@ export function PanelContentStage({
   useEffect(() => cleanup, [cleanup])
 
   return (
-    <div ref={viewportRef} className="relative flex-1 min-h-0 overflow-hidden">
+    <div ref={viewportRef} className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <div
         ref={liveRef}
         data-panel-content
-        className="absolute inset-0 overflow-y-auto pb-20 md:pb-0 bg-[#0f1a0a] light:bg-white"
+        className="relative min-h-0 flex-1 overflow-y-auto pb-20 md:pb-0 bg-[#0f1a0a] light:bg-white"
       >
         {children}
       </div>

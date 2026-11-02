@@ -117,4 +117,12 @@ test.describe('Teachers', () => {
     expect(await page.evaluate(() => (window as unknown as { __ghostSeen: boolean }).__ghostSeen)).toBe(false)
     await expect(page.locator('[data-panel-ghost]')).toHaveCount(0)
   })
+
+  test('mobile sheet sizes to its content (stage does not collapse the panel)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    const panel = await openPanel(page)
+    await expect(panel.getByRole('heading', { level: 2 }).first()).toBeVisible()
+    const box = await panel.boundingBox()
+    expect(box!.height).toBeGreaterThan(400)
+  })
 })
