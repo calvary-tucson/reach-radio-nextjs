@@ -17,6 +17,11 @@ interface ModalStore {
   // this at mount to skip replaying the slide-in. Reset on open/close.
   panelEntered: boolean
   markPanelEntered: () => void
+  // One-shot signal for the panel content stage: which way the in-panel
+  // navigation just moved. Set by pushModal/prepareBack, consumed (cleared)
+  // by the stage once the animation is started.
+  navDirection: 'push' | 'pop' | null
+  clearNavDirection: () => void
   openModal: (title?: string) => void
   openSearchSheet: (title?: string) => void
   pushModal: (title?: string) => void
@@ -39,8 +44,11 @@ export const useModalStore = create<ModalStore>((set) => ({
   rootSheet: null,
   panelEntered: false,
   markPanelEntered: () => set({ panelEntered: true }),
+  navDirection: null,
+  clearNavDirection: () => set({ navDirection: null }),
   openModal: (title) =>
     set({
+      navDirection: null,
       panelEntered: false,
       expectingRoute: true,
       expectingBack: false,
@@ -52,6 +60,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     }),
   openSearchSheet: (title) =>
     set({
+      navDirection: null,
       panelEntered: false,
       expectingRoute: true,
       expectingBack: false,
@@ -63,6 +72,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     }),
   pushModal: (title) =>
     set((state) => ({
+      navDirection: 'push' as const,
       expectingRoute: true,
       expectingBack: false,
       isOpen: true,
@@ -75,6 +85,7 @@ export const useModalStore = create<ModalStore>((set) => ({
   startClosing: () => set({ isClosing: true }),
   prepareBack: () =>
     set((state) => ({
+      navDirection: 'pop' as const,
       isClosing: false,
       expectingBack: true,
       expectingRoute: false,
@@ -82,6 +93,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     })),
   clearBack: () => set({ expectingBack: false }),
   close: () => set({
+    navDirection: null,
     panelEntered: false,
     isOpen: false,
     expectingRoute: false,
