@@ -119,8 +119,9 @@ test.describe('Teachers', () => {
   })
 
   test('swap resets scroll to the top; no animations replay after settling (swap and Back)', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 600 })
+    await page.setViewportSize({ width: 390, height: 420 })
     const panel = await openPanel(page)
+    await expect(panel.getByText('Also on Reach Radio')).toBeVisible()
     const live = panel.locator('[data-panel-content]')
     const firstUrl = page.url()
     const scrolled = await live.evaluate((el) => { el.scrollTop = el.scrollHeight; return el.scrollTop })
