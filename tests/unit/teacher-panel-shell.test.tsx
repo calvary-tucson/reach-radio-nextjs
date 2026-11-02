@@ -64,14 +64,35 @@ describe('TeacherPanelShell', () => {
     expect(closeButtons.length).toBeGreaterThanOrEqual(2) // DragHandle + desktop X
   })
 
-  it('does not render back button when stackDepth is 0', () => {
+  it('hides Back at root: inert + tabIndex -1 + aria-hidden, out of the a11y tree', () => {
     render(<Wrapper stackDepth={0} />)
     expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument()
+    const hidden = Array.from(document.querySelectorAll<HTMLElement>('button[aria-label="Back"]'))
+    expect(hidden.length).toBeGreaterThanOrEqual(1)
+    hidden.forEach((b) => {
+      expect(b.hasAttribute('inert')).toBe(true)
+      expect(b.getAttribute('tabindex')).toBe('-1')
+      expect(b.getAttribute('aria-hidden')).toBe('true')
+    })
   })
 
-  it('renders back button when stackDepth > 0', () => {
+  it('shows Back (no inert/aria-hidden) when stackDepth > 0', () => {
     render(<Wrapper stackDepth={1} />)
-    expect(screen.getAllByRole('button', { name: /back/i }).length).toBeGreaterThanOrEqual(1)
+    const backs = screen.getAllByRole('button', { name: /back/i })
+    expect(backs.length).toBeGreaterThanOrEqual(1)
+    backs.forEach((b) => {
+      expect(b.hasAttribute('inert')).toBe(false)
+      expect(b.hasAttribute('aria-hidden')).toBe(false)
+    })
+  })
+
+  it('moves focus to the dialog when the focused Back hides on return to root', () => {
+    const { rerender } = render(<Wrapper stackDepth={1} />)
+    const back = screen.getAllByRole('button', { name: /back/i })[0]
+    back.focus()
+    expect(document.activeElement).toBe(back)
+    rerender(<Wrapper stackDepth={0} />)
+    expect(document.activeElement).toBe(screen.getByRole('dialog'))
   })
 
   it('back button calls onBack', async () => {

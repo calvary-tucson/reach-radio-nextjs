@@ -2,9 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import { useModalStore } from '@/lib/stores/modal'
 
+const routerBack = vi.fn()
+const routerMock = { back: routerBack }
 vi.mock('next/navigation', () => ({
   usePathname: () => '/teachers',
-  useRouter: () => ({ back: vi.fn() }),
+  useRouter: () => routerMock,
 }))
 
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
@@ -34,6 +36,7 @@ async function loadLayout() {
 }
 
 beforeEach(() => {
+  routerBack.mockClear()
   useModalStore.setState({
     expectingRoute: false, isOpen: false, isClosing: false,
     title: null, triggerRef: null, stackDepth: 0, rootSheet: null, expectingBack: false,
@@ -111,5 +114,19 @@ describe('ModalLayout', () => {
     const dialog = screen.getByRole('dialog', { name: 'Teacher profile' })
     act(() => { useModalStore.getState().pushModal('B') })
     expect(screen.getByRole('dialog', { name: 'Teacher profile' })).toBe(dialog)
+  })
+
+  it('ignores a second Back while the first is still animating', async () => {
+    useModalStore.setState({
+      expectingRoute: true, isOpen: true, isClosing: false,
+      title: 'B', triggerRef: null, stackDepth: 2, rootSheet: 'detail', expectingBack: false,
+    })
+    const ModalLayout = await loadLayout()
+    render(<ModalLayout><p>content</p></ModalLayout>)
+    const back = screen.getAllByRole('button', { name: 'Back' })[0]
+    act(() => { back.click() })
+    act(() => { back.click() })
+    expect(routerBack).toHaveBeenCalledTimes(1)
+    expect(useModalStore.getState().stackDepth).toBe(1)
   })
 })

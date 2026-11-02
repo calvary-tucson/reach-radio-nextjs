@@ -1,7 +1,10 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { X, ArrowLeft } from 'lucide-react'
+import { PanelContentStage, usePrefersReducedMotion } from '@/components/modals/chrome/PanelContentStage'
+import { useModalStore } from '@/lib/stores/modal'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
@@ -10,14 +13,42 @@ import { cn } from '@/lib/utils'
 
 interface TeacherPanelShellProps {
   children: React.ReactNode
+  /** Fires when an in-panel push/pop finishes (or is skipped); releases the Back lock. */
+  onNavSettled?: () => void
 }
 
-export function TeacherPanelShell({ children }: TeacherPanelShellProps) {
+export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellProps) {
   const { onDismiss, onBack, isClosing, stackDepth } = useModal()
   const contentRef = useRef<HTMLDivElement>(null)
   const mobileDrag = useSheetDrag({ onDismiss, contentRef, axis: 'y' })
   const tabletDrag = useSheetDrag({ onDismiss, contentRef, axis: 'x' })
   const canGoBack = stackDepth > 0
+  const pathname = usePathname()
+  const reducedMotion = usePrefersReducedMotion()
+  const navDirection = useModalStore((s) => s.navDirection)
+  const mobileBackRef = useRef<HTMLButtonElement>(null)
+  const desktopBackRef = useRef<HTMLButtonElement>(null)
+
+  // Back hides while it may hold focus (inert drops focus to <body>): hand it
+  // to the dialog so keyboard users stay inside the panel.
+  useEffect(() => {
+    if (canGoBack) return
+    const active = document.activeElement
+    if (active && (active === mobileBackRef.current || active === desktopBackRef.current)) {
+      contentRef.current?.focus()
+    }
+  }, [canGoBack])
+
+  const handleBackClick = () => {
+    const willHide = stackDepth <= 1
+    onBack()
+    if (willHide) contentRef.current?.focus()
+  }
+
+  // Hidden Back: inert (no focus/click) + tabIndex -1 + aria-hidden, never aria-hidden alone.
+  const backA11y = canGoBack
+    ? {}
+    : ({ inert: true, tabIndex: -1, 'aria-hidden': true } as const)
 
   // Focus on open
   useEffect(() => { contentRef.current?.focus() }, [])
@@ -25,7 +56,10 @@ export function TeacherPanelShell({ children }: TeacherPanelShellProps) {
   useFocusTrap(contentRef)
 
   const backButtonClass =
-    'flex h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white/80 light:text-gray-500 hover:bg-white/40 light:hover:bg-gray-300 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+    'flex h-11 w-11 items-center justify-center rounded-full bg-white/25 light:bg-gray-200 text-white/80 light:text-gray-500 hover:bg-white/40 light:hover:bg-gray-300 hover:text-white light:hover:text-gray-900 motion-safe:transition-[opacity,transform,background-color,color] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  const backStateClass = canGoBack
+    ? 'opacity-100 translate-x-0 scale-100'
+    : 'opacity-0 -translate-x-3 scale-75 pointer-events-none'
 
   const closeButtonClass =
     'flex h-11 w-11 items-center justify-center rounded-full text-white/80 light:text-gray-500 hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 motion-safe:transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
@@ -59,18 +93,16 @@ export function TeacherPanelShell({ children }: TeacherPanelShellProps) {
       >
         {/* Mobile: drag handle + optional back button + close button */}
         <div className="flex items-center justify-between px-3 pt-3 pb-2 md:hidden shrink-0">
-          {canGoBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className={backButtonClass}
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          ) : (
-            <div className="w-11" />
-          )}
+          <button
+            ref={mobileBackRef}
+            type="button"
+            onClick={handleBackClick}
+            className={cn(backButtonClass, backStateClass)}
+            aria-label="Back"
+            {...backA11y}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
           <DragHandle drag={mobileDrag} onDismiss={onDismiss} />
           <button
             type="button"
@@ -88,25 +120,24 @@ export function TeacherPanelShell({ children }: TeacherPanelShellProps) {
         <div
           data-testid="tablet-drag-zone"
           className={cn(
-            'hidden md:flex items-center px-4 pt-4 pb-0 shrink-0 touch-pan-y',
-            canGoBack ? 'justify-between' : 'justify-end',
+            'hidden md:flex items-center justify-between px-4 pt-4 pb-0 shrink-0 touch-pan-y',
           )}
           onTouchStart={tabletDrag.onTouchStart}
           onTouchMove={tabletDrag.onTouchMove}
           onTouchEnd={tabletDrag.onTouchEnd}
         >
-          {canGoBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
-              className={backButtonClass}
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          )}
+          <button
+            ref={desktopBackRef}
+            type="button"
+            onClick={handleBackClick}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            className={cn(backButtonClass, backStateClass)}
+            aria-label="Back"
+            {...backA11y}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
           <button
             data-testid="desktop-close-btn"
             type="button"
@@ -120,10 +151,16 @@ export function TeacherPanelShell({ children }: TeacherPanelShellProps) {
           </button>
         </div>
 
-        {/* Scrollable content; pb-20 clears the fixed bottom nav bar on mobile */}
-        <div className="flex-1 min-h-0 overflow-y-auto pb-20 md:pb-0">
+        {/* Scrollable content (pb-20 clears the fixed bottom nav bar on mobile) lives in the stage */}
+        <PanelContentStage
+          direction={navDirection}
+          reducedMotion={reducedMotion}
+          contentKey={pathname}
+          onConsume={() => useModalStore.getState().clearNavDirection()}
+          onSettled={() => onNavSettled?.()}
+        >
           {children}
-        </div>
+        </PanelContentStage>
       </div>
     </div>
   )

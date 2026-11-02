@@ -7,7 +7,7 @@ import { ModalProvider } from '@/components/modals/ModalContext'
 import { useVisualViewportOffset } from '@/lib/hooks/useVisualViewportOffset'
 import { SectionErrorBoundary } from '@/components/global/SectionErrorBoundary'
 import { TeacherSearchSheetContent } from '@/components/teachers/TeacherSearchSheetContent'
-import { EXIT_DURATION } from '@/lib/constants/modal'
+import { EXIT_DURATION, PANEL_NAV_TIMEOUT, PANEL_PAGE_DURATION } from '@/lib/constants/modal'
 import { useShallow } from 'zustand/react/shallow'
 import { useModalStore } from '@/lib/stores/modal'
 import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
@@ -45,13 +45,28 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   )
   const dismissGuardRef = useRef(false)
   const dismissTimer = useRef<ReturnType<typeof setTimeout>>(null)
+  // Guards Back while a push/pop slide runs (like dismissGuardRef for close).
+  // Released by the stage when it settles; the timer is a fallback for paths
+  // where no stage is mounted (e.g. Back to the search sheet root).
+  const navLockRef = useRef(false)
+  const navLockTimer = useRef<ReturnType<typeof setTimeout>>(null)
+  const releaseNavLock = useCallback(() => {
+    navLockRef.current = false
+    if (navLockTimer.current) clearTimeout(navLockTimer.current)
+    navLockTimer.current = null
+  }, [])
   const overlayOffsetTop = useVisualViewportOffset()
 
   useEffect(() => {
     return () => {
       if (dismissTimer.current) clearTimeout(dismissTimer.current)
+      if (navLockTimer.current) clearTimeout(navLockTimer.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (!isOpen) releaseNavLock()
+  }, [isOpen, releaseNavLock])
 
   useHideMediaBarWhileOpen(isOpen)
 
@@ -90,10 +105,13 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
   // prepareBack() signals the pathname effect to treat the upcoming pop as an
   // in-panel navigation (not a full close).
   const handleBack = useCallback(() => {
+    if (navLockRef.current) return
+    navLockRef.current = true
+    navLockTimer.current = setTimeout(releaseNavLock, PANEL_PAGE_DURATION + PANEL_NAV_TIMEOUT)
     const state = useModalStore.getState()
     state.prepareBack()
     router.back()
-  }, [router])
+  }, [router, releaseNavLock])
 
   if (!isOpen) return null
 
@@ -158,7 +176,7 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
                 <TeacherSearchSheetContent />
               </SectionErrorBoundary>
             ) : (
-              <TeacherPanelShell>
+              <TeacherPanelShell onNavSettled={releaseNavLock}>
                 <Suspense fallback={<TeacherDetailSkeleton />}>{children}</Suspense>
               </TeacherPanelShell>
             )}
