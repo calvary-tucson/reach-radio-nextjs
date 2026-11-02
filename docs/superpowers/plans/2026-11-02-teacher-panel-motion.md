@@ -111,4 +111,21 @@ Approved by owner 2026-11-02 ("proceed"): `2026-11-02-teacher-panel-motion.mock.
 
 ## Appendix: Spike findings
 
-_(filled in by Task 1)_
+Probe: Playwright (own dev server, port 3000, sandbox off for Sanity), light theme (cookie + colorScheme), 390x844, Recommended row opens panel, rAF loop sampling overlay opacity and bottom `NAV`. Dev-mode timings; ~8ms frames.
+
+**Open (t = ms since click, overlay = computed opacity of `bg-black/80` overlay):**
+
+| t | overlay | bottom nav |
+|---|---------|-----------|
+| 19 | absent | opacity 1, visible, y=765 |
+| 60 | 0.07 | opacity 1, visible |
+| 110 | 0.43 | opacity 1, visible |
+| 160 | 0.73 | opacity 1, visible |
+| 210 | 0.93 | opacity 1, visible |
+| 260 | 1.00 | opacity 1, visible |
+| 275-312 | 1.00 | hide animation starts (transformed wrapper, opacity 0 layer, y 771) |
+| ~346 | 1.00 | gone (removed) |
+
+**Close:** bottom nav already gone at t=1 (stays hidden through the whole close). Overlay holds 1.0 for ~24ms, fades 1.0 to 0 over ~150ms (t=33..175), matching the 0.15s fade-out; panel exit also 0.15s CSS, but `EXIT_DURATION` is 280ms, so for ~100ms (t=175..280) overlay and panel are both gone and the page shows without the nav (nav re-appears only after `close()`): a visible empty gap, not a mismatch in animation timing between overlay and panel.
+
+**Decision:** cause (a). The overlay ramps 0 to 1 over ~250ms (CSS 0.2s ease-out) while the nav is fully opaque and visible for the whole ramp; the nav only hides at ~275-346ms, after the overlay is already opaque. So the bright nav shows through the translucent overlay, then vanishes: the flash. Task 5 applies the overlay fix (drop `fade-in` on open, keep `fade-out`). Secondary lag (nav hides ~300ms after click via `useHideMediaBarWhileOpen`) is hidden once the overlay is opaque at once (nav only bleeds through at 20%), so the hook is not changed. Close already animates out; the owner's remaining "animate out" gap is the ~100ms (EXIT_DURATION 280 vs 150ms animations) where nothing is on screen before the nav returns; noted, not changed (out of scope of the approved mock, which keeps 0.2s/0.25s close).
