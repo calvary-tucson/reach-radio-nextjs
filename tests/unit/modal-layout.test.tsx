@@ -129,4 +129,24 @@ describe('ModalLayout', () => {
     expect(routerBack).toHaveBeenCalledTimes(1)
     expect(useModalStore.getState().stackDepth).toBe(1)
   })
+
+  it('overlay is opaque at once on open (no fade-in) so the nav cannot show through', async () => {
+    useModalStore.getState().openModal('Test')
+    const ModalLayout = await loadLayout()
+    render(<ModalLayout><p>content</p></ModalLayout>)
+    const overlay = document.querySelector('[class*="bg-black/80"]') as HTMLElement
+    expect(overlay).not.toBeNull()
+    expect(overlay.className).not.toContain('fade-in')
+  })
+
+  it('overlay still fades out while closing', async () => {
+    useModalStore.setState({
+      expectingRoute: true, isOpen: true, isClosing: true,
+      title: 'Test', triggerRef: null, stackDepth: 0, rootSheet: 'detail', expectingBack: false,
+    })
+    const ModalLayout = await loadLayout()
+    render(<ModalLayout><p>content</p></ModalLayout>)
+    const overlay = document.querySelector('[class*="bg-black/80"]') as HTMLElement
+    expect(overlay.className).toContain('fade-out')
+  })
 })

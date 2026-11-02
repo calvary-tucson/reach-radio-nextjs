@@ -119,10 +119,12 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
     <DialogPrimitive.Root open onOpenChange={(open) => { if (!open) handleClose() }}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
+          // No fade-in on open: while the overlay ramped, the bottom nav showed through
+          // undimmed, then vanished (probe, plan appendix). Fade-out on close is kept.
           className={
             isClosing
               ? 'fixed inset-x-0 top-0 h-[100dvh] z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-out_0.15s_ease-in_forwards]'
-              : 'fixed inset-x-0 top-0 h-[100dvh] z-[70] bg-black/80 [will-change:opacity] motion-safe:animate-[fade-in_0.2s_ease-out_both]'
+              : 'fixed inset-x-0 top-0 h-[100dvh] z-[70] bg-black/80'
           }
           style={overlayOffsetTop !== null ? { top: overlayOffsetTop } : undefined}
         />
