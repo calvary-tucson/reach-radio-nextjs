@@ -70,6 +70,9 @@ async function DonateContent() {
         <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/90 light:text-gray-600">
           {reassurance}
         </p>
+        <p className="mt-2 text-center text-xs md:text-sm text-white/90 light:text-gray-600">
+          If you don&apos;t know what campus option to select then select &ldquo;Exclusively Online&rdquo;
+        </p>
       </div>
     </>
   )
