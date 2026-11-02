@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TeacherPanelChrome } from '@/components/modals/chrome/TeacherPanelChrome'
 import { ModalProvider } from '@/components/modals/ModalContext'
+import { useModalStore } from '@/lib/stores/modal'
 
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
   useSheetDrag: () => ({
@@ -92,5 +93,28 @@ describe('TeacherPanelChrome', () => {
     await user.click(desktopClose)
     expect(onDismiss).toHaveBeenCalledOnce()
     expect(onBack).not.toHaveBeenCalled()
+  })
+})
+
+describe('TeacherPanelChrome enter animation', () => {
+  it('plays the slide-in on first open and marks the panel entered', () => {
+    useModalStore.setState({ panelEntered: false })
+    render(<Wrapper />)
+    expect(screen.getByRole('dialog').className).toContain('panel-slide-in')
+    expect(useModalStore.getState().panelEntered).toBe(true)
+  })
+
+  it('skips the slide-in when the panel was already entered (teacher swap)', () => {
+    useModalStore.setState({ panelEntered: true })
+    render(<Wrapper />)
+    const cls = screen.getByRole('dialog').className
+    expect(cls).not.toContain('slide-in')
+    expect(cls).not.toContain('slide-up')
+  })
+
+  it('still plays the exit animation while closing', () => {
+    useModalStore.setState({ panelEntered: true })
+    render(<Wrapper isClosing />)
+    expect(screen.getByRole('dialog').className).toContain('slide-out')
   })
 })

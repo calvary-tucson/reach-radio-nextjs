@@ -42,4 +42,31 @@ test.describe('Teachers', () => {
     // Breadcrumb link back to teachers list
     await expect(page.locator('a[href="/teachers"]').first()).toBeVisible()
   })
+
+  test('switching teacher from the panel does not replay the panel enter animation', async ({ page }) => {
+    await page.goto('/teachers')
+    // The grid cards are plain links (full-page nav); the "Recommended" row uses
+    // TeacherModalLink, which opens the side panel.
+    const recommended = page.getByRole('region', { name: 'Recommended teachers' })
+    await recommended.getByRole('button').first().click()
+    const panel = page.getByRole('dialog', { name: 'Teacher profile' })
+    await expect(panel).toBeVisible()
+
+    // First open slides in.
+    await expect.poll(() => panel.evaluate((el) => getComputedStyle(el).animationName)).toContain('slide-in')
+
+    const firstHeading = (await panel.getByRole('heading', { level: 2 }).first().textContent())?.trim()
+    const firstUrl = page.url()
+    const related = panel.getByText('Also on Reach Radio').locator('xpath=following-sibling::div//button').first()
+    await related.click()
+    await expect(page).not.toHaveURL(firstUrl)
+    await expect(panel.getByRole('heading', { level: 2 }).first()).not.toHaveText(firstHeading ?? '')
+
+    // The chrome remounts with the per-slug page, so node identity is not
+    // preserved; what matters is that the slide-in does not replay.
+    const swapped = page.getByRole('dialog', { name: 'Teacher profile' })
+    await expect(swapped).toBeVisible()
+    expect(await swapped.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
+    expect(await swapped.evaluate((el) => el.getAnimations().length)).toBe(0)
+  })
 })

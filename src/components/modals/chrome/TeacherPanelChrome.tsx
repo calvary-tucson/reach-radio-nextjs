@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
+import { useModalStore } from '@/lib/stores/modal'
 import { X, ArrowLeft } from 'lucide-react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
@@ -18,6 +19,10 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
   const mobileDrag = useSheetDrag({ onDismiss, contentRef, axis: 'y' })
   const tabletDrag = useSheetDrag({ onDismiss, contentRef, axis: 'x' })
   const canGoBack = stackDepth > 0
+
+  // Chrome remounts on teacher swap; skip the enter animation if already entered.
+  const [skipEnter] = useState(() => useModalStore.getState().panelEntered)
+  useEffect(() => { useModalStore.getState().markPanelEntered() }, [])
 
   // Focus on open
   useEffect(() => { contentRef.current?.focus() }, [])
@@ -49,12 +54,12 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           'max-h-[92dvh] rounded-t-2xl border',
           isClosing
             ? 'motion-safe:animate-[modal-slide-down_0.15s_ease-in_forwards]'
-            : 'motion-safe:animate-[modal-slide-up_0.2s_cubic-bezier(0.32,0.72,0,1)_both]',
+            : !skipEnter && 'motion-safe:animate-[modal-slide-up_0.2s_cubic-bezier(0.32,0.72,0,1)_both]',
           // Desktop: right panel
           'md:max-h-none md:h-full md:w-[480px] md:rounded-none md:rounded-l-2xl md:border-y-0 md:border-r-0 md:border-l',
           isClosing
             ? 'md:motion-safe:animate-[panel-slide-out_0.15s_ease-in_forwards]'
-            : 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
+            : !skipEnter && 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
         )}
       >
         {/* Mobile: drag handle + optional back button + close button */}

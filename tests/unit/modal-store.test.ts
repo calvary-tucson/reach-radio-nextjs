@@ -8,6 +8,7 @@ beforeEach(() => {
     isClosing: false,
     title: null,
     triggerRef: null,
+    panelEntered: false,
   })
 })
 
@@ -40,5 +41,24 @@ describe('useModalStore', () => {
     expect(useModalStore.getState().expectingRoute).toBe(true)
     useModalStore.getState().routeArrived()
     expect(useModalStore.getState().expectingRoute).toBe(false)
+  })
+
+  it('markPanelEntered sets panelEntered; close and openModal reset it', () => {
+    useModalStore.getState().openModal('A')
+    expect(useModalStore.getState().panelEntered).toBe(false)
+    useModalStore.getState().markPanelEntered()
+    expect(useModalStore.getState().panelEntered).toBe(true)
+    useModalStore.getState().pushModal('B')
+    expect(useModalStore.getState().panelEntered).toBe(true)
+    useModalStore.getState().prepareBack()
+    expect(useModalStore.getState().panelEntered).toBe(true)
+    useModalStore.getState().close()
+    expect(useModalStore.getState().panelEntered).toBe(false)
+    useModalStore.getState().markPanelEntered()
+    useModalStore.getState().openModal('C')
+    expect(useModalStore.getState().panelEntered).toBe(false)
+    useModalStore.getState().markPanelEntered()
+    useModalStore.getState().openSearchSheet('S')
+    expect(useModalStore.getState().panelEntered).toBe(false)
   })
 })
