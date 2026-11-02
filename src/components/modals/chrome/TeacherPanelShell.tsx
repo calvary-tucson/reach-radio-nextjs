@@ -88,7 +88,8 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
         tabIndex={-1}
         aria-label="Teacher profile"
         className={cn(
-          'w-full flex flex-col bg-[#0f1a0a] light:bg-white border-white/[0.08] light:border-gray-200 overflow-hidden [will-change:opacity,transform]',
+          // cursor-default: the backdrop wrapper is cursor-pointer (click to dismiss) and cursor inherits.
+          'w-full flex flex-col cursor-default bg-[#0f1a0a] light:bg-white border-white/[0.08] light:border-gray-200 overflow-hidden [will-change:opacity,transform]',
           // Mobile: bottom sheet
           'max-h-[92dvh] rounded-t-2xl border',
           isClosing
