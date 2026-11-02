@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { TeacherAvatar } from '@/components/teachers/primitives/TeacherAvatar'
 
 vi.mock('next/image', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   default: ({ alt, fill: _fill, ...props }: { alt: string; fill?: boolean; [key: string]: unknown }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img alt={alt} {...props} />
