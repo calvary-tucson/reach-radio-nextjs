@@ -91,7 +91,7 @@ export async function TodaySchedule() {
         </div>
         <div>
           <div className="font-bold text-base">Music</div>
-          <div className="uppercase text-sm text-white/70 light:text-gray-500">Reach Radio</div>
+          <div className="uppercase text-sm text-white/70 light:text-gray-600">Reach Radio</div>
         </div>
       </div>
     )
@@ -142,8 +142,8 @@ export async function TodaySchedule() {
             </div>
             <div>
               <div className="font-bold text-base">{item.title}</div>
-              <div className="uppercase text-sm text-white/70 light:text-gray-500">{item.name}</div>
-              <div className="text-sm text-white/60 light:text-gray-500">{item.time}</div>
+              <div className="uppercase text-sm text-white/70 light:text-gray-600">{item.name}</div>
+              <div className="text-sm text-white/60 light:text-gray-600">{item.time}</div>
             </div>
           </>
         )

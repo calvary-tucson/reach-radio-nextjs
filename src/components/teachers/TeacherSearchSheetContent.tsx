@@ -52,7 +52,7 @@ export function TeacherSearchSheetContent() {
       <div className="px-4 pb-16">
         {error ? (
           <div className="text-center py-12 space-y-3">
-            <p className="text-sm text-white/90 light:text-gray-500">
+            <p className="text-sm text-white/90 light:text-gray-600">
               Couldn&apos;t load teachers.
             </p>
             <button

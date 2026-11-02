@@ -57,7 +57,7 @@ export function TeacherSortControl() {
     <button
       type="button"
       onClick={cycleSort}
-      className={`${baseClass} gap-1.5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white/90 light:text-gray-500 can-hover:hover:border-white/20 can-hover:hover:text-white light:can-hover:hover:border-gray-300`}
+      className={`${baseClass} gap-1.5 bg-white/5 light:bg-gray-50 border border-white/10 light:border-gray-200 text-white/90 light:text-gray-600 can-hover:hover:border-white/20 can-hover:hover:text-white light:can-hover:hover:border-gray-300`}
       aria-label={`Sort: ${sortLabel}. Press to cycle.`}
     >
       {sortLabel}

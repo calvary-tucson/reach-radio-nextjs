@@ -42,6 +42,12 @@ const ICON_ALLOW: Allow[] = [
 const RULES: Rule[] = [
   // Light theme: below 4.5:1 for any text, below 3:1 for icons.
   { name: 'light gray-100..400 text', pattern: new RegExp(`light:${VARIANTS}text-gray-(?:100|200|300|400)\\b`) },
+  // Light theme: gray-500 is 4.39:1 on gray-100, so text uses gray-600. Icon-like lines (icon buttons, svg, sized glyphs) may keep gray-500 (3:1).
+  {
+    name: 'light gray-500 text',
+    pattern: new RegExp(`light:${VARIANTS}(?:text|placeholder:text)-gray-500\\b`),
+    unless: /h-11 w-11|w-11 min-h|className="w-7 |<svg|Chevron|BreadcrumbSeparator|w-4 h-4|h-4 w-4|shrink-0"$/,
+  },
   // Light theme: green-600 text is 3.52:1.
   { name: 'light green-600 text', pattern: new RegExp(`light:${VARIANTS}text-green-600\\b`) },
   // Dark theme: readable text needs white/60 (icons white/50, allowlisted above).
@@ -115,6 +121,15 @@ describe('contrast class guard regexes (fixtures)', () => {
     expect(hit(n, 'light:text-gray-500')).toBe(false)
     expect(hit(n, 'light:text-gray-600')).toBe(false)
     expect(hit(n, 'light:bg-gray-100')).toBe(false)
+  })
+
+  it('flags light gray-500 text but not icon-like lines', () => {
+    const n = 'light gray-500 text'
+    expect(hit(n, '<p className="text-sm text-white/60 light:text-gray-500">')).toBe(true)
+    expect(hit(n, 'placeholder:text-white/60 light:placeholder:text-gray-500')).toBe(true)
+    expect(hit(n, '<p className="text-sm light:text-gray-600">')).toBe(false)
+    expect(hit(n, 'className="flex h-11 w-11 light:text-gray-500"')).toBe(false)
+    expect(hit(n, '<ChevronDown className="h-3.5 light:text-gray-500" />')).toBe(false)
   })
 
   it('flags light green-600 text, not borders', () => {

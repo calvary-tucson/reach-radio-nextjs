@@ -33,7 +33,7 @@ Brand green on light is `light:text-green-700` (green-600 is 3.52:1, the `#84b84
 | Primary text | `text-white` | `light:text-gray-900` |
 | Secondary / subtitle | `text-white/85` to `/90` | `light:text-gray-700` |
 | Body / empty state | `text-white/70` | `light:text-gray-600` |
-| Label / chip / placeholder (readable floor) | `text-white/60` | `light:text-gray-500` (min) or `-600` |
+| Label / chip / placeholder (readable floor) | `text-white/60` | `light:text-gray-600` |
 | Icon only | `text-white/50` min | `light:text-gray-500` |
 | Brand accent text | `text-[#84b84f]` | `light:text-green-700` |
 
@@ -47,7 +47,7 @@ Brand green on light is `light:text-green-700` (green-600 is 3.52:1, the `#84b84
 | Detail panel name | `text-[19px] md:text-[28px] font-extrabold tracking-tight` |
 | Card name | `text-[13px] md:text-sm font-bold text-white leading-snug` |
 | Card subtitle | `text-[11px] md:text-xs text-white/80` |
-| Section label (allcaps) | `text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-500` |
+| Section label (allcaps) | `text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-600` |
 | Filter section label | `text-[10px] font-semibold uppercase tracking-widest text-white/60` |
 | Body / result count | `text-sm text-white/60` |
 | Empty state | `text-sm text-white/70 light:text-gray-600 py-8` (`/90` in teacher search results) |
@@ -155,7 +155,7 @@ Search icon left-inset (`left-3`), clear/spinner right-inset (`right-2`).
 px-4 py-2 text-sm font-semibold capitalize transition-colors cursor-pointer border-b-2 -mb-px
 ```
 Active: `text-[#84b84f] border-[#84b84f]`
-Inactive: `text-white/60 light:text-gray-500 border-transparent hover:text-white/75 light:hover:text-gray-900`
+Inactive: `text-white/60 light:text-gray-600 border-transparent hover:text-white/75 light:hover:text-gray-900`
 
 Tab container: `flex gap-1 mb-5 border-b border-white/7`
 
@@ -298,7 +298,7 @@ Card:       bg-[#1c2128] border border-white/5 rounded-[18px]
 Row:        bg-white/5 border border-white/10 rounded-xl
 Callout:    bg-[rgba(132,184,79,0.08)] border border-[rgba(132,184,79,0.18)] rounded-[12px]
 Chip:       rounded-full min-h-[44px] — accent or dim variant
-Section:    text-[10px] font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-500
+Section:    text-[10px] font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-600
 Focus:      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
 Motion:     motion-safe: prefix on all animations
 Cursor:     cursor-pointer on every interactive element

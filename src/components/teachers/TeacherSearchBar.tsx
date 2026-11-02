@@ -72,7 +72,7 @@ export function TeacherSearchBar() {
           // overrides this to a platform-native border/background shift
           // instead of a glowing web ring (approved a11y one-off, 2026-07-06)
           // -- see the "Native search-field focus" block in globals.css.
-          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/60 light:placeholder:text-gray-500 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-full bg-white/5 light:bg-white border border-white/10 light:border-gray-300 rounded-xl pl-10 pr-12 py-2.5 text-base text-white light:text-gray-900 placeholder:text-white/60 light:placeholder:text-gray-600 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Search teachers"
         />
         {displayValue && (

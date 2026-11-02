@@ -71,7 +71,7 @@ export function SleepTimerSheet({ open, onClose }: SleepTimerSheetProps) {
             <p className="text-white light:text-gray-900 text-5xl font-mono mb-2" aria-hidden="true">
               {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </p>
-            <p className="text-white/90 light:text-gray-500 text-sm mb-8" aria-hidden="true">
+            <p className="text-white/90 light:text-gray-600 text-sm mb-8" aria-hidden="true">
               {paused ? 'Timer paused' : `Radio stops in ${minutes}m ${secs}s`}
             </p>
             <div className="flex flex-col gap-3">

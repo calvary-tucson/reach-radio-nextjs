@@ -67,7 +67,7 @@ async function DonateContent() {
           </a>
         </div>
 
-        <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/90 light:text-gray-500">
+        <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/90 light:text-gray-600">
           {reassurance}
         </p>
       </div>

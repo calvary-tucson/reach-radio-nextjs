@@ -41,7 +41,7 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
             className={`px-4 py-2 text-sm md:text-sm font-semibold capitalize motion-safe:transition-colors cursor-pointer border-b-2 -mb-px ${
               activeTab === tab
                 ? 'text-[#84b84f] light:text-green-700 border-[#84b84f] light:border-green-600'
-                : 'text-white/60 light:text-gray-500 border-transparent hover:text-white/75 light:hover:text-gray-900'
+                : 'text-white/60 light:text-gray-600 border-transparent hover:text-white/75 light:hover:text-gray-900'
             }`}
           >
             {tab}
@@ -52,7 +52,7 @@ export function TeachersClientView({ teachers, scheduleTeachers }: TeachersClien
       {activeTab === 'teachers' && (
         <div id="panel-teachers" role="tabpanel" aria-labelledby="tab-teachers">
           <div className="flex items-center justify-between mb-[10px]">
-            <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-500">
+            <p className="text-[13px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-600">
               All Teachers
             </p>
             <span className="text-[12px] md:text-sm text-white/60 light:text-gray-600">{teachers.length}</span>

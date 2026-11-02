@@ -14,7 +14,7 @@ Every interactive component you write must satisfy all of these before committin
 - **Role:** `<div>` acting as button → `role="button"` and `tabIndex={0}`. Native `<button>` preferred.
 - **Label:** Every icon-only button needs `aria-label`. Every form input needs `<label>` or `aria-label`.
 - **Touch target:** Min `h-11 w-11` (44px) on mobile interactive elements.
-- **Contrast:** Readable text is `text-white/60` minimum on dark surfaces (icons `text-white/50` minimum). On light use `light:text-gray-600`; `light:text-gray-500` is the floor (4.8:1) and nothing lighter. Brand green text needs `light:text-green-700`. Enforced by `tests/unit/contrast-classes.test.ts`.
+- **Contrast:** Readable text is `text-white/60` minimum on dark surfaces (icons `text-white/50` minimum). On light use `light:text-gray-600` for all text (gray-500 is 4.39:1 on gray-100); `light:text-gray-500` only for icons (3:1) and nothing lighter. Brand green text needs `light:text-green-700`. Enforced by `tests/unit/contrast-classes.test.ts`.
 - **Focus visible:** Interactive elements need `focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none`.
 - **Cursor:** `cursor-pointer` on all clickables. `cursor-not-allowed` on disabled.
 - **Motion:** Wrap animations in `motion-safe:` variant. Never animate without this guard.

@@ -183,7 +183,7 @@ async function AboutContent({ searchParams }: { searchParams: Promise<Record<str
       {/* Contact form */}
       <div className="bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-5">
         <h2 className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/80 light:text-gray-600 mb-2">Got Questions?</h2>
-        <p className="text-white/90 light:text-gray-500 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
+        <p className="text-white/90 light:text-gray-600 text-sm mb-4">Send us a message and we will get back to you as soon as possible.</p>
         <div className="max-w-lg">
           <ContactForm dryRun={dryRun} />
         </div>
@@ -197,7 +197,7 @@ async function AboutContent({ searchParams }: { searchParams: Promise<Record<str
         <div className="flex items-center justify-between">
           <div>
             <p className="text-white light:text-gray-900 font-semibold text-sm">Privacy Policy</p>
-            <p className="text-white/90 light:text-gray-500 text-xs mt-1">How we collect and protect your information</p>
+            <p className="text-white/90 light:text-gray-600 text-xs mt-1">How we collect and protect your information</p>
           </div>
           <svg
             className="w-4 h-4 text-white/50 light:text-gray-500 group-hover:text-white/70 motion-safe:transition-colors flex-shrink-0 ml-4"

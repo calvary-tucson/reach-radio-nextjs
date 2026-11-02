@@ -18,7 +18,7 @@ export async function RecommendedTeachers() {
 
   return (
     <section className="mb-4 md:mb-6" aria-label="Recommended teachers">
-      <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-500 px-0 mb-[10px] md:mb-3">
+      <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-600 px-0 mb-[10px] md:mb-3">
         Recommended
       </p>
       <div className="relative">

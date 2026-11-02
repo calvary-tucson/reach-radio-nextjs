@@ -79,7 +79,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
             shape="circle"
             sizes="24px"
           />
-          <span className="text-xs text-white/60 light:text-gray-500">
+          <span className="text-xs text-white/60 light:text-gray-600">
             Most on air:{' '}
             <span className="text-white light:text-gray-900 font-semibold">{mostOnAir.teacher.name}</span>
             {' · '}
@@ -138,7 +138,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
                       className={`h-4 w-4 shrink-0 text-[#84b84f] light:text-green-700 motion-safe:transition-opacity ${selectedDay === day ? 'opacity-100' : 'opacity-0'}`}
                       aria-hidden="true"
                     />
-                    <span className={selectedDay === day ? 'text-white light:text-gray-900' : 'text-white/60 light:text-gray-500'}>
+                    <span className={selectedDay === day ? 'text-white light:text-gray-900' : 'text-white/60 light:text-gray-600'}>
                       {day}
                       {day === today && <span className="ml-2 text-[#84b84f] light:text-green-700 text-xs">Today</span>}
                     </span>
