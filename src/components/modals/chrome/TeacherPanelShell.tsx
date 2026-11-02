@@ -92,12 +92,12 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
           // Mobile: bottom sheet
           'max-h-[92dvh] rounded-t-2xl border',
           isClosing
-            ? 'motion-safe:animate-[modal-slide-down_0.15s_ease-in_forwards]'
-            : 'motion-safe:animate-[modal-slide-up_0.2s_cubic-bezier(0.32,0.72,0,1)_both]',
+            ? 'motion-safe:animate-[panel-sheet-down_0.2s_ease-in_forwards]'
+            : 'motion-safe:animate-[panel-sheet-up_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
           // Desktop: right panel
           'md:max-h-none md:h-full md:w-[480px] md:rounded-none md:rounded-l-2xl md:border-y-0 md:border-r-0 md:border-l',
           isClosing
-            ? 'md:motion-safe:animate-[panel-slide-out_0.15s_ease-in_forwards]'
+            ? 'md:motion-safe:animate-[panel-slide-out_0.2s_ease-in_forwards]'
             : 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
         )}
       >
