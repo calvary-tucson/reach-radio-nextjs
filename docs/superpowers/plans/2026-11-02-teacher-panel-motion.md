@@ -139,3 +139,15 @@ Deviations: (1) Stage takes extra props `contentKey` (pathname) and `onConsume`.
 Checks: tsc clean; eslint clean; vitest 68 files / 428 tests green; Playwright full suite 43 passed, 2 failed (`donate.spec.ts` CTA expects /pushpay/ but href is ppay.co; Listen link missing). Donate files untouched by this work, treated as pre-existing, not verified on base. Screenshots (mid-slide push/pop, mobile 390 and desktop 1280, dark and light, search-sheet -> teacher -> Back seam) inspected in /private/tmp/claude/shots (sampled several, not all).
 
 Unverified: drag-to-dismiss, Escape and focus return to trigger in a real browser (unit coverage only); real iOS WebView; no `code-review` subagent pass was run (self-review only).
+
+## Review-fix addendum (2026-11-02)
+
+Code review (cc7b2c6..HEAD) fixes, commits 5bdb431, 3a1c7df, b89e58e, 2c233a7:
+- Scroll: push resets live scrollTop to 0 (ghost keeps old offset); pop restores that page's saved offset.
+- Signal is consumed at arm; an armed signal with no route change drops the ghost and settles after PANEL_NAV_TIMEOUT; reduced motion settles only after the swap commits; signal and swap in one commit animates the live layer only.
+- Back-hide focus handoff tracks focus-in-Back via focus/blur events (inert drops focus before effects).
+- One shared `usePrefersReducedMotion` in `src/lib/hooks`; scroll offset lives in `Pending`.
+- e2e: scroll reset plus no running animations on the dialog after swap and Back (shell enter animation uses fill:both so `getAnimations().length` is never 0; running-only is checked).
+
+Checks: tsc clean; eslint clean (src, unit tests, teachers e2e); vitest 68 files / 436 tests; Playwright teachers 7/7, donate 4/6, full suite 44 passed / 2 failed.
+Donate failures are pre-existing: CTA href `https://ppay.co/...` vs test regex `/pushpay/i`, and the Listen link is not found. `git diff cc7b2c6 HEAD` touches no donate spec/page/component.
