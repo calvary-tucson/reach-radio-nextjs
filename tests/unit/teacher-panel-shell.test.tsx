@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TeacherPanelShell } from '@/components/modals/chrome/TeacherPanelShell'
 import { ModalProvider } from '@/components/modals/ModalContext'
@@ -93,6 +93,25 @@ describe('TeacherPanelShell', () => {
     expect(document.activeElement).toBe(back)
     rerender(<Wrapper stackDepth={0} />)
     expect(document.activeElement).toBe(screen.getByRole('dialog'))
+  })
+
+  it('moves focus to the dialog when the browser drops focus (blur to body) as Back hides', () => {
+    const { rerender } = render(<Wrapper stackDepth={1} />)
+    const back = screen.getAllByRole('button', { name: /back/i })[0]
+    back.focus()
+    // Real browsers blur the element as it goes inert, before effects run.
+    act(() => { back.blur() })
+    expect(document.activeElement).toBe(document.body)
+    rerender(<Wrapper stackDepth={0} />)
+    expect(document.activeElement).toBe(screen.getByRole('dialog'))
+  })
+
+  it('does not steal focus when Back hides and focus was elsewhere', () => {
+    const { rerender } = render(<Wrapper stackDepth={1} />)
+    const close = screen.getAllByRole('button', { name: /close/i })[0]
+    close.focus()
+    rerender(<Wrapper stackDepth={0} />)
+    expect(document.activeElement).toBe(close)
   })
 
   it('back button calls onBack', async () => {

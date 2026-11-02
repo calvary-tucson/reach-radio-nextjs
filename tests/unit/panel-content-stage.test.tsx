@@ -151,6 +151,75 @@ describe('PanelContentStage', () => {
     expect(onConsume).toHaveBeenCalled()
   })
 
+  it('push resets the live scroll to 0 while the ghost keeps the old offset', () => {
+    const { container, rerender } = render(<Stage direction={null} contentKey="/a" text="A" />)
+    const live = container.querySelector('[data-panel-content]') as HTMLElement
+    live.scrollTop = 300
+    rerender(<Stage direction="push" contentKey="/a" text="A" />)
+    rerender(<Stage direction="push" contentKey="/b" text="B" />)
+    expect(live.scrollTop).toBe(0)
+    expect((container.querySelector('[data-panel-ghost]') as HTMLElement).scrollTop).toBe(300)
+  })
+
+  it('pop restores the revealed page\'s own scroll offset', () => {
+    const { container, rerender } = render(<Stage direction={null} contentKey="/a" text="A" />)
+    const live = container.querySelector('[data-panel-content]') as HTMLElement
+    live.scrollTop = 250
+    rerender(<Stage direction="push" contentKey="/a" text="A" />)
+    rerender(<Stage direction="push" contentKey="/b" text="B" />)
+    rerender(<Stage direction={null} contentKey="/b" text="B" />)
+    live.scrollTop = 40
+    rerender(<Stage direction="pop" contentKey="/b" text="B" />)
+    rerender(<Stage direction="pop" contentKey="/a" text="A" />)
+    expect(live.scrollTop).toBe(250)
+  })
+
+  it('consumes the signal at arm so a repeated same-direction signal fires again', () => {
+    const onConsume = vi.fn()
+    const { rerender } = render(<Stage direction={null} contentKey="/a" text="A" onConsume={onConsume} />)
+    rerender(<Stage direction="push" contentKey="/a" text="A" onConsume={onConsume} />)
+    expect(onConsume).toHaveBeenCalledTimes(1)
+    rerender(<Stage direction="push" contentKey="/b" text="B" onConsume={onConsume} />)
+    expect(anims).toHaveLength(2)
+  })
+
+  describe('with fake timers', () => {
+    beforeEach(() => { vi.useFakeTimers() })
+    afterEach(() => { vi.useRealTimers() })
+
+    it('a signal with no route change drops the ghost state and settles after the timeout', () => {
+      const onSettled = vi.fn()
+      const { container, rerender } = render(<Stage direction={null} contentKey="/a" text="A" onSettled={onSettled} />)
+      rerender(<Stage direction="push" contentKey="/a" text="A" onSettled={onSettled} />)
+      expect(onSettled).not.toHaveBeenCalled()
+      act(() => { vi.advanceTimersByTime(2100) })
+      expect(onSettled).toHaveBeenCalledTimes(1)
+      // A later swap with no new signal must not animate from the stale arm.
+      rerender(<Stage direction={null} contentKey="/b" text="B" onSettled={onSettled} />)
+      expect(anims).toHaveLength(0)
+      expect(container.querySelector('[data-panel-ghost]')).toBeNull()
+    })
+
+    it('reduced motion holds the lock until the swap commits', () => {
+      const onSettled = vi.fn()
+      const { rerender } = render(<Stage direction={null} contentKey="/a" text="A" reducedMotion onSettled={onSettled} />)
+      rerender(<Stage direction="pop" contentKey="/a" text="A" reducedMotion onSettled={onSettled} />)
+      expect(onSettled).not.toHaveBeenCalled()
+      rerender(<Stage direction={null} contentKey="/b" text="B" reducedMotion onSettled={onSettled} />)
+      expect(onSettled).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('signal and swap in the same commit still animates (live layer only)', () => {
+    const { container, rerender } = render(<Stage direction={null} contentKey="/a" text="A" />)
+    rerender(<Stage direction="push" contentKey="/b" text="B" />)
+    const live = container.querySelector('[data-panel-content]') as HTMLElement
+    expect(container.querySelector('[data-panel-ghost]')).toBeNull()
+    expect(anims).toHaveLength(1)
+    expect(anims[0].target).toBe(live)
+    expect(anims[0].frames[0].transform).toBe('translateX(100%)')
+  })
+
   it('a new signal mid-animation cancels the previous run and leaves a single ghost', () => {
     const { container, rerender } = render(<Stage direction={null} contentKey="/a" text="A" />)
     rerender(<Stage direction="push" contentKey="/a" text="A" />)

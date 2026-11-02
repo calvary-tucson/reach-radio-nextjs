@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useSyncExternalStore,
-} from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import {
   PANEL_NAV_TIMEOUT,
   PANEL_PAGE_DIM,
@@ -14,25 +8,6 @@ import {
   PANEL_PAGE_DURATION,
   PANEL_PAGE_EASE,
 } from '@/lib/constants/modal'
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
-
-function subscribeReducedMotion(cb: () => void) {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {}
-  const mq = window.matchMedia(REDUCED_MOTION_QUERY)
-  mq.addEventListener('change', cb)
-  return () => mq.removeEventListener('change', cb)
-}
-
-function getReducedMotion() {
-  return typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia(REDUCED_MOTION_QUERY).matches
-}
-
-export function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false)
-}
 
 export type PanelNavDirection = 'push' | 'pop'
 
@@ -42,21 +17,24 @@ interface PanelContentStageProps {
   reducedMotion: boolean
   /** Changes when the routed content swaps (the pathname). The animation runs on this change. */
   contentKey: string
-  /** Called once the signal is consumed so the store can reset it. */
+  /** Called as soon as a signal is armed so the store resets it (a repeat signal must re-fire). */
   onConsume: () => void
-  /** Called when a signalled navigation has finished (or been skipped). */
+  /** Called when a signalled navigation has finished, been skipped, or never got a route. */
   onSettled: () => void
   children: React.ReactNode
 }
 
 interface Pending {
   direction: PanelNavDirection
-  ghost: HTMLElement
+  /** Clone of the outgoing content; null when the swap committed with the signal (live-only motion). */
+  ghost: HTMLElement | null
+  /** Outgoing scroll offset, applied to the ghost. */
+  scrollTop: number
 }
 
-// Clone of the outgoing content. Made inert (no focus, no a11y tree), ids are
-// stripped so the clone never duplicates anchors/labels, and the scroll
-// position (which cloneNode drops) is copied across.
+// Clone of the outgoing content. Made inert (no focus, no a11y tree) and ids
+// are stripped so the clone never duplicates anchors/labels. The scroll
+// position (which cloneNode drops) is re-applied by the caller.
 function createGhost(live: HTMLElement): HTMLElement {
   const ghost = live.cloneNode(true) as HTMLElement
   ghost.removeAttribute('id')
@@ -77,8 +55,10 @@ function createGhost(live: HTMLElement): HTMLElement {
 /**
  * Viewport for the routed teacher content. Push/pop is a one-shot Web
  * Animations API run (never CSS classes), so Next hiding or un-hiding cached
- * pages cannot replay it. The outgoing content is snapshotted into a DOM ghost
- * when the signal arrives (before the swap commits), then both layers animate.
+ * pages cannot replay it. The signal is armed when it arrives (the outgoing
+ * content is still on screen, so it is snapshotted into a DOM ghost) and the
+ * animation runs when the routed swap commits. If no swap arrives the armed
+ * state is dropped after PANEL_NAV_TIMEOUT.
  */
 export function PanelContentStage({
   direction,
@@ -91,8 +71,10 @@ export function PanelContentStage({
   const viewportRef = useRef<HTMLDivElement>(null)
   const liveRef = useRef<HTMLDivElement>(null)
   const pendingRef = useRef<Pending | null>(null)
+  const activeRef = useRef<Pending | null>(null)
   const animsRef = useRef<Animation[]>([])
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scrollsRef = useRef(new Map<string, number>())
   const mountedRef = useRef(false)
   const committedKeyRef = useRef(contentKey)
   const settledRef = useRef(onSettled)
@@ -102,42 +84,42 @@ export function PanelContentStage({
     consumeRef.current = onConsume
   })
 
-  // Tear down any in-flight animation/ghost immediately (used on a new signal,
-  // on completion and on unmount).
+  // Tear down any armed state / in-flight animation / ghost immediately.
   const cleanup = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = null
     animsRef.current.forEach((a) => a.cancel())
     animsRef.current = []
-    pendingRef.current?.ghost.remove()
     pendingRef.current = null
+    activeRef.current = null
     viewportRef.current?.querySelectorAll('[data-panel-ghost]').forEach((g) => g.remove())
     if (liveRef.current) liveRef.current.style.zIndex = ''
   }, [])
 
-  // Arm: the signal (store update on click) renders BEFORE the routed swap
-  // commits, so the DOM still holds the outgoing content here. Snapshot it
-  // now; it is attached and animated when the swap lands (effect below).
+  // Arm: the signal (store update on click) normally renders BEFORE the routed
+  // swap commits, so the DOM still holds the outgoing content. Snapshot it now
+  // and consume the signal so a repeat of the same direction fires again.
   // (useInsertionEffect is too late: React mutates descendants first.)
   useLayoutEffect(() => {
     if (!direction) return
-    if (!mountedRef.current) {
-      // Stale signal at mount (shell mounted by a push over the search
-      // sheet): never animate.
-      consumeRef.current()
-      return
-    }
+    consumeRef.current()
+    if (!mountedRef.current) return // stale signal at mount: never animate
     cleanup()
     const live = liveRef.current
-    if (reducedMotion || !live || committedKeyRef.current !== contentKey) {
-      // Swap already committed (or no motion): nothing to ghost.
-      consumeRef.current()
-      settledRef.current()
-      return
+    if (!live) return
+    const swapped = committedKeyRef.current !== contentKey
+    if (!swapped) scrollsRef.current.set(committedKeyRef.current, live.scrollTop)
+    pendingRef.current = {
+      direction,
+      // Signal and swap in one commit: the old DOM is gone, so live-only motion.
+      ghost: swapped || reducedMotion ? null : createGhost(live),
+      scrollTop: live.scrollTop,
     }
-    const ghost = createGhost(live)
-    ghost.dataset.scrollTop = String(live.scrollTop)
-    pendingRef.current = { direction, ghost }
+    // No route arrived: drop the armed state and release the Back lock.
+    timerRef.current = setTimeout(() => {
+      cleanup()
+      settledRef.current()
+    }, PANEL_NAV_TIMEOUT)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [direction])
 
@@ -150,20 +132,28 @@ export function PanelContentStage({
     }
     if (committedKeyRef.current === contentKey) return
     committedKeyRef.current = contentKey
-    if (!direction) return
-    consumeRef.current()
     const pending = pendingRef.current
     const viewport = viewportRef.current
     const live = liveRef.current
-    if (reducedMotion || !pending || !viewport || !live) {
+    if (!live) return
+    // The live layer's scroll belongs to the old page: push starts at the top,
+    // pop restores the revealed page's own offset (0 if unknown).
+    live.scrollTop = pending?.direction === 'pop' ? (scrollsRef.current.get(contentKey) ?? 0) : 0
+    if (!pending) return
+    if (reducedMotion || !viewport) {
       cleanup()
       settledRef.current()
       return
     }
+    if (timerRef.current) clearTimeout(timerRef.current)
+    pendingRef.current = null
+    activeRef.current = pending
+
     const { ghost } = pending
-    viewport.appendChild(ghost)
-    ghost.scrollTop = Number(ghost.dataset.scrollTop ?? 0)
-    delete ghost.dataset.scrollTop
+    if (ghost) {
+      viewport.appendChild(ghost)
+      ghost.scrollTop = pending.scrollTop
+    }
 
     const dim = `brightness(${PANEL_PAGE_DIM})`
     const opts: KeyframeAnimationOptions = {
@@ -172,40 +162,51 @@ export function PanelContentStage({
       fill: 'forwards',
     }
     const drift = `translateX(-${PANEL_PAGE_DRIFT}%)`
-    let ghostAnim: Animation
-    let liveAnim: Animation
+    const anims: Animation[] = []
     if (pending.direction === 'push') {
       // New content slides in over the old, which drifts left and dims.
-      ghost.style.zIndex = '0'
+      if (ghost) {
+        ghost.style.zIndex = '0'
+        anims.push(
+          ghost.animate(
+            [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: drift, filter: dim }],
+            opts,
+          ),
+        )
+      }
       live.style.zIndex = '1'
-      ghostAnim = ghost.animate(
-        [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: drift, filter: dim }],
-        opts,
-      )
-      liveAnim = live.animate(
-        [{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }],
-        { ...opts, fill: 'none' },
+      anims.push(
+        live.animate(
+          [{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }],
+          { ...opts, fill: 'none' },
+        ),
       )
     } else {
       // Leaving content slides right; the revealed content drifts back in.
-      ghost.style.zIndex = '2'
-      ghostAnim = ghost.animate(
-        [{ transform: 'translateX(0)' }, { transform: 'translateX(100%)' }],
-        opts,
-      )
-      liveAnim = live.animate(
-        [{ transform: drift, filter: dim }, { transform: 'translateX(0)', filter: 'brightness(1)' }],
-        { ...opts, fill: 'none' },
+      if (ghost) {
+        ghost.style.zIndex = '2'
+        anims.push(
+          ghost.animate(
+            [{ transform: 'translateX(0)' }, { transform: 'translateX(100%)' }],
+            opts,
+          ),
+        )
+      }
+      anims.push(
+        live.animate(
+          [{ transform: drift, filter: dim }, { transform: 'translateX(0)', filter: 'brightness(1)' }],
+          { ...opts, fill: 'none' },
+        ),
       )
     }
-    animsRef.current = [ghostAnim, liveAnim]
+    animsRef.current = anims
     timerRef.current = setTimeout(() => {
       cleanup()
       settledRef.current()
     }, PANEL_PAGE_DURATION + PANEL_NAV_TIMEOUT)
-    Promise.all([ghostAnim.finished, liveAnim.finished])
+    Promise.all(anims.map((a) => a.finished))
       .then(() => {
-        if (pendingRef.current !== pending) return
+        if (activeRef.current !== pending) return
         cleanup()
         settledRef.current()
       })

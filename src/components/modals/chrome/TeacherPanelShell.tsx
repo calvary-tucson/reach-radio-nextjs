@@ -3,7 +3,8 @@
 import { useRef, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { X, ArrowLeft } from 'lucide-react'
-import { PanelContentStage, usePrefersReducedMotion } from '@/components/modals/chrome/PanelContentStage'
+import { PanelContentStage } from '@/components/modals/chrome/PanelContentStage'
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion'
 import { useModalStore } from '@/lib/stores/modal'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
@@ -29,14 +30,23 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
   const mobileBackRef = useRef<HTMLButtonElement>(null)
   const desktopBackRef = useRef<HTMLButtonElement>(null)
 
-  // Back hides while it may hold focus (inert drops focus to <body>): hand it
-  // to the dialog so keyboard users stay inside the panel.
+  // Back hides while it may hold focus. Going inert drops focus to <body>
+  // before effects run, so activeElement can't be trusted: track focus-in-Back
+  // from events (a blur with no related target is the inert drop; a blur to
+  // another element clears it) and hand focus to the dialog on hide.
+  const backFocusedRef = useRef(false)
+  const onBackFocus = () => { backFocusedRef.current = true }
+  const onBackBlur = (e: React.FocusEvent) => {
+    if (e.relatedTarget) backFocusedRef.current = false
+  }
   useEffect(() => {
     if (canGoBack) return
     const active = document.activeElement
-    if (active && (active === mobileBackRef.current || active === desktopBackRef.current)) {
+    const droppedToBody = !active || active === document.body
+    if (backFocusedRef.current && (droppedToBody || active === mobileBackRef.current || active === desktopBackRef.current)) {
       contentRef.current?.focus()
     }
+    backFocusedRef.current = false
   }, [canGoBack])
 
   const handleBackClick = () => {
@@ -97,6 +107,8 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
             ref={mobileBackRef}
             type="button"
             onClick={handleBackClick}
+            onFocus={onBackFocus}
+            onBlur={onBackBlur}
             className={cn(backButtonClass, backStateClass)}
             aria-label="Back"
             {...backA11y}
@@ -130,6 +142,8 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
             ref={desktopBackRef}
             type="button"
             onClick={handleBackClick}
+            onFocus={onBackFocus}
+            onBlur={onBackBlur}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
             className={cn(backButtonClass, backStateClass)}

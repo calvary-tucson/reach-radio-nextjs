@@ -17,5 +17,7 @@ export const PANEL_PAGE_EASE = 'cubic-bezier(0.32,0.72,0,1)'
 // How far the outgoing page drifts (percent of panel width) and how much it dims.
 export const PANEL_PAGE_DRIFT = 28
 export const PANEL_PAGE_DIM = 0.7
-// If the route never arrives after a push/pop signal, give up and unlock.
+// Max wait (ms) for the routed content to swap after a push/pop signal. If it
+// never does (same-path push, no-op back), the stage drops its pending ghost
+// and releases the Back lock; also the layout's fallback Back-lock release.
 export const PANEL_NAV_TIMEOUT = 2000
