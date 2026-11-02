@@ -77,7 +77,7 @@ export function ScheduleCardList({ slots, currentTime, onSelect, compact = false
                 <p className={`text-white light:text-gray-900 font-semibold truncate ${compact ? 'text-xs' : 'text-sm'}`}>
                   {slot.teacher.name}
                 </p>
-                <p className={`${compact ? 'text-[10px]' : 'text-xs'} ${isActive ? 'text-[#84b84f] light:text-green-700' : 'text-white/60 light:text-gray-600'}`}>
+                <p className={`${compact ? 'text-[11px]' : 'text-xs'} ${isActive ? 'text-[#84b84f] light:text-green-700' : 'text-white/60 light:text-gray-600'}`}>
                   {formatTimeMinutes(slot.startMinutes)} – {formatTimeMinutes(slot.endMinutes)}
                 </p>
               </div>
