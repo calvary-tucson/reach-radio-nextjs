@@ -79,7 +79,7 @@ export function ScheduleTabView({ scheduleTeachers }: ScheduleTabViewProps) {
             shape="circle"
             sizes="24px"
           />
-          <span className="text-xs text-white/55 light:text-gray-500">
+          <span className="text-xs text-white/60 light:text-gray-500">
             Most on air:{' '}
             <span className="text-white light:text-gray-900 font-semibold">{mostOnAir.teacher.name}</span>
             {' · '}
