@@ -1,9 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { TeacherPanelChrome } from '@/components/modals/chrome/TeacherPanelChrome'
+import { TeacherPanelShell } from '@/components/modals/chrome/TeacherPanelShell'
 import { ModalProvider } from '@/components/modals/ModalContext'
-import { useModalStore } from '@/lib/stores/modal'
 
 vi.mock('@/lib/hooks/useSheetDrag', () => ({
   useSheetDrag: () => ({
@@ -32,14 +31,14 @@ function Wrapper({
       isClosing={isClosing}
       stackDepth={stackDepth}
     >
-      <TeacherPanelChrome>
+      <TeacherPanelShell>
         <p>Panel content</p>
-      </TeacherPanelChrome>
+      </TeacherPanelShell>
     </ModalProvider>
   )
 }
 
-describe('TeacherPanelChrome', () => {
+describe('TeacherPanelShell', () => {
   it('renders children', () => {
     render(<Wrapper />)
     expect(screen.getByText('Panel content')).toBeInTheDocument()
@@ -96,35 +95,29 @@ describe('TeacherPanelChrome', () => {
   })
 })
 
-describe('TeacherPanelChrome enter animation', () => {
-  it('plays the slide-in on first open and marks the panel entered', () => {
-    useModalStore.setState({ panelEntered: false })
-    render(<Wrapper />)
-    expect(screen.getByRole('dialog').className).toContain('panel-slide-in')
-    expect(useModalStore.getState().panelEntered).toBe(true)
-  })
-
-  it('skips the slide-in when the panel was already entered (teacher swap)', () => {
-    useModalStore.setState({ panelEntered: true })
-    render(<Wrapper />)
-    const cls = screen.getByRole('dialog').className
-    expect(cls).not.toContain('slide-in')
-    expect(cls).not.toContain('slide-up')
-  })
-
-  it('drops the enter animation once it ends so a revealed cached page does not replay it', () => {
-    useModalStore.setState({ panelEntered: false })
-    render(<Wrapper />)
+describe('TeacherPanelShell lifecycle', () => {
+  it('stays mounted (same DOM node) across stackDepth 0 -> 1 -> 0', () => {
+    const { rerender } = render(<Wrapper stackDepth={0} />)
     const dialog = screen.getByRole('dialog')
-    expect(dialog.className).toContain('slide-in')
-    fireEvent.animationEnd(dialog)
-    expect(dialog.className).not.toContain('slide-in')
-    expect(dialog.className).not.toContain('slide-up')
+    rerender(<Wrapper stackDepth={1} />)
+    expect(screen.getByRole('dialog')).toBe(dialog)
+    expect(dialog.isConnected).toBe(true)
+    rerender(<Wrapper stackDepth={0} />)
+    expect(screen.getByRole('dialog')).toBe(dialog)
   })
 
-  it('still plays the exit animation while closing', () => {
-    useModalStore.setState({ panelEntered: true })
-    render(<Wrapper isClosing />)
+  it('plays the slide-in on mount and the exit animation while closing', () => {
+    const { rerender } = render(<Wrapper />)
+    expect(screen.getByRole('dialog').className).toContain('panel-slide-in')
+    rerender(<Wrapper isClosing />)
     expect(screen.getByRole('dialog').className).toContain('slide-out')
+  })
+
+  it('Escape-independent dismiss: clicking the backdrop calls onDismiss', async () => {
+    const onDismiss = vi.fn()
+    const user = userEvent.setup()
+    const { container } = render(<Wrapper onDismiss={onDismiss} />)
+    await user.click(container.querySelector('[role="presentation"]') as HTMLElement)
+    expect(onDismiss).toHaveBeenCalledOnce()
   })
 })

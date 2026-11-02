@@ -12,11 +12,6 @@ interface ModalStore {
   // (pushModal/prepareBack never touch it), so a detail sheet pushed on top
   // of the search sheet still resolves back to the search sheet when popped.
   rootSheet: 'search' | 'detail' | null
-  // True once the teacher panel has played its enter animation. The panel chrome
-  // remounts on every teacher swap (it lives in the per-slug page), so it reads
-  // this at mount to skip replaying the slide-in. Reset on open/close.
-  panelEntered: boolean
-  markPanelEntered: () => void
   // One-shot signal for the panel content stage: which way the in-panel
   // navigation just moved. Set by pushModal/prepareBack, consumed (cleared)
   // by the stage once the animation is started.
@@ -42,14 +37,11 @@ export const useModalStore = create<ModalStore>((set) => ({
   triggerRef: null,
   stackDepth: 0,
   rootSheet: null,
-  panelEntered: false,
-  markPanelEntered: () => set({ panelEntered: true }),
   navDirection: null,
   clearNavDirection: () => set({ navDirection: null }),
   openModal: (title) =>
     set({
       navDirection: null,
-      panelEntered: false,
       expectingRoute: true,
       expectingBack: false,
       isOpen: true,
@@ -61,7 +53,6 @@ export const useModalStore = create<ModalStore>((set) => ({
   openSearchSheet: (title) =>
     set({
       navDirection: null,
-      panelEntered: false,
       expectingRoute: true,
       expectingBack: false,
       isOpen: true,
@@ -94,7 +85,6 @@ export const useModalStore = create<ModalStore>((set) => ({
   clearBack: () => set({ expectingBack: false }),
   close: () => set({
     navDirection: null,
-    panelEntered: false,
     isOpen: false,
     expectingRoute: false,
     expectingBack: false,

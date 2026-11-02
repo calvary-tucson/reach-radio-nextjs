@@ -1,7 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
-import { useModalStore } from '@/lib/stores/modal'
+import { useRef, useEffect } from 'react'
 import { X, ArrowLeft } from 'lucide-react'
 import { useModal } from '@/components/modals/ModalContext'
 import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
@@ -9,30 +8,16 @@ import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { DragHandle } from '@/components/global/DragHandle'
 import { cn } from '@/lib/utils'
 
-interface TeacherPanelChromeProps {
+interface TeacherPanelShellProps {
   children: React.ReactNode
 }
 
-export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
+export function TeacherPanelShell({ children }: TeacherPanelShellProps) {
   const { onDismiss, onBack, isClosing, stackDepth } = useModal()
   const contentRef = useRef<HTMLDivElement>(null)
   const mobileDrag = useSheetDrag({ onDismiss, contentRef, axis: 'y' })
   const tabletDrag = useSheetDrag({ onDismiss, contentRef, axis: 'x' })
   const canGoBack = stackDepth > 0
-
-  // Chrome remounts on teacher swap; skip the enter animation if already entered.
-  // Also dropped once the animation ends: Next keeps the previous page mounted
-  // (hidden) for Back, and un-hiding it would otherwise restart the CSS animation.
-  const [skipEnter, setSkipEnter] = useState(() => useModalStore.getState().panelEntered)
-  useEffect(() => { useModalStore.getState().markPanelEntered() }, [])
-  // Native listener (not React's onAnimationEnd) so it also works under jsdom.
-  useEffect(() => {
-    const el = contentRef.current
-    if (!el) return
-    const onEnd = (e: Event) => { if (e.target === el && !isClosing) setSkipEnter(true) }
-    el.addEventListener('animationend', onEnd)
-    return () => el.removeEventListener('animationend', onEnd)
-  }, [isClosing])
 
   // Focus on open
   useEffect(() => { contentRef.current?.focus() }, [])
@@ -64,12 +49,12 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
           'max-h-[92dvh] rounded-t-2xl border',
           isClosing
             ? 'motion-safe:animate-[modal-slide-down_0.15s_ease-in_forwards]'
-            : !skipEnter && 'motion-safe:animate-[modal-slide-up_0.2s_cubic-bezier(0.32,0.72,0,1)_both]',
+            : 'motion-safe:animate-[modal-slide-up_0.2s_cubic-bezier(0.32,0.72,0,1)_both]',
           // Desktop: right panel
           'md:max-h-none md:h-full md:w-[480px] md:rounded-none md:rounded-l-2xl md:border-y-0 md:border-r-0 md:border-l',
           isClosing
             ? 'md:motion-safe:animate-[panel-slide-out_0.15s_ease-in_forwards]'
-            : !skipEnter && 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
+            : 'md:motion-safe:animate-[panel-slide-in_0.25s_cubic-bezier(0.32,0.72,0,1)_both]',
         )}
       >
         {/* Mobile: drag handle + optional back button + close button */}

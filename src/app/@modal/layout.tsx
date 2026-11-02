@@ -1,69 +1,18 @@
 'use client'
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useRef } from 'react'
 import { ModalProvider } from '@/components/modals/ModalContext'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useSheetDrag } from '@/lib/hooks/useSheetDrag'
 import { useVisualViewportOffset } from '@/lib/hooks/useVisualViewportOffset'
-import { DragHandle } from '@/components/global/DragHandle'
 import { SectionErrorBoundary } from '@/components/global/SectionErrorBoundary'
 import { TeacherSearchSheetContent } from '@/components/teachers/TeacherSearchSheetContent'
-import { EXIT_DURATION, MODAL_ENTER_ANIMATION, MODAL_EXIT_ANIMATION } from '@/lib/constants/modal'
+import { EXIT_DURATION } from '@/lib/constants/modal'
 import { useShallow } from 'zustand/react/shallow'
 import { useModalStore } from '@/lib/stores/modal'
 import { useHideMediaBarWhileOpen } from '@/lib/hooks/useHideMediaBarWhileOpen'
-import { cn } from '@/lib/utils'
-
-function ModalSkeleton({
-  title,
-  onDismiss,
-  isClosing,
-}: {
-  title?: string | null
-  onDismiss: () => void
-  isClosing?: boolean
-}) {
-  const skeletonRef = useRef<HTMLDivElement>(null)
-  const drag = useSheetDrag({ onDismiss, contentRef: skeletonRef })
-
-  return (
-    <div
-      className="fixed inset-0 z-[70] flex items-end sm:items-center sm:justify-center"
-      onClick={(e) => { if (e.target === e.currentTarget) onDismiss() }}
-    >
-      <div
-        ref={skeletonRef}
-        className={cn(
-          'w-full max-h-[90dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl border border-white/10 light:border-gray-200 bg-gray-800 light:bg-white p-0 h-[85dvh] sm:h-auto sm:max-w-2xl sm:w-[95vw]',
-          isClosing ? MODAL_EXIT_ANIMATION : MODAL_ENTER_ANIMATION
-        )}
-      >
-        <DragHandle drag={drag} onDismiss={onDismiss} className="w-full pt-3 pb-2 sm:hidden" />
-        <div className="flex items-center justify-between border-b border-white/10 light:border-gray-200 bg-gray-800 light:bg-white px-6 py-4">
-          {title ? (
-            <h2 className="text-xl font-bold text-white light:text-gray-900">{title}</h2>
-          ) : (
-            <Skeleton className="h-6 w-1/3" />
-          )}
-          <button
-            type="button"
-            onClick={onDismiss}
-            className="ml-auto -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/60 light:text-gray-500 motion-safe:transition-colors hover:bg-white/10 light:hover:bg-gray-100 hover:text-white light:hover:text-gray-900 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="p-6 space-y-4">
-          <Skeleton className="w-full h-12 rounded-xl" />
-        </div>
-      </div>
-    </div>
-  )
-}
+import { TeacherPanelShell } from '@/components/modals/chrome/TeacherPanelShell'
+import { TeacherDetailSkeleton } from '@/components/skeletons/TeacherDetailSkeleton'
 
 export default function ModalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -209,13 +158,9 @@ export default function ModalLayout({ children }: { children: React.ReactNode })
                 <TeacherSearchSheetContent />
               </SectionErrorBoundary>
             ) : (
-              <Suspense
-                fallback={
-                  <ModalSkeleton title={title} onDismiss={handleClose} isClosing={isClosing} />
-                }
-              >
-                {children}
-              </Suspense>
+              <TeacherPanelShell>
+                <Suspense fallback={<TeacherDetailSkeleton />}>{children}</Suspense>
+              </TeacherPanelShell>
             )}
           </ModalProvider>
         </DialogPrimitive.Content>

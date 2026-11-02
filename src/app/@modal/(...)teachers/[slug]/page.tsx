@@ -4,7 +4,6 @@ import { sanityFetch } from '@/lib/sanity/client'
 import { teacherDetailQuery, highlightedTeachersQuery } from '@/lib/sanity/queries'
 import type { TeacherDetail, TeacherSummary } from '@/lib/sanity/types'
 import { HIGHLIGHTED_TEACHER_SLUGS, sortByHighlightedOrder } from '@/lib/teachers/highlighted'
-import { TeacherPanelChrome } from '@/components/modals/chrome/TeacherPanelChrome'
 import { TeacherDetailContent } from '@/components/teachers/TeacherDetailContent'
 import { TeacherDetailSkeleton } from '@/components/skeletons/TeacherDetailSkeleton'
 
@@ -40,10 +39,8 @@ async function ModalTeacherContentWrapper({ params }: Props) {
 
 export default function TeacherDetailModalPage({ params }: Props) {
   return (
-    <TeacherPanelChrome>
-      <Suspense fallback={<TeacherDetailSkeleton />}>
-        <ModalTeacherContentWrapper params={params} />
-      </Suspense>
-    </TeacherPanelChrome>
+    <Suspense fallback={<TeacherDetailSkeleton />}>
+      <ModalTeacherContentWrapper params={params} />
+    </Suspense>
   )
 }

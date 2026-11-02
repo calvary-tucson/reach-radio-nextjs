@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { useModalStore } from '@/lib/stores/modal'
 
 vi.mock('next/navigation', () => ({
@@ -14,6 +14,10 @@ vi.mock('@/lib/hooks/useSheetDrag', () => ({
     onTouchEnd: vi.fn(),
     onMouseDown: vi.fn(),
   }),
+}))
+
+vi.mock('@/components/teachers/TeacherSearchSheetContent', () => ({
+  TeacherSearchSheetContent: () => <div data-testid="search-sheet" />,
 }))
 
 vi.mock('@radix-ui/react-dialog', async () => {
@@ -32,7 +36,7 @@ async function loadLayout() {
 beforeEach(() => {
   useModalStore.setState({
     expectingRoute: false, isOpen: false, isClosing: false,
-    title: null, triggerRef: null,
+    title: null, triggerRef: null, stackDepth: 0, rootSheet: null, expectingBack: false,
   })
 })
 
@@ -72,5 +76,40 @@ describe('ModalLayout', () => {
     // store.isOpen should be false
     expect(useModalStore.getState().isOpen).toBe(false)
     vi.useRealTimers()
+  })
+
+  it('wraps detail content in the teacher panel shell', async () => {
+    useModalStore.getState().openModal('Test')
+    const ModalLayout = await loadLayout()
+    render(<ModalLayout><p>modal content</p></ModalLayout>)
+    const dialog = screen.getByRole('dialog', { name: 'Teacher profile' })
+    expect(dialog).toContainElement(screen.getByText('modal content'))
+  })
+
+  it('renders no teacher shell for the search sheet root', async () => {
+    useModalStore.getState().openSearchSheet('Search')
+    const ModalLayout = await loadLayout()
+    render(<ModalLayout><p>modal content</p></ModalLayout>)
+    expect(screen.getByTestId('search-sheet')).toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Teacher profile' })).not.toBeInTheDocument()
+  })
+
+  it('swaps in the teacher shell when a detail is pushed over the search sheet', async () => {
+    useModalStore.getState().openSearchSheet('Search')
+    const ModalLayout = await loadLayout()
+    const { rerender } = render(<ModalLayout><p>modal content</p></ModalLayout>)
+    act(() => { useModalStore.getState().pushModal('Teacher') })
+    rerender(<ModalLayout><p>modal content</p></ModalLayout>)
+    expect(screen.getByRole('dialog', { name: 'Teacher profile' })).toBeInTheDocument()
+    expect(screen.queryByTestId('search-sheet')).not.toBeInTheDocument()
+  })
+
+  it('keeps the same shell node across teacher swaps', async () => {
+    useModalStore.getState().openModal('A')
+    const ModalLayout = await loadLayout()
+    render(<ModalLayout><p>modal content</p></ModalLayout>)
+    const dialog = screen.getByRole('dialog', { name: 'Teacher profile' })
+    act(() => { useModalStore.getState().pushModal('B') })
+    expect(screen.getByRole('dialog', { name: 'Teacher profile' })).toBe(dialog)
   })
 })
