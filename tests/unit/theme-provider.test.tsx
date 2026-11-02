@@ -31,6 +31,43 @@ function stubScheme(scheme: Scheme) {
 
 const cls = () => document.documentElement.classList
 
+interface VtRun {
+  finish: () => void
+  fail: (e: Error) => void
+}
+
+/** Fake startViewTransition: runs the swap like a browser (async errors surface via promises) and exposes a deferred `finished`. */
+function installViewTransition(opts: { swapThrows?: boolean } = {}) {
+  const runs: VtRun[] = []
+  const start = vi.fn((cb: () => void) => {
+    let resolveFinished!: () => void
+    let rejectFinished!: (e: Error) => void
+    const finished = new Promise<void>((res, rej) => { resolveFinished = res; rejectFinished = rej })
+    const ready = Promise.resolve()
+    const updateCallbackDone = new Promise<void>((res, rej) => {
+      try {
+        if (opts.swapThrows) throw new Error('swap failed')
+        cb()
+        res()
+      } catch (e) {
+        rej(e)
+        rejectFinished(e as Error)
+        ready.catch(() => {})
+      }
+    })
+    runs.push({ finish: resolveFinished, fail: rejectFinished })
+    return { finished, ready, updateCallbackDone }
+  })
+  Object.defineProperty(document, 'startViewTransition', { configurable: true, value: start })
+  return { start, runs }
+}
+
+async function mountCtx() {
+  const current = { current: undefined as unknown as ReturnType<typeof useTheme> }
+  await act(async () => { render(wrap(<ThemeReader onRender={(v) => { current.current = v }} />)) })
+  return current
+}
+
 describe('ThemeProvider', () => {
   beforeEach(() => {
     Object.defineProperty(document, 'cookie', { writable: true, configurable: true, value: '' })
@@ -94,11 +131,9 @@ describe('ThemeProvider', () => {
   })
 
   it('setTheme runs the class swap inside startViewTransition when supported', async () => {
-    const start = vi.fn((cb: () => void) => { cb(); return { finished: Promise.resolve() } })
-    Object.defineProperty(document, 'startViewTransition', { configurable: true, value: start })
-    let ctx: ReturnType<typeof useTheme>
-    await act(async () => { render(wrap(<ThemeReader onRender={(v) => { ctx = v }} />)) })
-    await act(async () => { ctx!.setTheme('light') })
+    const { start } = installViewTransition()
+    const ctx = await mountCtx()
+    await act(async () => { ctx.current.setTheme('light') })
     expect(start).toHaveBeenCalledTimes(1)
     expect(cls().contains('light')).toBe(true)
   })
@@ -115,13 +150,78 @@ describe('ThemeProvider', () => {
     expect(cls().contains('light')).toBe(true)
   })
 
-  it('removes the theme-transition class when the transition finishes', async () => {
-    const start = vi.fn((cb: () => void) => { cb(); return { finished: Promise.resolve() } })
-    Object.defineProperty(document, 'startViewTransition', { configurable: true, value: start })
-    let ctx: ReturnType<typeof useTheme>
-    await act(async () => { render(wrap(<ThemeReader onRender={(v) => { ctx = v }} />)) })
-    await act(async () => { ctx!.setTheme('light') })
-    await act(async () => { await Promise.resolve() })
+  it('keeps theme-transition while running and removes it once finished resolves', async () => {
+    const { runs } = installViewTransition()
+    const ctx = await mountCtx()
+    await act(async () => { ctx.current.setTheme('light') })
+    expect(cls().contains('theme-transition')).toBe(true)
+    await act(async () => { runs[0].finish() })
     expect(cls().contains('theme-transition')).toBe(false)
+  })
+
+  it('overlapping transitions: class stays until the LATEST one finishes', async () => {
+    const { runs } = installViewTransition()
+    const ctx = await mountCtx()
+    await act(async () => { ctx.current.setTheme('light') })
+    await act(async () => { ctx.current.setTheme('dark') })
+    expect(runs).toHaveLength(2)
+    await act(async () => { runs[0].finish() })
+    expect(cls().contains('theme-transition')).toBe(true)
+    await act(async () => { runs[1].finish() })
+    expect(cls().contains('theme-transition')).toBe(false)
+  })
+
+  it('rejected finished: no unhandled rejection and class is removed', async () => {
+    const unhandled = vi.fn()
+    process.on('unhandledRejection', unhandled)
+    try {
+      const { runs } = installViewTransition()
+      const ctx = await mountCtx()
+      await act(async () => { ctx.current.setTheme('light') })
+      await act(async () => { runs[0].fail(new Error('skipped')) })
+      await new Promise((r) => setTimeout(r, 10))
+      expect(cls().contains('theme-transition')).toBe(false)
+      expect(unhandled).not.toHaveBeenCalled()
+    } finally {
+      process.off('unhandledRejection', unhandled)
+    }
+  })
+
+  it('throwing swap: class is removed and no unhandled rejection', async () => {
+    const unhandled = vi.fn()
+    process.on('unhandledRejection', unhandled)
+    try {
+      const { runs } = installViewTransition({ swapThrows: true })
+      const ctx = await mountCtx()
+      await act(async () => { ctx.current.setTheme('light') })
+      await new Promise((r) => setTimeout(r, 10))
+      expect(runs).toHaveLength(1)
+      expect(cls().contains('theme-transition')).toBe(false)
+      expect(unhandled).not.toHaveBeenCalled()
+    } finally {
+      process.off('unhandledRejection', unhandled)
+    }
+  })
+
+  it('no-op toggle (already-applied theme) does not start a transition', async () => {
+    const { start } = installViewTransition()
+    document.documentElement.classList.add('dark')
+    const ctx = await mountCtx()
+    start.mockClear()
+    await act(async () => { ctx.current.setTheme('dark') })
+    expect(start).not.toHaveBeenCalled()
+    expect(cls().contains('theme-transition')).toBe(false)
+    expect(document.cookie).toContain('theme=dark')
+  })
+
+  it("no-op toggle resolves 'system' via the light media query", async () => {
+    stubScheme('light')
+    document.documentElement.classList.add('light')
+    const { start } = installViewTransition()
+    const ctx = await mountCtx()
+    start.mockClear()
+    await act(async () => { ctx.current.setTheme('system') })
+    expect(start).not.toHaveBeenCalled()
+    expect(ctx.current.theme).toBe('system')
   })
 })

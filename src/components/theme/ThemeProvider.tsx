@@ -30,6 +30,9 @@ function setThemeCookie(theme: Theme) {
 const LIGHT_QUERY = '(prefers-color-scheme: light)'
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
+let latestTransition = 0
+const noop = () => {}
+
 function applyTheme(theme: Theme) {
   const html = document.documentElement
   const resolved = resolveTheme(theme, window.matchMedia(LIGHT_QUERY).matches)
@@ -66,15 +69,34 @@ function ThemeInit({ children }: { children: React.ReactNode }) {
       applyTheme(t)
     }
     const html = document.documentElement
+    const resolved = resolveTheme(t, window.matchMedia(LIGHT_QUERY).matches)
     const reduce = window.matchMedia(REDUCED_MOTION_QUERY).matches
-    if (reduce || typeof document.startViewTransition !== 'function') {
+    // already showing this theme: update state/cookie only, nothing to animate
+    if (
+      reduce ||
+      typeof document.startViewTransition !== 'function' ||
+      html.classList.contains(resolved)
+    ) {
       swap()
       return
     }
+    const id = ++latestTransition
+    // only the latest transition may clear the class, or an older one finishing would cut the newer animation
+    const cleanup = () => {
+      if (id === latestTransition) html.classList.remove('theme-transition')
+    }
     html.classList.add('theme-transition')
-    const vt = document.startViewTransition(swap)
-    // finished settles on skip/abort too, so the class cannot stick
-    void vt.finished.finally(() => html.classList.remove('theme-transition'))
+    let vt: ViewTransition
+    try {
+      vt = document.startViewTransition(swap)
+    } catch (e) {
+      cleanup()
+      throw e
+    }
+    // finished/ready/updateCallbackDone reject on skip or a throwing swap: handle all so none goes unhandled
+    vt.finished.then(cleanup, cleanup)
+    vt.ready.catch(noop)
+    vt.updateCallbackDone.catch(noop)
   }, [])
 
   return (
