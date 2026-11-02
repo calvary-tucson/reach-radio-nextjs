@@ -75,8 +75,20 @@ const MEASURE = () => {
 
 // networkidle never fires here (long-lived streams), so wait on concrete state instead:
 // the theme class on <html> and a visible content locator.
-const themeApplied = (page: Page, theme: 'light' | 'dark') =>
-  expect(page.locator('html')).toHaveClass(new RegExp(`(^|\\s)${theme}(\\s|$)`))
+// Also waits for finite CSS transitions/animations: colors and opacity are measured
+// via getComputedStyle, which returns mid-flight values while the theme swap fades in.
+const themeApplied = async (page: Page, theme: 'light' | 'dark') => {
+  await expect(page.locator('html')).toHaveClass(new RegExp(`(^|\\s)${theme}(\\s|$)`))
+  await page.evaluate(async () => {
+    for (let i = 0; i < 5; i++) {
+      const running = document
+        .getAnimations()
+        .filter((a) => Number.isFinite(a.effect?.getComputedTiming().endTime ?? 0))
+      if (running.length === 0) return
+      await Promise.all(running.map((a) => a.finished.catch(() => undefined)))
+    }
+  })
+}
 
 // A scheduled card button: present in both the mobile list and desktop week layouts.
 const scheduleCard = (page: Page) => page.locator('button[aria-label*=" to "]:visible').first()
