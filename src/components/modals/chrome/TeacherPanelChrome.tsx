@@ -21,8 +21,18 @@ export function TeacherPanelChrome({ children }: TeacherPanelChromeProps) {
   const canGoBack = stackDepth > 0
 
   // Chrome remounts on teacher swap; skip the enter animation if already entered.
-  const [skipEnter] = useState(() => useModalStore.getState().panelEntered)
+  // Also dropped once the animation ends: Next keeps the previous page mounted
+  // (hidden) for Back, and un-hiding it would otherwise restart the CSS animation.
+  const [skipEnter, setSkipEnter] = useState(() => useModalStore.getState().panelEntered)
   useEffect(() => { useModalStore.getState().markPanelEntered() }, [])
+  // Native listener (not React's onAnimationEnd) so it also works under jsdom.
+  useEffect(() => {
+    const el = contentRef.current
+    if (!el) return
+    const onEnd = (e: Event) => { if (e.target === el && !isClosing) setSkipEnter(true) }
+    el.addEventListener('animationend', onEnd)
+    return () => el.removeEventListener('animationend', onEnd)
+  }, [isClosing])
 
   // Focus on open
   useEffect(() => { contentRef.current?.focus() }, [])

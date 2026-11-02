@@ -52,8 +52,8 @@ test.describe('Teachers', () => {
     const panel = page.getByRole('dialog', { name: 'Teacher profile' })
     await expect(panel).toBeVisible()
 
-    // First open slides in.
-    await expect.poll(() => panel.evaluate((el) => getComputedStyle(el).animationName)).toContain('slide-in')
+    // First open slides in, then the animation class is dropped once it ends.
+    await expect.poll(() => panel.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
 
     const firstHeading = (await panel.getByRole('heading', { level: 2 }).first().textContent())?.trim()
     const firstUrl = page.url()
@@ -68,5 +68,13 @@ test.describe('Teachers', () => {
     await expect(swapped).toBeVisible()
     expect(await swapped.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
     expect(await swapped.evaluate((el) => el.getAnimations().length)).toBe(0)
+
+    // Back reveals the previous page, which Next keeps mounted but hidden; it must not replay either.
+    await page.getByRole('button', { name: 'Back' }).filter({ visible: true }).first().click()
+    await expect(page).toHaveURL(firstUrl)
+    const restored = page.getByRole('dialog', { name: 'Teacher profile' })
+    await expect(restored).toBeVisible()
+    expect(await restored.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
+    expect(await restored.evaluate((el) => el.getAnimations().length)).toBe(0)
   })
 })

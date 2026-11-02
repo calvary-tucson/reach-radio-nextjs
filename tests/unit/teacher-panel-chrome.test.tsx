@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TeacherPanelChrome } from '@/components/modals/chrome/TeacherPanelChrome'
 import { ModalProvider } from '@/components/modals/ModalContext'
@@ -110,6 +110,16 @@ describe('TeacherPanelChrome enter animation', () => {
     const cls = screen.getByRole('dialog').className
     expect(cls).not.toContain('slide-in')
     expect(cls).not.toContain('slide-up')
+  })
+
+  it('drops the enter animation once it ends so a revealed cached page does not replay it', () => {
+    useModalStore.setState({ panelEntered: false })
+    render(<Wrapper />)
+    const dialog = screen.getByRole('dialog')
+    expect(dialog.className).toContain('slide-in')
+    fireEvent.animationEnd(dialog)
+    expect(dialog.className).not.toContain('slide-in')
+    expect(dialog.className).not.toContain('slide-up')
   })
 
   it('still plays the exit animation while closing', () => {
