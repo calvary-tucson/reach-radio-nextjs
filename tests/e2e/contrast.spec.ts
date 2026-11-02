@@ -33,7 +33,13 @@ const MEASURE = () => {
     }
     return layers.reverse().reduce((acc, l) => over(l, acc), [255, 255, 255, 1])
   }
+  const opacityOf = (el: Element) => {
+    let o = 1
+    for (let n: Element | null = el; n; n = n.parentElement) o *= Number(getComputedStyle(n).opacity)
+    return o
+  }
   const out: { text: string; ratio: number; need: number; selector: string }[] = []
+  const dlg = document.querySelector('[role=dialog]')
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
   for (let t = walker.nextNode(); t; t = walker.nextNode()) {
     const text = (t.textContent ?? '').trim()
@@ -43,10 +49,13 @@ const MEASURE = () => {
     const cs = getComputedStyle(el)
     const r = el.getBoundingClientRect()
     if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0 || r.width <= 1 || r.height <= 1) continue // <=1px = sr-only
-    const dlg = document.querySelector('[role=dialog]')
     if (dlg && !dlg.contains(el)) continue // dialog open: measure only inside it
+    const opacity = opacityOf(el)
+    if (opacity === 0) continue
     const bg = bgOf(el)
-    const fg = over(parse(cs.color), bg)
+    const color = parse(cs.color)
+    color[3] *= opacity // fold ancestor opacity into the foreground alpha
+    const fg = over(color, bg)
     const l1 = lum(fg)
     const l2 = lum(bg)
     const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
@@ -64,42 +73,53 @@ const MEASURE = () => {
   return out
 }
 
-// networkidle never fires here (long-lived streams), so wait for load plus a short settle.
-const settle = async (page: Page) => {
-  await page.waitForLoadState('load')
-  await page.waitForTimeout(1500)
+// networkidle never fires here (long-lived streams), so wait on concrete state instead:
+// the theme class on <html> and a visible content locator.
+const themeApplied = (page: Page, theme: 'light' | 'dark') =>
+  expect(page.locator('html')).toHaveClass(new RegExp(`(^|\\s)${theme}(\\s|$)`))
+
+// A scheduled card button: present in both the mobile list and desktop week layouts.
+const scheduleCard = (page: Page) => page.locator('button[aria-label*=" to "]:visible').first()
+
+const openScheduleTab = async (page: Page, theme: 'light' | 'dark') => {
+  await page.goto(`/teachers?theme=${theme}`)
+  await themeApplied(page, theme)
+  const tab = page.getByRole('tab', { name: /schedule/i })
+  await tab.click()
+  await expect(tab).toHaveAttribute('aria-selected', 'true')
+  await expect(scheduleCard(page)).toBeVisible()
 }
 
-const PAGES =['/', '/teachers', '/about', '/donate']
+const PAGES = ['/', '/teachers', '/about', '/donate']
 
 for (const theme of ['light', 'dark'] as const) {
   for (const path of PAGES) {
     test(`contrast ${theme} ${path}`, async ({ page }) => {
-      await page.goto(`${path}${path.includes('?') ? '&' : '?'}theme=${theme}`)
-      await settle(page)
+      await page.goto(`${path}?theme=${theme}`)
+      await themeApplied(page, theme)
+      await expect(page.locator('main h1').first()).toBeVisible()
       const fails = await page.evaluate(MEASURE)
       expect(fails, JSON.stringify(fails, null, 2)).toEqual([])
     })
   }
 
   test(`contrast ${theme} schedule tab and day picker`, async ({ page }) => {
-    await page.goto(`/teachers?theme=${theme}`)
-    await page.getByRole('tab', { name: /schedule/i }).click()
-    await settle(page)
+    await openScheduleTab(page, theme)
     expect(await page.evaluate(MEASURE), 'schedule tab').toEqual([])
     // Day picker trigger exists only below the lg breakpoint (ScheduleTabView.tsx:92).
     await page.setViewportSize({ width: 390, height: 844 })
+    const picker = page.locator('button[aria-haspopup=listbox]')
+    await expect(picker).toBeVisible()
+    await expect(scheduleCard(page)).toBeVisible()
     expect(await page.evaluate(MEASURE), 'schedule tab mobile').toEqual([])
-    await page.locator('button[aria-haspopup=listbox]').click()
+    await picker.click()
     await page.waitForSelector('[role=dialog]')
     expect(await page.evaluate(MEASURE), 'day picker open').toEqual([])
   })
 
   test(`contrast ${theme} teacher modal from schedule`, async ({ page }) => {
-    await page.goto(`/teachers?theme=${theme}`)
-    await page.getByRole('tab', { name: /schedule/i }).click()
-    await settle(page)
-    await page.locator('button[aria-label*=" to "]:visible').first().click()
+    await openScheduleTab(page, theme)
+    await scheduleCard(page).click()
     await page.waitForSelector('[role=dialog]')
     expect(await page.evaluate(MEASURE), 'teacher modal open').toEqual([])
   })
