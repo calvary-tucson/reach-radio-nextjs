@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useState, Suspense } from 'react'
+import { flushSync } from 'react-dom'
 import { useSearchParams } from 'next/navigation'
 import { isTheme, pickTheme, resolveTheme, type Theme } from '@/lib/theme/resolve-theme'
 
@@ -27,6 +28,7 @@ function setThemeCookie(theme: Theme) {
 }
 
 const LIGHT_QUERY = '(prefers-color-scheme: light)'
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
 function applyTheme(theme: Theme) {
   const html = document.documentElement
@@ -58,8 +60,21 @@ function ThemeInit({ children }: { children: React.ReactNode }) {
 
   const setTheme = useCallback((t: Theme) => {
     setThemeCookie(t)
-    setThemeState(t)
-    applyTheme(t)
+    const swap = () => {
+      // flushSync so the new snapshot shows the new toggle state, not the old one
+      flushSync(() => setThemeState(t))
+      applyTheme(t)
+    }
+    const html = document.documentElement
+    const reduce = window.matchMedia(REDUCED_MOTION_QUERY).matches
+    if (reduce || typeof document.startViewTransition !== 'function') {
+      swap()
+      return
+    }
+    html.classList.add('theme-transition')
+    const vt = document.startViewTransition(swap)
+    // finished settles on skip/abort too, so the class cannot stick
+    void vt.finished.finally(() => html.classList.remove('theme-transition'))
   }, [])
 
   return (
