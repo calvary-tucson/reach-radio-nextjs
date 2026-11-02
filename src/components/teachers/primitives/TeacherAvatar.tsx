@@ -45,7 +45,7 @@ export function TeacherAvatar({
       src={photo}
       alt={name}
       fill
-      className="object-cover"
+      className="object-cover object-top"
       placeholder={lqip ? 'blur' : 'empty'}
       blurDataURL={lqip ?? undefined}
       sizes={imgSizes}
