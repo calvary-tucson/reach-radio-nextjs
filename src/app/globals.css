@@ -225,6 +225,17 @@ body[data-app] [data-media-bar] {
   }
 }
 
+@keyframes theme-out {
+  0% { transform: scale(1); filter: blur(0); }
+  45%, 100% { transform: scale(1.05); filter: blur(6px); }
+}
+
+@keyframes theme-in {
+  0%, 45% { transform: scale(1.05); filter: blur(6px); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: scale(1); filter: blur(0); opacity: 1; }
+}
+
 @supports (view-transition-name: none) {
   @media (prefers-reduced-motion: no-preference) {
     /* Directional slide — forward (left) */
@@ -253,6 +264,25 @@ body[data-app] [data-media-bar] {
       animation:
         210ms ease-out 150ms both vt-fade,
         400ms ease-in-out both vt-slide;
+    }
+
+    /* Theme toggle: zoom in + blur, swap at peak, settle back (approved mock 2026-11-01).
+       Named groups (site-header, teacher-*) are dropped so the whole page moves as one. */
+    html.theme-transition * {
+      view-transition-name: none !important;
+    }
+    html.theme-transition::view-transition-old(root),
+    html.theme-transition::view-transition-new(root) {
+      animation-duration: 500ms;
+      animation-fill-mode: both;
+      animation-timing-function: ease-in-out;
+      mix-blend-mode: normal;
+    }
+    html.theme-transition::view-transition-old(root) {
+      animation-name: theme-out;
+    }
+    html.theme-transition::view-transition-new(root) {
+      animation-name: theme-in;
     }
   }
 
