@@ -22,7 +22,20 @@ Derived from the teachers pages (the most complete implementation). Apply these 
 
 Step down through this scale: name → subtitle → label → secondary → placeholder → decorative.
 
-`text-white` → `/80` → `/60` → `/55` → `/50` → `/45` → `/40` → `/35`
+`text-white` → `/90` → `/80` → `/70` → `/60` (readable-text floor) → `/50` (icons only). Never go below `/50`; see the contrast table below.
+
+### Text roles, dark vs light
+
+Brand green on light is `light:text-green-700` (green-600 is 3.52:1, the `#84b84f` hex is about 2.1:1 on white). Never use `text-[#84b84f]` without it. Guarded by `tests/unit/contrast-classes.test.ts`.
+
+| Role | Dark | Light |
+|---|---|---|
+| Primary text | `text-white` | `light:text-gray-900` |
+| Secondary / subtitle | `text-white/85` to `/90` | `light:text-gray-700` |
+| Body / empty state | `text-white/70` | `light:text-gray-600` |
+| Label / chip / placeholder (readable floor) | `text-white/60` | `light:text-gray-500` (min) or `-600` |
+| Icon only | `text-white/50` min | `light:text-gray-500` |
+| Brand accent text | `text-[#84b84f]` | `light:text-green-700` |
 
 ---
 
@@ -34,10 +47,10 @@ Step down through this scale: name → subtitle → label → secondary → plac
 | Detail panel name | `text-[19px] md:text-[28px] font-extrabold tracking-tight` |
 | Card name | `text-[13px] md:text-sm font-bold text-white leading-snug` |
 | Card subtitle | `text-[11px] md:text-xs text-white/80` |
-| Section label (allcaps) | `text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/55` |
+| Section label (allcaps) | `text-[10px] md:text-[12px] font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-500` |
 | Filter section label | `text-[10px] font-semibold uppercase tracking-widest text-white/60` |
 | Body / result count | `text-sm text-white/60` |
-| Empty state | `text-sm text-white/45 py-12` |
+| Empty state | `text-sm text-white/70 light:text-gray-600 py-8` (`/90` in teacher search results) |
 
 ---
 
@@ -116,7 +129,7 @@ bg-white/5 border-white/10 text-white/60 can-hover:hover:border-white/20 can-hov
 bg-[rgba(132,184,79,0.1)] light:bg-green-100 border border-[rgba(132,184,79,0.2)] light:border-green-300 text-[#84b84f] light:text-green-700
 
 // dim variant
-bg-white/5 light:bg-gray-100 border border-white/10 light:border-gray-200 text-white/50 light:text-gray-500
+bg-white/5 light:bg-gray-100 border border-white/10 light:border-gray-200 text-white/60 light:text-gray-600
 ```
 
 Both: `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold`
@@ -132,7 +145,7 @@ transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:rin
 
 ```
 w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white
-placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20
+placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/20
 ```
 Search icon left-inset (`left-3`), clear/spinner right-inset (`right-2`).
 
@@ -142,7 +155,7 @@ Search icon left-inset (`left-3`), clear/spinner right-inset (`right-2`).
 px-4 py-2 text-sm font-semibold capitalize transition-colors cursor-pointer border-b-2 -mb-px
 ```
 Active: `text-[#84b84f] border-[#84b84f]`
-Inactive: `text-white/55 border-transparent hover:text-white/75`
+Inactive: `text-white/60 light:text-gray-500 border-transparent hover:text-white/75 light:hover:text-gray-900`
 
 Tab container: `flex gap-1 mb-5 border-b border-white/7`
 
@@ -183,7 +196,7 @@ hover:bg-[#96cc5e] transition-colors cursor-pointer
 
 1. Decorative banner (`h-[100px] md:h-[180px]`, dark green gradient + stripe + radial glow)
 2. Avatar overlapping banner (`mt-[-88px]` on both breakpoints), beside primary CTA
-3. Name (`font-extrabold`) + subtitle (`text-white/50`)
+3. Name (`font-extrabold`) + subtitle (`text-white/85 light:text-gray-700`)
 4. Info chips row
 5. Secondary links row (ghost pills)
 6. `h-px bg-white/6` divider
@@ -285,7 +298,7 @@ Card:       bg-[#1c2128] border border-white/5 rounded-[18px]
 Row:        bg-white/5 border border-white/10 rounded-xl
 Callout:    bg-[rgba(132,184,79,0.08)] border border-[rgba(132,184,79,0.18)] rounded-[12px]
 Chip:       rounded-full min-h-[44px] — accent or dim variant
-Section:    text-[10px] font-bold uppercase tracking-[0.08em] text-white/55
+Section:    text-[10px] font-bold uppercase tracking-[0.08em] text-white/60 light:text-gray-500
 Focus:      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
 Motion:     motion-safe: prefix on all animations
 Cursor:     cursor-pointer on every interactive element
