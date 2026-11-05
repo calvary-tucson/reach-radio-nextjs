@@ -79,6 +79,15 @@ Serverless MISS counts: `/api/live-stream-status` 82 (top, never cached), `/api/
   - Priority note: the log sample (section 4) confirms live-stream-status and manifest as real costs and does not confirm the search APIs. Deploy header commits first, watch, then the rest one at a time.
 - Do not release iOS v4 while away (still calls the Vercel SSE route).
 
+## 8b. east-live finding and offload research (2026-11-05)
+
+- **east-live (Verified in browser):** `east-live.calvarytucson.com` is a Cloudflare-hosted page. Loaded, it showed the "Recent Teaching (Recorded)" fallback video plus schedule, and it called `https://calvarytucson.com/api/live-stream-status` (HTTP 200), the svelte endpoint on Vercel. So every open east-live tab adds to the top uncached svelte hit. Polling interval not measured; its poll code location is unconfirmed.
+- **Where the code lives (owner: "in both svelte and nextjs"):** `calvarytucson-nextjs` has the `/live-stream-east` page (plan `docs/superpowers/plans/2026-08-19-live-stream-east-page.md`) and `next.config.ts:93-108` allows framing only by `https://east-live.calvarytucson.com` (`frame-ancestors`), so east-live frames that page. svelte has its own `src/routes/live-stream-east`. Which one east-live actually frames today (Inferred: whichever serves `calvarytucson.com`, currently svelte) and what west-live is: not verified.
+- **Nov 13 action:** find who calls `/api/live-stream-status`; the `s-maxage=30` header fix covers all callers, so deploy it first. Consider serving that status from a Cloudflare Worker with a short cache.
+- **New global rule (offload ladder):** `~/.claude/CLAUDE.md` stub plus full text in `~/.claude/docs/claude-md-reference.md` "Offload ladder": static, CDN headers, free CDNs, Cloudflare Worker for streams/polls/media, GH Actions crons. Free Cloudflare tiers are cliffs (100k requests/day error 1027, Images 5,000 transforms/month, KV 1,000 writes/day).
+- **Unverified offload candidates to check on Nov 13:** Pagefind static search index instead of the uncached search APIs, client-side Sanity API-CDN GROQ, R2 for large media, Vercel firewall rules for crawlers writing ISR pages, Turnstile.
+- **Whole-app moves are not recommended now:** svelte `adapter-cloudflare` has no ISR equivalent; Next 16 on OpenNext conflicts with PPR cache interception and lacks Node Middleware.
+
 ## 9. Pick-up checklist for Nov 13
 
 1. `vercel usage --from 2026-11-05 --breakdown daily`: confirm Reach Radio Fluid memory about $0 each day and svelte per-day vs $0.45 baseline (Sunday Nov 8 and Nov 15 spikes).
