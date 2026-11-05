@@ -130,7 +130,7 @@ Direct Sanity client (`src/utils/SanityClient.ts`, env `PUBLIC_SANITY_PROJECT_ID
 | Android | none dynamic | `Config.kt` pages.dev stream; artwork = hardcoded cdn.sanity.io image (`Config.kt:8`) |
 | Both | `cdn.sanity.io/images/bk05c6rl/...` album art | hardcoded; changing/deleting that asset breaks default artwork in apps |
 
-Teacher/schedule content reaches native apps only **through the WebView** (the website), not directly from Sanity. Now-playing metadata comes from `/api/stream-info-sse` (radiojar), not Sanity.
+Teacher/schedule content reaches native apps only **through the WebView** (the website), not directly from Sanity. Now-playing metadata comes from radiojar, not Sanity: the web client reads the Cloudflare endpoint `NOW_PLAYING_SSE_URL` (`reach-radio-web.pages.dev/api/stream-info-sse`), while iOS v4 native still uses the legacy Vercel route `/api/stream-info-sse`.
 
 ---
 

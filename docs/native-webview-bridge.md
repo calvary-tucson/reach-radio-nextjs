@@ -152,14 +152,14 @@ App launches
 Understanding this flow prevents a common bug (see Pitfalls):
 
 ```
-/api/stream-info-sse
-  polls radiojar JSONP every 30s
-  resolves raw artist → canonical Sanity teacher name + photo
+Cloudflare endpoint (NOW_PLAYING_SSE_URL, reach-radio-web.pages.dev)
+  sends title + artist only, every 20s, as named `time-update` events
   ↓
 useNowPlaying hook  ← runs in ALL contexts, including native WebView
+  matches artist against the teachers list client-side (re-resolves when the list loads late)
   artist = raw Radiojar string (unchanged)
   resolvedArtist = canonical teacher name | null (null = music gap or no match)
-  image = Sanity teacher photo URL
+  image = Sanity teacher photo URL (fallback image when no match)
   ↓
 Zustand media store  (title, artist, resolvedArtist, image)
   ↓
@@ -172,6 +172,8 @@ native: lock screen · CarPlay · Watch · media bar
 ```
 
 `BridgeInit` is a **pure store relay** — it does not fetch metadata independently. The SSE must run to populate the store.
+
+Note: native clients on iOS v4 (`NowPlayingService`) still use the legacy Vercel route `/api/stream-info-sse`, which resolves the teacher name and photo server-side. Only the web client (including the WebView) reads the Cloudflare endpoint.
 
 ### 3. Native App Detection
 
