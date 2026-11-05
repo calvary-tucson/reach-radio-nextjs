@@ -112,4 +112,5 @@ Serverless MISS counts: `/api/live-stream-status` 82 (top, never cached), `/api/
 8. Plan the standalone Worker (`stream.reach.radio`) and repoint iOS v4 `NowPlayingService.swift` before it ships.
 9. Owner: rotate the YouTube API key (item 5.9).
 10. Read the east-live and west-live code in both `calvarytucson-svelte` and `calvarytucson-nextjs`: which repo each page frames or polls, poll interval, whether polling stops while a stream plays and pauses when the tab is hidden; apply the offload ladder (section 8b) to `/api/live-stream-status`.
+12. Merge this docs branch (`calvary-tucson/vercel-usage-audit-reach`) to main and push (deploys reach.radio; owner chose to hold until Nov 13). Also commit the config repo offload-rule commit 32ad0c7 push if wanted, and run `retrospective` when the effort closes.
 11. Evaluate the unverified offload candidates in 8b (Pagefind, client-side Sanity CDN, R2, crawler firewall rules, Turnstile) against measured Obs Plus data.
