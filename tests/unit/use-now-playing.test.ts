@@ -130,6 +130,70 @@ describe('useNowPlaying', () => {
     expect(EventSourceSpy.mock.calls.length).toBe(callsAfterExhaustion)
   })
 
+  describe('payload validation', () => {
+    it('ignores a non-string title and keeps the previous value', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: { x: 1 }, artist: 'Jane Roe' }))
+      })
+      expect(useMediaStore.getState().title).toBe('Reach Radio')
+      expect(useMediaStore.getState().artist).toBe('Jane Roe')
+    })
+
+    it('ignores a non-string artist and keeps the previous value', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 42 }))
+      })
+      expect(useMediaStore.getState().title).toBe('Show')
+      expect(useMediaStore.getState().artist).toBe('')
+    })
+
+    it('caps title and artist at 200 characters', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'a'.repeat(500), artist: 'b'.repeat(500) }))
+      })
+      expect(useMediaStore.getState().title).toHaveLength(200)
+      expect(useMediaStore.getState().artist).toHaveLength(200)
+    })
+
+    it('ignores imageUrl from a disallowed host and falls back to client match', () => {
+      useTeachersStore.setState({ teachersList: [{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }] })
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({
+          title: 'Show', artist: 'John Doe', imageUrl: 'https://evil.example/x.jpg', resolvedArtist: 'John Doe',
+        }))
+      })
+      expect(useMediaStore.getState().image).toContain('cdn.sanity.io/teacher.jpg')
+    })
+
+    it('accepts server-resolved imageUrl on the Sanity CDN', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({
+          title: 'Show', artist: 'John Doe', imageUrl: 'https://cdn.sanity.io/srv.jpg', resolvedArtist: 'John Doe',
+        }))
+      })
+      expect(useMediaStore.getState().image).toBe('https://cdn.sanity.io/srv.jpg')
+      expect(useMediaStore.getState().resolvedArtist).toBe('John Doe')
+    })
+
+    it('does not drop the title update when a matched teacher has a null photo', () => {
+      useTeachersStore.setState({
+        teachersList: [{ name: 'John Doe', photo: null as unknown as string }],
+      })
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'John Doe' }))
+      })
+      expect(useMediaStore.getState().title).toBe('Show')
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+      expect(useMediaStore.getState().resolvedArtist).toBe('John Doe')
+    })
+  })
+
   describe('teacher photo resolution', () => {
     it('resolves image on exact name match', async () => {
       vi.mocked(global.fetch).mockResolvedValue({

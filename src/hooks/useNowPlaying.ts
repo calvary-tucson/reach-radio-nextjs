@@ -7,6 +7,8 @@ import type { TeacherListEntry } from '@/lib/store/teachers-store'
 import { FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
+const MAX_TEXT_LEN = 200
+const ALLOWED_IMAGE_PREFIX = 'https://cdn.sanity.io/'
 
 interface ParsedPayload {
   title?: string
@@ -64,9 +66,12 @@ export function useNowPlaying(): void {
           rawArtist.toLowerCase().includes(t.name.toLowerCase())
         )
         if (match) {
-          image = match.photo.includes('?')
-            ? `${match.photo}&w=420&fm=jpg`
-            : `${match.photo}?w=420&fm=jpg`
+          // A teacher without a photo keeps the fallback image but still resolves the name
+          if (match.photo) {
+            image = match.photo.includes('?')
+              ? `${match.photo}&w=420&fm=jpg`
+              : `${match.photo}?w=420&fm=jpg`
+          }
           resolvedArtist = match.name
         }
       }
@@ -94,18 +99,20 @@ export function useNowPlaying(): void {
         try {
           const raw = JSON.parse(event.data)
           if (typeof raw !== 'object' || raw === null) return
-          const data = raw as {
-            title?: string
-            artist?: string
-            imageUrl?: string | null
-            resolvedArtist?: string | null
-          }
+          const data = raw as Record<string, unknown>
+
+          // Server-resolved pair is accepted only when both are strings and the
+          // image is on the Sanity CDN; otherwise fall through to the client match.
+          const serverResolved =
+            typeof data.imageUrl === 'string' &&
+            typeof data.resolvedArtist === 'string' &&
+            data.imageUrl.startsWith(ALLOWED_IMAGE_PREFIX)
 
           last = {
-            title: data.title,
-            artist: data.artist,
-            imageUrl: data.imageUrl,
-            resolvedArtist: data.resolvedArtist,
+            title: typeof data.title === 'string' ? data.title.slice(0, MAX_TEXT_LEN) : undefined,
+            artist: typeof data.artist === 'string' ? data.artist.slice(0, MAX_TEXT_LEN) : undefined,
+            imageUrl: serverResolved ? (data.imageUrl as string) : null,
+            resolvedArtist: serverResolved ? (data.resolvedArtist as string) : null,
           }
           applyLast()
           retries = 0
