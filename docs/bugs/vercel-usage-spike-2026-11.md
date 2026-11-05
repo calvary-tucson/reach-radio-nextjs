@@ -123,6 +123,13 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 - Open: check `vercel logs` for callers of `/api/stream-info` before proposing anything; it is short-lived, not a cost driver.
 - Audio soak result (2026-11-05): `curl -sN -o /dev/null -m 3600 https://stream.reach.radio/` ended at 1685.9 s (about 28 min), well before the 3600 s cap, with 27,047,810 bytes (about 128 kbps, so audio flowed normally until the end) and HTTP 200. Conclusion: the stream was closed after about 28 min by something other than the curl cap. Not yet known whether the Worker, Cloudflare or the Radiojar upstream closed it, and no exit code was captured. CORRECTION (same day): `AudioProvider` reconnects only from `onError`. A clean server close ends the media element, which (per the HTML spec, inferred, not yet reproduced live) fires `pause` then `ended`; `onPause` sets `isPlaying` false and there is no `onEnded` handler, so the listener likely hears silence and the UI flips to Play until they press it. The earlier claim of a short gap was wrong. The legacy `pages.dev` path closed cleanly at about 24 min (exit 0), so this predates the Worker. Follow-up: repeat with `-w '%{exitcode}'` and compare against the legacy `pages.dev/api/audio-stream` path (what web played before `46e0145`) to see if the cut is new.
 
+## 8e. Reconnect fix for clean stream close (2026-11-05)
+
+- Problem: a clean server close fires `pause` then `ended`; `AudioProvider` only reconnected on `error`, so playback stopped and the button flipped to Play. Live repro (local dev, Orca): swapping the audio src to a 2 s WAV that ends cleanly left the button on "Play radio" for 15 s with no recovery.
+- Fix: `onEnded` reconnects (reuses `scheduleReconnect` backoff) when the store still says playing; `onPause` ignores the pause the browser fires at end of media (`e.currentTarget.ended`). Tests in `tests/unit/audio-provider.test.tsx` (3 new, red first).
+- Live result with fix: same swap recovered within 4 s to `https://stream.reach.radio/`, `Pause radio` showing, time advancing; manual Pause still sticks. Full suite 455/455, tsc and eslint clean.
+- Test recipe: put a short WAV in `public/`, play, then in the page set `audio.src = '/<file>.wav'; audio.play()` to force a clean end (media-src allows `'self'`, blob: does not). Delete the WAV after.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
