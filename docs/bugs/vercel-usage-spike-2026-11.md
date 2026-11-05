@@ -140,6 +140,16 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 - Options: (a) leave iOS v4 on the Vercel route for now and keep it alive; (b) add teacher resolution to the Worker (Sanity read, new feature); (c) resolve client-side in iOS. Owner decision pending.
 - Android and iOS v3 were not re-checked; v3 and Android are believed to use the legacy `pages.dev` endpoint.
 
+## 8g. Worker teacher resolution (option b) built and deployed (2026-11-05)
+
+- Plan: `docs/superpowers/plans/2026-11-05-worker-sse-teacher-resolution.md`. Worker repo branch `worker-sse-teacher-resolution`: `e07d235` (teachers.ts), `406821d` (SSE fields), `240ab5a` (docs). Not merged, not pushed.
+- Verified before deploy: 48 tests pass (re-run by orchestrator sandbox-off), typecheck clean, local smoke returned a live teacher match.
+- Deployed (owner Yes) as version `108a9a36` (previous `02298be7`, rollback target).
+- Post-deploy checks: audio `HTTP/2 200 audio/mpeg no-store`; SSE returns `imageUrl` and `resolvedArtist` for the on-air teacher (Chuck Smith), identical to `reach-radio-nextjs.vercel.app/api/stream-info`; two concurrent SSE clients both got events (ids 1 and 2).
+- 25 min hold and CPU/subrequest limit check: see the result line below when it lands.
+- Still open: Worker repo merge and push (own Yes/No); iOS repoint. Before the iOS repoint, confirm `NowPlayingService` parses named `event: time-update` events (the Worker sends named events, the Vercel route sends unnamed `data:` only).
+- Vercel SSE route stays until iOS v4 is repointed.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
