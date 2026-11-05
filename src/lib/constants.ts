@@ -18,6 +18,6 @@ export const RADIOJAR_URL =
 // Now-playing SSE is served from Cloudflare: Vercel bills provisioned memory
 // for every second an SSE request stays open; Cloudflare does not bill
 // wall-clock duration for streaming responses.
-// This targets the legacy Astro app reach-radio-web.pages.dev, which must be
-// migrated (e.g. to the standalone Worker) before that app is retired.
-export const NOW_PLAYING_SSE_URL = 'https://reach-radio-web.pages.dev/api/stream-info-sse'
+// Served by the standalone stream Worker (reach-radio-audio-stream-worker), same
+// wire format as the legacy Astro endpoint on reach-radio-web.pages.dev.
+export const NOW_PLAYING_SSE_URL = 'https://stream.reach.radio/api/stream-info-sse'

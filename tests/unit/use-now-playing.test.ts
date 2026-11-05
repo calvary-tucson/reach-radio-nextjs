@@ -54,10 +54,10 @@ describe('useNowPlaying', () => {
     vi.useRealTimers()
   })
 
-  it('connects to the Cloudflare SSE endpoint, not the Vercel route', () => {
+  it('connects to the stream Worker SSE endpoint, not the Vercel route', () => {
     renderHook(() => useNowPlaying())
     expect(mockES.url).toBe(NOW_PLAYING_SSE_URL)
-    expect(mockES.url).toMatch(/^https:\/\/reach-radio-web\.pages\.dev\//)
+    expect(mockES.url).toMatch(/^https:\/\/stream\.reach\.radio\//)
   })
 
   it('updates store when SSE message arrives', () => {

@@ -27,12 +27,12 @@ describe('next.config audio stream', () => {
     expect(csp).toMatch(new RegExp(`media-src[^;]*${PAGES_DEV.replace(/\./g, '\\.')}`))
   })
 
-  it('allows the pages.dev host in CSP connect-src (now-playing SSE)', async () => {
+  it('allows the stream.reach.radio Worker host in CSP connect-src (now-playing SSE)', async () => {
     const headers = await nextConfig.headers?.()
     const csp = headers
       ?.flatMap((h) => h.headers)
       .find((h) => h.key === 'Content-Security-Policy')?.value
-    expect(csp).toMatch(new RegExp(`connect-src[^;]*${PAGES_DEV.replace(/\./g, '\\.')}`))
+    expect(csp).toMatch(/connect-src[^;]*https:\/\/stream\.reach\.radio/)
   })
 
   it('allows the stream.reach.radio Worker host in CSP media-src', async () => {

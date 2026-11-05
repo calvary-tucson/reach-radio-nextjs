@@ -154,7 +154,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         {/* now-playing SSE (CORS fetch), so the preconnect must be crossOrigin to be reused */}
-        <link rel="preconnect" href="https://reach-radio-web.pages.dev" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://stream.reach.radio" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://formspree.io" />
       </head>
       <body className="bg-[var(--color-brand-purple)] text-white min-h-screen light:bg-white light:text-gray-900 pb-[152px]">

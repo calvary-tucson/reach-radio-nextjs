@@ -152,7 +152,7 @@ App launches
 Understanding this flow prevents a common bug (see Pitfalls):
 
 ```
-Cloudflare endpoint (NOW_PLAYING_SSE_URL, reach-radio-web.pages.dev)
+Cloudflare endpoint (NOW_PLAYING_SSE_URL, stream.reach.radio Worker)
   sends title + artist only, every 20s, as named `time-update` events
   ↓
 useNowPlaying hook  ← runs in ALL contexts, including native WebView

@@ -34,7 +34,7 @@ Teacher detail (`/teachers/[slug]`) and teacher search also render as **intercep
 |---|---|
 | `GET /api/audio-stream` | Proxies the live radiojar stream to browser audio |
 | `GET /api/stream-info` | Current track title/artist (single fetch) |
-| `GET /api/stream-info-sse` | **Legacy** Server-Sent Events route, kept for iOS v4 native `NowPlayingService` and stale open tabs. The web client now reads the Cloudflare endpoint (`NOW_PLAYING_SSE_URL`, `https://reach-radio-web.pages.dev/api/stream-info-sse`) |
+| `GET /api/stream-info-sse` | **Legacy** Server-Sent Events route, kept for iOS v4 native `NowPlayingService` and stale open tabs. The web client now reads the Cloudflare endpoint (`NOW_PLAYING_SSE_URL`, `https://stream.reach.radio/api/stream-info-sse`, the stream Worker) |
 | `GET /api/native-config` | Config endpoint for rebuilt native apps — stream URL, web URL, min version |
 | `GET /api/teachers-list` | JSON list of teachers for search |
 | `POST /api/revalidate` | Sanity webhook — revalidates ISR cache tags on publish |
