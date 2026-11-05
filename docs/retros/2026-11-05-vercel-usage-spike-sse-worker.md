@@ -36,10 +36,10 @@
 - No global rule or skill change: each lesson is first occurrence and project-specific (see Pruned).
 
 ## Action items (owner | tracked in | due | done when)
-1. owner | this file | 2026-11-07 | `vercel usage --scope calvary-tucson-s-team` shows Fluid Provisioned Memory sharply lower; result added to the bug doc.
+1. owner | this file | 2026-11-13 (owner returns; moved from Nov 7) | `vercel usage --scope calvary-tucson-s-team --breakdown daily` shows Fluid Provisioned Memory for Nov 6-12 sharply lower than about $0.78/day; result added to the bug doc.
 2. owner | plan Task 3 step 5, roadmap row 20 | before iOS v4 ships | `NowPlayingService.swift` points at `https://stream.reach.radio/api/stream-info-sse`.
-3. owner | this file | next session | Yes/No decided on pushing worker repo's 3 local commits (`9114d27`, `f225ea4`, `2965db5`); deployed code is currently not in git remote.
-4. owner | bug doc 8d | after the Nov 6-7 cost check | Yes/No decided on disabling the old Vercel SSE route (204 or tiny `maxDuration`).
+3. DONE 2026-11-05: Worker repo pushed (`2965db5`, then `2965db5..240ab5a` with teacher resolution).
+4. owner | bug doc 8d | after the Nov 13 cost check | Yes/No decided on disabling the old Vercel SSE route (204 or tiny `maxDuration`).
 5. me | bug doc section 8 | after iOS v4 and stale tabs gone | Vercel SSE route retired, `pages.dev` removed from `media-src` plan reviewed.
 
 ## Pruned
