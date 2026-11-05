@@ -18,7 +18,7 @@ import { WebSiteSchema } from '@/components/seo/WebSiteSchema'
 import { RadioStationSchema } from '@/components/seo/RadioStationSchema'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { THEME_INIT_SCRIPT } from '@/lib/theme/init-script'
-import { FALLBACK_STREAM_URL, FALLBACK_OG_IMAGE } from '@/lib/constants'
+import { FALLBACK_STREAM_URL, FALLBACK_OG_IMAGE, WEB_AUDIO_STREAM_URL } from '@/lib/constants'
 import { detectMobileApp } from '@/lib/utils/mobile-app'
 import { RouteAnnouncer } from '@/components/bridge/RouteAnnouncer'
 import './globals.css'
@@ -115,7 +115,7 @@ async function LayoutChrome({ modal }: { modal: React.ReactNode }) {
     <>
       <BridgeInit streamUrl={streamUrl} />
       <NowPlayingProvider />
-      {!isMobileApp && <AudioProvider streamUrl={streamUrl} />}
+      {!isMobileApp && <AudioProvider streamUrl={WEB_AUDIO_STREAM_URL} />}
       <SleepTimerProvider />
       {!isMobileApp && <Header />}
       {!isMobileApp && <MobileHeader />}

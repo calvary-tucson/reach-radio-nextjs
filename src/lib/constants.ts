@@ -21,3 +21,7 @@ export const RADIOJAR_URL =
 // Served by the standalone stream Worker (reach-radio-audio-stream-worker), same
 // wire format as the legacy Astro endpoint on reach-radio-web.pages.dev.
 export const NOW_PLAYING_SSE_URL = 'https://stream.reach.radio/api/stream-info-sse'
+
+// Audio the website's own player plays. Web-only: native apps keep reading the
+// Sanity `radioAudioURL` via BridgeInit and /api/native-config until the iOS v4 gate clears.
+export const WEB_AUDIO_STREAM_URL = 'https://stream.reach.radio/'
