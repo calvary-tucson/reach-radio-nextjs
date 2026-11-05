@@ -142,12 +142,12 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 
 ## 8g. Worker teacher resolution (option b) built and deployed (2026-11-05)
 
-- Plan: `docs/superpowers/plans/2026-11-05-worker-sse-teacher-resolution.md`. Worker repo branch `worker-sse-teacher-resolution`: `e07d235` (teachers.ts), `406821d` (SSE fields), `240ab5a` (docs). Not merged, not pushed.
+- Plan: `docs/superpowers/plans/2026-11-05-worker-sse-teacher-resolution.md`. Worker repo branch `worker-sse-teacher-resolution`: `e07d235` (teachers.ts), `406821d` (SSE fields), `240ab5a` (docs). Fast-forwarded into Worker `main` and pushed (`2965db5..240ab5a`, owner Yes).
 - Verified before deploy: 48 tests pass (re-run by orchestrator sandbox-off), typecheck clean, local smoke returned a live teacher match.
 - Deployed (owner Yes) as version `108a9a36` (previous `02298be7`, rollback target).
 - Post-deploy checks: audio `HTTP/2 200 audio/mpeg no-store`; SSE returns `imageUrl` and `resolvedArtist` for the on-air teacher (Chuck Smith), identical to `reach-radio-nextjs.vercel.app/api/stream-info`; two concurrent SSE clients both got events (ids 1 and 2).
 - 25 min hold and CPU/subrequest limit check: see the result line below when it lands.
-- Still open: Worker repo merge and push (own Yes/No); iOS repoint. Named events are safe for iOS: `NowPlayingService.swift:83` reads only lines starting `data: ` and skips `event:` and `id:` lines.
+- Still open: iOS repoint. Named events are safe for iOS: `NowPlayingService.swift:83` reads only lines starting `data: ` and skips `event:` and `id:` lines.
 - Vercel SSE route stays until iOS v4 is repointed.
 
 ## 9. Recipes and gotchas worth keeping
