@@ -147,7 +147,7 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 - Deployed (owner Yes) as version `108a9a36` (previous `02298be7`, rollback target).
 - Post-deploy checks: audio `HTTP/2 200 audio/mpeg no-store`; SSE returns `imageUrl` and `resolvedArtist` for the on-air teacher (Chuck Smith), identical to `reach-radio-nextjs.vercel.app/api/stream-info`; two concurrent SSE clients both got events (ids 1 and 2).
 - 25 min hold and CPU/subrequest limit check: see the result line below when it lands.
-- Still open: Worker repo merge and push (own Yes/No); iOS repoint. Before the iOS repoint, confirm `NowPlayingService` parses named `event: time-update` events (the Worker sends named events, the Vercel route sends unnamed `data:` only).
+- Still open: Worker repo merge and push (own Yes/No); iOS repoint. Named events are safe for iOS: `NowPlayingService.swift:83` reads only lines starting `data: ` and skips `event:` and `id:` lines.
 - Vercel SSE route stays until iOS v4 is repointed.
 
 ## 9. Recipes and gotchas worth keeping
