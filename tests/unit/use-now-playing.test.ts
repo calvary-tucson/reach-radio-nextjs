@@ -9,6 +9,7 @@ class MockEventSource {
   static OPEN = 1
   onmessage: ((e: { data: string }) => void) | null = null
   onerror: (() => void) | null = null
+  onopen: (() => void) | null = null
   close = vi.fn()
   listeners: Record<string, (e: { data: string }) => void> = {}
   constructor(public url: string) {}
@@ -102,12 +103,61 @@ describe('useNowPlaying', () => {
     // Error handler closes the current connection immediately before scheduling retry
     expect(mockES.close).toHaveBeenCalledTimes(1)
 
-    // Advance past the 1s + up to 500ms jitter retry delay — a new EventSource is created
+    // Advance past the 1s + up to 2s jitter retry delay — a new EventSource is created
     act(() => {
-      vi.advanceTimersByTime(1600)
+      vi.advanceTimersByTime(3100)
     })
 
     expect(EventSource).toHaveBeenCalledTimes(2)
+  })
+
+  describe('reconnect backoff floor', () => {
+    it('does not reset backoff just because a message arrived before the close', () => {
+      renderHook(() => useNowPlaying())
+
+      // First failure -> reconnect (delay 1-3s)
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(3100) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+
+      // Connection delivers one message then closes: backoff must keep growing (2s+)
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'A' }))
+        mockES.simulateError()
+      })
+      act(() => { vi.advanceTimersByTime(1900) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+      act(() => { vi.advanceTimersByTime(2200) })
+      expect(EventSource).toHaveBeenCalledTimes(3)
+    })
+
+    it('resets backoff once the connection stayed open for 10s', () => {
+      renderHook(() => useNowPlaying())
+
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(3100) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+
+      act(() => { mockES.onopen?.() })
+      act(() => { vi.advanceTimersByTime(10_000) })
+      act(() => { mockES.simulateError() })
+      // Back to first-retry window (max 3s)
+      act(() => { vi.advanceTimersByTime(3100) })
+      expect(EventSource).toHaveBeenCalledTimes(3)
+    })
+
+    it('does not reset backoff when the connection closes before 10s', () => {
+      renderHook(() => useNowPlaying())
+
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(3100) })
+
+      act(() => { mockES.onopen?.() })
+      act(() => { vi.advanceTimersByTime(5_000) })
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(1900) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+    })
   })
 
   it('does not reconnect within remaining backoff window after exhausting short delays', async () => {

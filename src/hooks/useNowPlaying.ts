@@ -12,6 +12,7 @@ import {
 } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
+const STABLE_CONNECTION_MS = 10_000
 const MAX_TEXT_LEN = 200
 const ALLOWED_IMAGE_PREFIX = 'https://cdn.sanity.io/'
 
@@ -47,6 +48,12 @@ export function useNowPlaying(): void {
     let retries = 0
     let destroyed = false
     let last: ParsedPayload | null = null
+    let stableTimer: ReturnType<typeof setTimeout> | null = null
+
+    function clearStableTimer() {
+      if (stableTimer) clearTimeout(stableTimer)
+      stableTimer = null
+    }
 
     // Resolve photo/name for the last payload against the current teachers list
     // and push to the store only when something changed.
@@ -98,6 +105,7 @@ export function useNowPlaying(): void {
     function connect() {
       if (destroyed) return
       if (es) es.close()
+      clearStableTimer()
       es = new EventSource(NOW_PLAYING_SSE_URL)
 
       const handleMessage = (event: MessageEvent<string>) => {
@@ -125,7 +133,6 @@ export function useNowPlaying(): void {
             resolvedArtist: serverResolved ? (data.resolvedArtist as string) : null,
           }
           applyLast()
-          retries = 0
         } catch {
           // retain existing values on parse error
         }
@@ -135,11 +142,19 @@ export function useNowPlaying(): void {
       es.onmessage = handleMessage
       es.addEventListener('time-update', handleMessage as EventListener)
 
+      // Backoff resets only after the connection has stayed open long enough,
+      // so a server that sends one message then closes cannot cause a tight loop.
+      es.onopen = () => {
+        clearStableTimer()
+        stableTimer = setTimeout(() => { retries = 0 }, STABLE_CONNECTION_MS)
+      }
+
       es.onerror = () => {
+        clearStableTimer()
         es?.close()
         if (destroyed) return
         // Exponential backoff capped at 60s — no hard stop
-        const delay = Math.min(Math.pow(2, retries) * 1000 + Math.random() * 500, MAX_BACKOFF_MS)
+        const delay = Math.min(Math.pow(2, retries) * 1000 + Math.random() * 2000, MAX_BACKOFF_MS)
         retries++
         retryTimer = setTimeout(connect, delay)
       }
@@ -149,6 +164,7 @@ export function useNowPlaying(): void {
       if (document.hidden) {
         // Disconnect when tab is hidden — saves server slots
         if (retryTimer) clearTimeout(retryTimer)
+        clearStableTimer()
         if (es) { es.close(); es = null }
       } else {
         // Reconnect when tab becomes visible
@@ -165,6 +181,7 @@ export function useNowPlaying(): void {
       unsubscribeTeachers()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (retryTimer) clearTimeout(retryTimer)
+      clearStableTimer()
       if (es) es.close()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- setNowPlaying/setTeachersList are stable Zustand actions; SSE connects once on mount
