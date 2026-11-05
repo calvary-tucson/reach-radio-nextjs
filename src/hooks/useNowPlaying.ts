@@ -108,9 +108,12 @@ export function useNowPlaying(): void {
       clearStableTimer()
       es = new EventSource(NOW_PLAYING_SSE_URL)
 
-      const handleMessage = (event: MessageEvent<string>) => {
+      // Typed as Event so the same handler fits both onmessage and addEventListener
+      const handleMessage = (event: Event) => {
         try {
-          const raw = JSON.parse(event.data)
+          const payload = (event as MessageEvent).data
+          if (typeof payload !== 'string') return
+          const raw: unknown = JSON.parse(payload)
           if (typeof raw !== 'object' || raw === null) return
           const data = raw as Record<string, unknown>
 
@@ -138,9 +141,11 @@ export function useNowPlaying(): void {
         }
       }
 
-      // Cloudflare endpoint emits named `time-update` events; Vercel's emits unnamed
+      // The Cloudflare endpoint emits named `time-update` events. Unnamed events
+      // (the legacy Vercel route used by iOS v4 / stale tabs, or format drift)
+      // are still accepted via onmessage.
       es.onmessage = handleMessage
-      es.addEventListener('time-update', handleMessage as EventListener)
+      es.addEventListener('time-update', handleMessage)
 
       // Backoff resets only after the connection has stayed open long enough,
       // so a server that sends one message then closes cannot cause a tight loop.
