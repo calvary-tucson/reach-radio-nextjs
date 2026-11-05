@@ -130,6 +130,13 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 - Live result with fix: same swap recovered within 4 s to `https://stream.reach.radio/`, `Pause radio` showing, time advancing; manual Pause still sticks. Full suite 455/455, tsc and eslint clean.
 - Test recipe: put a short WAV in `public/`, play, then in the page set `audio.src = '/<file>.wav'; audio.play()` to force a clean end (media-src allows `'self'`, blob: does not). Delete the WAV after.
 
+## 8f. iOS v4 repoint is not a one-line change (checked 2026-11-05)
+
+- Native repo `~/Documents/Development/reach-radio-native-ios`, `main` at `0daf905` (also `stream-url-worker`, `test/stream-override`). No edit made.
+- `NowPlayingService.swift:71` builds the SSE URL as `baseURL.appendingPathComponent("api/stream-info-sse")`. `baseURL` defaults to `AppConfig.fallbackWebURL` (`https://reach-radio-nextjs.vercel.app/`) and is updated from the web host by `updateBaseURL`. So iOS v4 now-playing hits the Vercel SSE route, not the Astro app.
+- Consequence: do not disable the Vercel SSE route until v4 is repointed or retired from testing. Repointing needs a separate `AppConfig` now-playing URL (not derived from the web host) and a change to `updateBaseURL`; that is a small design change, not a string swap. Not done; owner decision plus a v4 test pass.
+- Android and iOS v3 were not re-checked; v3 and Android are believed to use the legacy `pages.dev` endpoint.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
