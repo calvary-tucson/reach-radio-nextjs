@@ -95,6 +95,15 @@ Accessibility: no issues, no markup changed. Performance: no other long-lived Ve
 - **Retirement coupling:** `reach-radio-web.pages.dev` is the legacy Astro app. Android and iOS v3 depend on it too, so plan the move to the standalone Worker (`stream.reach.radio`) before that app is retired, and port the Next.js hardening (jitter, keepalive, abort on cancel, no overlapping polls) into the Worker rather than changing the live Astro endpoint.
 - **Success metric:** check `vercel usage` for Fluid Provisioned Memory one to two days after the deploy; it should fall sharply.
 
+## 8b. Worker cutover (2026-11-05)
+
+- Stream Worker `reach-radio-audio-stream-worker` now serves `/api/stream-info-sse` (3 local commits `9114d27`, `f225ea4`, `2965db5`, not pushed to git). Deployed as version `02298be7`.
+- Worker-host hold: 74 events over 1500 s, no cut.
+- Web repointed in `c1aee86` (`NOW_PLAYING_SSE_URL`, CSP `connect-src`, preconnect, tests). Pushed to `main`.
+- Prod check after push: CSP correct, one SSE connection to `stream.reach.radio`, no console errors, title matches feed, 0 hits on the Vercel route in 10 min.
+- Orca's embedded browser fires `visibilitychange` about every 20 s, so it reconnects often; real browsers do not.
+- Not live-tested: hide path, late teacher-photo path (unit tests only), native apps.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.

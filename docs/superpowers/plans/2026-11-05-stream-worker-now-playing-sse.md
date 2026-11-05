@@ -313,10 +313,10 @@ Run `rg-run --class light --label handler-test -- npm test -- src/handler.test.t
 
 ### Task 3: Deploy and cut over (separate, each step ask-gated; NOT part of the agent run)
 
-- [ ] **Step 1 (USER or Yes/No):** `npm run deploy` in the worker repo (needs `wrangler login`). Rollback: `npx wrangler rollback`.
-- [ ] **Step 2:** verify the deployed host: `curl -sN -m 60 -H "Origin: https://reach.radio" https://stream.reach.radio/api/stream-info-sse` shows `Content-Type: text/event-stream`, `access-control-allow-origin: *`, 3 `time-update` events 20 s apart. Check `curl -sI https://stream.reach.radio/` still returns audio/mpeg.
-- [ ] **Step 3:** 25-minute hold on the new host (same method as the 2026-11-04 `pages.dev` measurement). Pass: `curl -sN -m 1500` runs to the cap (exit 28 or time_total 1500) with events every 20 s and no early close. Free-plan CPU is cumulative per invocation, so the new host must prove it, not just pages.dev.
-- [ ] **Step 4 (nextjs repo, own push Yes/No):** `NOW_PLAYING_SSE_URL` to `https://stream.reach.radio/api/stream-info-sse`, add `https://stream.reach.radio` to CSP `connect-src` (already in `media-src`), update the preconnect link and the config test, re-run the live Orca check, keep `pages.dev` in `connect-src` until stale tabs are gone.
+- [x] **Step 1 (USER or Yes/No):** `npm run deploy` in the worker repo (needs `wrangler login`). Rollback: `npx wrangler rollback`. **DONE:** done 2026-11-05, worker version 02298be7.
+- [x] **Step 2:** verify the deployed host: `curl -sN -m 60 -H "Origin: https://reach.radio" https://stream.reach.radio/api/stream-info-sse` shows `Content-Type: text/event-stream`, `access-control-allow-origin: *`, 3 `time-update` events 20 s apart. Check `curl -sI https://stream.reach.radio/` still returns audio/mpeg. **DONE:** verified 2026-11-05.
+- [x] **Step 3:** 25-minute hold on the new host (same method as the 2026-11-04 `pages.dev` measurement). Pass: `curl -sN -m 1500` runs to the cap (exit 28 or time_total 1500) with events every 20 s and no early close. Free-plan CPU is cumulative per invocation, so the new host must prove it, not just pages.dev. **DONE:** 74 events over 1500 s, no cut.
+- [x] **Step 4 (nextjs repo, own push Yes/No):** `NOW_PLAYING_SSE_URL` to `https://stream.reach.radio/api/stream-info-sse`, add `https://stream.reach.radio` to CSP `connect-src` (already in `media-src`), update the preconnect link and the config test, re-run the live Orca check, keep `pages.dev` in `connect-src` until stale tabs are gone. **DONE:** `c1aee86`, prod check passed; `pages.dev` removed from `connect-src` (kept in `media-src`).
 - [ ] **Step 5:** iOS v4 `NowPlayingService.swift` repoint before it ships (native repo, owner decision).
 
 ## Self-Review
