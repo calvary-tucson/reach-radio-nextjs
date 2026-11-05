@@ -4,6 +4,18 @@ Follow-up to `vercel-usage-spike-2026-11.md`. Owner is on vacation 2026-11-06 to
 
 Evidence labels: **Verified** = CLI output or code read. **Inferred** = reasoned, not measured.
 
+## 0. Summary of everything (2026-11-05)
+
+1. **Reach Radio fix:** SSE moved to Cloudflare Pages; Fluid memory fell from $0.78/day to $0.02 on a 9h partial day. Needs full-day recheck (Nov 6+).
+2. **Usage:** $15.93 of the $20 credit used by Nov 5 (svelte $3.95, reach-radio $10.74, nextjs $1.23, prayer $0.01). Projection to Nov 24: about $24 to $25, so about $4 to $5 on-demand overage (Inferred). Spend Management budget $5, Pause Off, so alerts only, no outage.
+3. **calvarytucson-nextjs:** about $1.2/month, not over budget. Risks listed in section 5.
+4. **calvarytucson-svelte:** baseline cost driver (about $12 to $13/month). Log sample says `/api/live-stream-status`, `/api/YouTubeCoverImage`, `/manifest.json` and teachings pages are the real hits; search APIs not confirmed.
+5. **Held (nothing deployed):** unpushed svelte branches `perf/cache-headers` and `perf/server-cost`; drop the 120s slow poll in 17587e61 before merge.
+6. **Observability Plus:** "Included + $1.20/1M events", currently Off; decision was to enable after return.
+7. **east-live finding:** east-live (Cloudflare-hosted) polls Vercel svelte `/api/live-stream-status`. Owner says the east-live and west-live code lives in **both** `calvarytucson-svelte` and `calvarytucson-nextjs` (which repo serves which page is not yet verified; confirm on Nov 13).
+8. **New global rule (offload ladder):** see 8b. Config repo commit 32ad0c7.
+9. **Owner items:** send "recheck usage" and Cloudflare peak daily requests tomorrow; rotate hardcoded YouTube key; do not release iOS v4; optionally raise Vercel budget and enable Observability Plus.
+
 ## 1. Billing facts (Verified)
 
 - Team `calvary-tucson-s-team`, Pro. Billing period **Oct 24 to Nov 24** (API period start/end). $20 credit covers all metered usage; the $20 platform fee ($0.6452/day in `vercel usage` daily output) is separate and not credit usage.
@@ -99,3 +111,5 @@ Serverless MISS counts: `/api/live-stream-status` 82 (top, never cached), `/api/
 7. Set Deployment Retention and preview-build limits on calvarytucson-nextjs; plan the Next.js search cache headers and dev-route exclusion.
 8. Plan the standalone Worker (`stream.reach.radio`) and repoint iOS v4 `NowPlayingService.swift` before it ships.
 9. Owner: rotate the YouTube API key (item 5.9).
+10. Read the east-live and west-live code in both `calvarytucson-svelte` and `calvarytucson-nextjs`: which repo each page frames or polls, poll interval, whether polling stops while a stream plays and pauses when the tab is hidden; apply the offload ladder (section 8b) to `/api/live-stream-status`.
+11. Evaluate the unverified offload candidates in 8b (Pagefind, client-side Sanity CDN, R2, crawler firewall rules, Turnstile) against measured Obs Plus data.
