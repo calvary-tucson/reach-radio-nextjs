@@ -104,6 +104,13 @@ Accessibility: no issues, no markup changed. Performance: no other long-lived Ve
 - Orca's embedded browser fires `visibilitychange` about every 20 s, so it reconnects often; real browsers do not.
 - Not live-tested: hide path, late teacher-photo path (unit tests only), native apps.
 
+## 8c. Web audio on the Worker (2026-11-05)
+
+- `46e0145`: the web player (`AudioProvider`) plays `https://stream.reach.radio/` directly via `WEB_AUDIO_STREAM_URL`. Web-only: `BridgeInit`, `/api/native-config` and Sanity `radioAudioURL` untouched, so the Phase F flip gate (iOS v4 released plus real-device tests) still stands.
+- Local check (dev server, Orca): audio src correct, 30 s playback, no CSP errors. Prod check after deploy: 128 s playback, `readyState` 4, no error, no console CSP violations.
+- Baseline for the success metric, Fluid Provisioned Memory per day from `vercel usage --breakdown daily`: Nov 1 $2.75, Nov 2 $0.91, Nov 3 $0.76, Nov 4 $0.78. SSE left Vercel on Nov 5; compare Nov 6 and Nov 7 against this.
+- Not tested: audio soak beyond minutes in a browser, lock screen, CarPlay, cellular.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
