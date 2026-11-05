@@ -121,7 +121,7 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 - `vercel usage` Nov 1-5 month to date: Fluid Provisioned Memory $5.20, ISR Writes $0.46 (second largest), Fluid Active CPU $0.45. The $5.20 is almost all pre-fix. ISR Writes are a Vercel caching question (`cacheLife`, revalidate frequency), not a Cloudflare one.
 - Decision (owner, 2026-11-05): wait for the Nov 6-7 cost check before disabling the old Vercel SSE route. When disabling, return 204 or set a tiny `maxDuration`; never redirect (old tabs' CSP `connect-src` lacks `stream.reach.radio`).
 - Open: check `vercel logs` for callers of `/api/stream-info` before proposing anything; it is short-lived, not a cost driver.
-- Audio soak: 60 min `curl -sN -o /dev/null -m 3600 https://stream.reach.radio/` started 2026-11-05, log `/tmp/claude-501/audio-soak.log` (result to be added).
+- Audio soak result (2026-11-05): `curl -sN -o /dev/null -m 3600 https://stream.reach.radio/` ended at 1685.9 s (about 28 min), well before the 3600 s cap, with 27,047,810 bytes (about 128 kbps, so audio flowed normally until the end) and HTTP 200. Conclusion: the stream was closed after about 28 min by something other than the curl cap. Not yet known whether the Worker, Cloudflare or the Radiojar upstream closed it, and no exit code was captured. The web player has reconnect logic (`AudioProvider`), so a listener would hear a short gap, not silence. Follow-up: repeat with `-w '%{exitcode}'` and compare against the legacy `pages.dev/api/audio-stream` path (what web played before `46e0145`) to see if the cut is new.
 
 ## 9. Recipes and gotchas worth keeping
 
