@@ -184,6 +184,40 @@ describe('useNowPlaying', () => {
       expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
     })
 
+    it('re-resolves the teacher when the list loads after the first event', () => {
+      renderHook(() => useNowPlaying())
+
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'John Doe' }))
+      })
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+      expect(useMediaStore.getState().resolvedArtist).toBeNull()
+
+      act(() => {
+        useTeachersStore.getState().setTeachersList([
+          { name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' },
+        ])
+      })
+
+      expect(useMediaStore.getState().image).toContain('cdn.sanity.io/teacher.jpg')
+      expect(useMediaStore.getState().resolvedArtist).toBe('John Doe')
+      expect(useMediaStore.getState().title).toBe('Show')
+    })
+
+    it('stops re-resolving after unmount', () => {
+      const { unmount } = renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'John Doe' }))
+      })
+      unmount()
+      act(() => {
+        useTeachersStore.getState().setTeachersList([
+          { name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' },
+        ])
+      })
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+    })
+
     it('uses FALLBACK_OG_IMAGE when teacher fetch fails', async () => {
       vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'))
 

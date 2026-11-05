@@ -8,6 +8,13 @@ import { FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
 
+interface ParsedPayload {
+  title?: string
+  artist?: string
+  imageUrl?: string | null
+  resolvedArtist?: string | null
+}
+
 export function useNowPlaying(): void {
   const setNowPlaying = useMediaStore((s) => s.setNowPlaying)
   const setTeachersList = useTeachersStore((s) => s.setTeachersList)
@@ -32,6 +39,51 @@ export function useNowPlaying(): void {
     let retryTimer: ReturnType<typeof setTimeout> | null = null
     let retries = 0
     let destroyed = false
+    let last: ParsedPayload | null = null
+
+    // Resolve photo/name for the last payload against the current teachers list
+    // and push to the store only when something changed.
+    function applyLast() {
+      if (!last) return
+      const { teachersList } = useTeachersStore.getState()
+      const current = useMediaStore.getState()
+
+      const rawArtist = last.artist ?? current.artist
+      const title = last.title ?? current.title
+      let image = FALLBACK_OG_IMAGE
+      let resolvedArtist: string | null = null
+
+      if (last.imageUrl && last.resolvedArtist) {
+        // Server resolved both — use directly, skip redundant client match
+        image = last.imageUrl
+        resolvedArtist = last.resolvedArtist
+      } else if (rawArtist && teachersList.length > 0) {
+        // Client-side match (Cloudflare payload has no imageUrl/resolvedArtist)
+        const match = teachersList.find((t) =>
+          t.name.toLowerCase().includes(rawArtist.toLowerCase()) ||
+          rawArtist.toLowerCase().includes(t.name.toLowerCase())
+        )
+        if (match) {
+          image = match.photo.includes('?')
+            ? `${match.photo}&w=420&fm=jpg`
+            : `${match.photo}?w=420&fm=jpg`
+          resolvedArtist = match.name
+        }
+      }
+
+      if (
+        title === current.title &&
+        rawArtist === current.artist &&
+        resolvedArtist === current.resolvedArtist &&
+        image === current.image
+      ) return
+      setNowPlaying(title, rawArtist, resolvedArtist, image)
+    }
+
+    // Teachers list often loads after the first SSE event: re-resolve then
+    const unsubscribeTeachers = useTeachersStore.subscribe((state, prev) => {
+      if (state.teachersList !== prev.teachersList) applyLast()
+    })
 
     function connect() {
       if (destroyed) return
@@ -49,36 +101,13 @@ export function useNowPlaying(): void {
             resolvedArtist?: string | null
           }
 
-          const { teachersList } = useTeachersStore.getState()
-
-          const rawArtist = data.artist ?? useMediaStore.getState().artist
-          let image = FALLBACK_OG_IMAGE
-          let resolvedArtist: string | null = null
-
-          if (data.imageUrl && data.resolvedArtist) {
-            // Server resolved both — use directly, skip redundant client match
-            image = data.imageUrl
-            resolvedArtist = data.resolvedArtist
-          } else if (rawArtist && teachersList.length > 0) {
-            // Fallback: client-side match (music gaps, null imageUrl, unmatched artist)
-            const match = teachersList.find((t) =>
-              t.name.toLowerCase().includes(rawArtist.toLowerCase()) ||
-              rawArtist.toLowerCase().includes(t.name.toLowerCase())
-            )
-            if (match) {
-              image = match.photo.includes('?')
-                ? `${match.photo}&w=420&fm=jpg`
-                : `${match.photo}?w=420&fm=jpg`
-              resolvedArtist = match.name
-            }
+          last = {
+            title: data.title,
+            artist: data.artist,
+            imageUrl: data.imageUrl,
+            resolvedArtist: data.resolvedArtist,
           }
-
-          setNowPlaying(
-            data.title ?? useMediaStore.getState().title,
-            rawArtist,
-            resolvedArtist,
-            image
-          )
+          applyLast()
           retries = 0
         } catch {
           // retain existing values on parse error
@@ -116,6 +145,7 @@ export function useNowPlaying(): void {
 
     return () => {
       destroyed = true
+      unsubscribeTeachers()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (retryTimer) clearTimeout(retryTimer)
       if (es) es.close()
