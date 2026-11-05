@@ -16,7 +16,11 @@ export async function GET(): Promise<Response> {
     const artist = json.artist || ''
     const { imageUrl, resolvedArtist } = await resolveArtist(artist)
 
-    return Response.json({ title, artist, streamTitle: title, streamArtist: artist, imageUrl, resolvedArtist })
+    // CDN-cache so N listeners cost ~1 function run per window, not N
+    return Response.json(
+      { title, artist, streamTitle: title, streamArtist: artist, imageUrl, resolvedArtist },
+      { headers: { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=30' } }
+    )
   } catch {
     return Response.json(
       { title: 'Reach Radio', artist: '', streamTitle: 'Reach Radio', streamArtist: '', imageUrl: null, resolvedArtist: null },
