@@ -6,6 +6,10 @@
 - Measured stream lifetime on Cloudflare: 25 min held, twice (pages.dev 75 events; worker 74 events). Prod check after push: CSP ok, one SSE connection, no console errors, 0 hits on the Vercel route in 10 min.
 - Docs: `docs/bugs/vercel-usage-spike-2026-11.md`, plan `2026-11-05-stream-worker-now-playing-sse.md`, roadmap row 20.
 
+## Addendum (same day): web audio on the Worker
+- `46e0145` points the web player at `https://stream.reach.radio/`, web-only (native config and Sanity untouched, Phase F gate stands). Local and prod checks passed (128 s, no errors). Details: bug doc 8c, 8d.
+- Process note: the first dev-server attempt ran in the sandbox (Doppler TLS failure, EMFILE, 404) and needed a sandbox-off Yes/No; the recipe is already in memory `reference-dev-server-doppler-worktree.md`.
+
 ## What worked
 - Measuring before deciding (25 min hold) replaced a wrong review claim ("Cloudflare closes on a timeout") with evidence.
 - Four-reviewer full review caught the teacher-photo race, unvalidated payload and stale docs before push (`2b384e2`, `8c05251`).
@@ -35,7 +39,8 @@
 1. owner | this file | 2026-11-07 | `vercel usage --scope calvary-tucson-s-team` shows Fluid Provisioned Memory sharply lower; result added to the bug doc.
 2. owner | plan Task 3 step 5, roadmap row 20 | before iOS v4 ships | `NowPlayingService.swift` points at `https://stream.reach.radio/api/stream-info-sse`.
 3. owner | this file | next session | Yes/No decided on pushing worker repo's 3 local commits (`9114d27`, `f225ea4`, `2965db5`); deployed code is currently not in git remote.
-4. me | bug doc section 8 | after iOS v4 and stale tabs gone | Vercel SSE route retired, `pages.dev` removed from `media-src` plan reviewed.
+4. owner | bug doc 8d | after the Nov 6-7 cost check | Yes/No decided on disabling the old Vercel SSE route (204 or tiny `maxDuration`).
+5. me | bug doc section 8 | after iOS v4 and stale tabs gone | Vercel SSE route retired, `pages.dev` removed from `media-src` plan reviewed.
 
 ## Pruned
 - Roadmap row 20 stale status ("not deployed") replaced. Nothing removed from always-loaded config; none added.

@@ -111,6 +111,18 @@ Accessibility: no issues, no markup changed. Performance: no other long-lived Ve
 - Baseline for the success metric, Fluid Provisioned Memory per day from `vercel usage --breakdown daily`: Nov 1 $2.75, Nov 2 $0.91, Nov 3 $0.76, Nov 4 $0.78. SSE left Vercel on Nov 5; compare Nov 6 and Nov 7 against this.
 - Not tested: audio soak beyond minutes in a browser, lock screen, CarPlay, cellular.
 
+## 8d. What else could move off Vercel (review 2026-11-05)
+
+Survey of `src/app` routes plus an advisor review. Verdict: nothing else is worth moving; the one long-held request was the SSE route.
+
+- Only `stream-info-sse` used `maxDuration`, `ReadableStream` or `setInterval`. Fluid compute is expensive only for long-held requests.
+- Keep on Vercel: `native-config`, `teachers-list`, `teachers/search-data`, `theme` (short request/response, helped by ISR and CDN), `revalidate` (calls `revalidateTag`), `proxy.ts` (brief, needed for native detection), image optimization and the `/api/audio-stream` redirect (negligible, handled at the routing layer).
+- Do not orange-cloud reach.radio through Cloudflare in front of Vercel: two CDNs stacked break Vercel caching and ISR.
+- `vercel usage` Nov 1-5 month to date: Fluid Provisioned Memory $5.20, ISR Writes $0.46 (second largest), Fluid Active CPU $0.45. The $5.20 is almost all pre-fix. ISR Writes are a Vercel caching question (`cacheLife`, revalidate frequency), not a Cloudflare one.
+- Decision (owner, 2026-11-05): wait for the Nov 6-7 cost check before disabling the old Vercel SSE route. When disabling, return 204 or set a tiny `maxDuration`; never redirect (old tabs' CSP `connect-src` lacks `stream.reach.radio`).
+- Open: check `vercel logs` for callers of `/api/stream-info` before proposing anything; it is short-lived, not a cost driver.
+- Audio soak: 60 min `curl -sN -o /dev/null -m 3600 https://stream.reach.radio/` started 2026-11-05, log `/tmp/claude-501/audio-soak.log` (result to be added).
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
