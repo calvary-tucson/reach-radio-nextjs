@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { useNowPlaying } from '@/hooks/useNowPlaying'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
-import { FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
+import { DEFAULT_TITLE, FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
 
 class MockEventSource {
   static OPEN = 1
@@ -147,6 +147,16 @@ describe('useNowPlaying', () => {
       })
       expect(useMediaStore.getState().title).toBe('Show')
       expect(useMediaStore.getState().artist).toBe('')
+    })
+
+    it('maps the Cloudflare fallback title "Reach Radio FM" to the store default', () => {
+      useMediaStore.setState({ title: 'Some Show' })
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Reach Radio FM', artist: '' }))
+      })
+      expect(useMediaStore.getState().title).toBe(DEFAULT_TITLE)
+      expect(DEFAULT_TITLE).toBe('Reach Radio')
     })
 
     it('caps title and artist at 200 characters', () => {

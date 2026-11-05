@@ -4,7 +4,12 @@ import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
 import type { TeacherListEntry } from '@/lib/store/teachers-store'
-import { FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
+import {
+  CLOUDFLARE_FALLBACK_TITLE,
+  DEFAULT_TITLE,
+  FALLBACK_OG_IMAGE,
+  NOW_PLAYING_SSE_URL,
+} from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
 const MAX_TEXT_LEN = 200
@@ -109,7 +114,12 @@ export function useNowPlaying(): void {
             data.imageUrl.startsWith(ALLOWED_IMAGE_PREFIX)
 
           last = {
-            title: typeof data.title === 'string' ? data.title.slice(0, MAX_TEXT_LEN) : undefined,
+            title:
+              typeof data.title === 'string'
+                ? data.title === CLOUDFLARE_FALLBACK_TITLE
+                  ? DEFAULT_TITLE
+                  : data.title.slice(0, MAX_TEXT_LEN)
+                : undefined,
             artist: typeof data.artist === 'string' ? data.artist.slice(0, MAX_TEXT_LEN) : undefined,
             imageUrl: serverResolved ? (data.imageUrl as string) : null,
             resolvedArtist: serverResolved ? (data.resolvedArtist as string) : null,
