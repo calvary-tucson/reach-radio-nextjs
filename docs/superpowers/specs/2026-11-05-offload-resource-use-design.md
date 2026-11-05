@@ -25,7 +25,7 @@ Use the resources we already own before building anything that spends Vercel. Eq
 | 1 | Live status | `Cache-Control: s-maxage=N, stale-while-revalidate=M` on `live-stream-status`, shipped with `perf/cache-headers` | Existing branch review |
 | 2 | YouTube | Read quota in Google Cloud console; replace per-request `search.list` with shared TTL; thumbnails via `i.ytimg.com`; align error cache (svelte 10 min, nextjs 45 s) | Quota number first |
 | 3 | Search | Cache headers plus memoization; no Pagefind until per-route data shows search in the top duration lines | Per-route data |
-| 4 | Fonts | Self-host on both stacks (`next/font`, `@fontsource`) | Visual check in Orca |
+| 4 | Fonts | NON-FINDING (checked 2026-11-05): calvarytucson-nextjs already uses `next/font` (`src/app/layout.tsx`); calvarytucson-svelte loads no web fonts (no `@font-face`, no Google Fonts links in `src/`, `static/`, `app.html`). Only third-party script host seen: `cdn.jsdelivr.net` in nextjs `src/lib/csp.ts:11`, not investigated. | None |
 | 5 | Images | Sanity custom loader so Sanity images skip Vercel optimization | 10.7 list |
 | 6 | Crawlers | AI Bots deny and a rate rule on ISR paths (dashboard) | Owner Yes/No per setting |
 | 7 | Trailing-slash `_app` bug | `kit.paths.relative:false` or 308 in `vercel.json` | 10.7 list |
