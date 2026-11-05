@@ -61,6 +61,7 @@ Serverless MISS counts: `/api/live-stream-status` 82 (top, never cached), `/api/
 
 - $1.20 per 1M events, usage-based, no base fee. "Event" not defined on the page; no Pro free allowance stated. Owner role only. Team-level toggle with per-project exclusion. Enable: Team Billing settings > Observability Plus, or `vercel buy addon observability-plus`.
 - Adds path/route breakdown for functions, ISR revalidation data, CDN requests by path, 30-day retention. Backfill not stated (assume none). Disabling mid-cycle loses existing data.
+- Owner screenshot of Billing > Add-Ons (2026-11-05, Verified): Observability Plus shows "Included + $1.20/1M events", toggle currently **Off**. Speed Insights Plus ($10/mo per project + $6.50/100k events) and Web Analytics Plus ($10/mo + $3/100k) are separate paid add-ons, also Off. Do not enable those two for this audit.
 - Decision: **do not enable before vacation**. Enable on svelte only after return.
 
 ## 7. Cloudflare free-cap risk (open)
