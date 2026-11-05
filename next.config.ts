@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://cdn.sanity.io data: blob: https://www.google.com",
               "media-src 'self' https://*.radiojar.com https://reach.radio https://reach-radio-web.pages.dev https://stream.reach.radio",
-              "connect-src 'self' https://api.sanity.io https://cdn.sanity.io https://*.radiojar.com https://www.google.com",
+              "connect-src 'self' https://api.sanity.io https://cdn.sanity.io https://*.radiojar.com https://www.google.com https://reach-radio-web.pages.dev",
               "font-src 'self'",
               "object-src 'none'",
               "frame-src https://www.google.com",

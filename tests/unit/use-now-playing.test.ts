@@ -3,16 +3,23 @@ import { renderHook, act } from '@testing-library/react'
 import { useNowPlaying } from '@/hooks/useNowPlaying'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
-import { FALLBACK_OG_IMAGE } from '@/lib/constants'
+import { FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
 
 class MockEventSource {
   static OPEN = 1
   onmessage: ((e: { data: string }) => void) | null = null
   onerror: (() => void) | null = null
   close = vi.fn()
+  listeners: Record<string, (e: { data: string }) => void> = {}
   constructor(public url: string) {}
+  addEventListener(type: string, fn: (e: { data: string }) => void) {
+    this.listeners[type] = fn
+  }
   simulateMessage(data: string) {
     this.onmessage?.({ data })
+  }
+  simulateNamedEvent(type: string, data: string) {
+    this.listeners[type]?.({ data })
   }
   simulateError() {
     this.onerror?.()
@@ -46,6 +53,12 @@ describe('useNowPlaying', () => {
     vi.useRealTimers()
   })
 
+  it('connects to the Cloudflare SSE endpoint, not the Vercel route', () => {
+    renderHook(() => useNowPlaying())
+    expect(mockES.url).toBe(NOW_PLAYING_SSE_URL)
+    expect(mockES.url).toMatch(/^https:\/\/reach-radio-web\.pages\.dev\//)
+  })
+
   it('updates store when SSE message arrives', () => {
     renderHook(() => useNowPlaying())
 
@@ -56,6 +69,17 @@ describe('useNowPlaying', () => {
     const { title, artist } = useMediaStore.getState()
     expect(title).toBe('Test Show')
     expect(artist).toBe('John Doe')
+  })
+
+  it('updates store from named time-update events (Cloudflare endpoint format)', () => {
+    renderHook(() => useNowPlaying())
+
+    act(() => {
+      mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'CF Show', artist: 'Jane Roe' }))
+    })
+
+    expect(useMediaStore.getState().title).toBe('CF Show')
+    expect(useMediaStore.getState().artist).toBe('Jane Roe')
   })
 
   it('retains existing values on malformed SSE message', () => {

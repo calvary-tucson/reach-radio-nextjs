@@ -9,3 +9,7 @@ export const FALLBACK_OG_IMAGE =
 
 export const RADIOJAR_URL =
   'https://proxy.radiojar.com/api/stations/g4d600bv6p5tv/now_playing/?callback='
+
+// Now-playing SSE is served from Cloudflare: Vercel bills provisioned memory
+// for every second an SSE request stays open, Cloudflare does not bill duration.
+export const NOW_PLAYING_SSE_URL = 'https://reach-radio-web.pages.dev/api/stream-info-sse'

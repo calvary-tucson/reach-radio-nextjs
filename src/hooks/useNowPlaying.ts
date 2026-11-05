@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
 import type { TeacherListEntry } from '@/lib/store/teachers-store'
-import { FALLBACK_OG_IMAGE } from '@/lib/constants'
+import { FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
 
 const MAX_BACKOFF_MS = 60_000
 
@@ -36,9 +36,9 @@ export function useNowPlaying(): void {
     function connect() {
       if (destroyed) return
       if (es) es.close()
-      es = new EventSource('/api/stream-info-sse')
+      es = new EventSource(NOW_PLAYING_SSE_URL)
 
-      es.onmessage = (event) => {
+      const handleMessage = (event: MessageEvent<string>) => {
         try {
           const raw = JSON.parse(event.data)
           if (typeof raw !== 'object' || raw === null) return
@@ -84,6 +84,10 @@ export function useNowPlaying(): void {
           // retain existing values on parse error
         }
       }
+
+      // Cloudflare endpoint emits named `time-update` events; Vercel's emits unnamed
+      es.onmessage = handleMessage
+      es.addEventListener('time-update', handleMessage as EventListener)
 
       es.onerror = () => {
         es?.close()
