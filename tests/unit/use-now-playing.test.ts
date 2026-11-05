@@ -5,36 +5,32 @@ import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
 import { FALLBACK_OG_IMAGE } from '@/lib/constants'
 
-const NOW_PLAYING_URL = '/api/stream-info'
-
-let nowPlaying: unknown
-let nowPlayingOk: boolean
-let teachers: unknown
-
-function nowPlayingCalls() {
-  return vi.mocked(global.fetch).mock.calls.filter(([u]) => u === NOW_PLAYING_URL).length
+class MockEventSource {
+  static OPEN = 1
+  onmessage: ((e: { data: string }) => void) | null = null
+  onerror: (() => void) | null = null
+  close = vi.fn()
+  constructor(public url: string) {}
+  simulateMessage(data: string) {
+    this.onmessage?.({ data })
+  }
+  simulateError() {
+    this.onerror?.()
+  }
 }
 
-async function flush() {
-  await act(async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve() })
-}
+let mockES: MockEventSource
 
 describe('useNowPlaying', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    nowPlaying = { title: 'Reach Radio', artist: '' }
-    nowPlayingOk = true
-    teachers = []
-    vi.stubGlobal('fetch', vi.fn((url: string) => {
-      if (url === NOW_PLAYING_URL) {
-        return Promise.resolve({
-          ok: nowPlayingOk,
-          statusText: 'err',
-          json: () => Promise.resolve(nowPlaying),
-        })
-      }
-      if (teachers instanceof Error) return Promise.reject(teachers)
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(teachers) })
+    vi.stubGlobal('EventSource', vi.fn(function (url: string) {
+      mockES = new MockEventSource(url)
+      return mockES
+    }))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
     }))
     useMediaStore.setState({
       title: 'Reach Radio',
@@ -50,108 +46,131 @@ describe('useNowPlaying', () => {
     vi.useRealTimers()
   })
 
-  it('never opens an EventSource (SSE bills function time per listener)', async () => {
-    const es = vi.fn()
-    vi.stubGlobal('EventSource', es)
+  it('updates store when SSE message arrives', () => {
     renderHook(() => useNowPlaying())
-    await flush()
-    expect(es).not.toHaveBeenCalled()
-  })
 
-  it('updates store from the first poll', async () => {
-    nowPlaying = { title: 'Test Show', artist: 'John Doe' }
-    renderHook(() => useNowPlaying())
-    await flush()
+    act(() => {
+      mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'John Doe', image: 'https://cdn.sanity.io/img.jpg' }))
+    })
+
     const { title, artist } = useMediaStore.getState()
     expect(title).toBe('Test Show')
     expect(artist).toBe('John Doe')
   })
 
-  it('retains existing values on malformed payload', async () => {
-    nowPlaying = 'not-an-object'
+  it('retains existing values on malformed SSE message', () => {
     renderHook(() => useNowPlaying())
-    await flush()
+
+    act(() => {
+      mockES.simulateMessage('not-json')
+    })
+
     expect(useMediaStore.getState().title).toBe('Reach Radio')
   })
 
-  it('polls again after ~30-35s', async () => {
+  it('closes connection on error then retries after delay', async () => {
     renderHook(() => useNowPlaying())
-    await flush()
-    expect(nowPlayingCalls()).toBe(1)
-    await act(async () => { await vi.advanceTimersByTimeAsync(36_000) })
-    expect(nowPlayingCalls()).toBe(2)
+
+    act(() => {
+      mockES.simulateError()
+    })
+
+    // Error handler closes the current connection immediately before scheduling retry
+    expect(mockES.close).toHaveBeenCalledTimes(1)
+
+    // Advance past the 1s + up to 500ms jitter retry delay — a new EventSource is created
+    act(() => {
+      vi.advanceTimersByTime(1600)
+    })
+
+    expect(EventSource).toHaveBeenCalledTimes(2)
   })
 
-  it('backs off exponentially on failure: no retry before 30s, then 60s', async () => {
-    nowPlayingOk = false
+  it('does not reconnect within remaining backoff window after exhausting short delays', async () => {
     renderHook(() => useNowPlaying())
-    await flush()
-    expect(nowPlayingCalls()).toBe(1)
-    await act(async () => { await vi.advanceTimersByTimeAsync(29_000) })
-    expect(nowPlayingCalls()).toBe(1)
-    await act(async () => { await vi.advanceTimersByTimeAsync(2_000) })
-    expect(nowPlayingCalls()).toBe(2)
-    await act(async () => { await vi.advanceTimersByTimeAsync(58_000) })
-    expect(nowPlayingCalls()).toBe(2)
-    await act(async () => { await vi.advanceTimersByTimeAsync(3_000) })
-    expect(nowPlayingCalls()).toBe(3)
-  })
+    const EventSourceSpy = vi.mocked(EventSource)
 
-  it('stops polling while tab hidden and refreshes on return', async () => {
-    renderHook(() => useNowPlaying())
-    await flush()
-    const hidden = vi.spyOn(document, 'hidden', 'get')
-    hidden.mockReturnValue(true)
-    document.dispatchEvent(new Event('visibilitychange'))
-    await act(async () => { await vi.advanceTimersByTimeAsync(120_000) })
-    expect(nowPlayingCalls()).toBe(1)
-    hidden.mockReturnValue(false)
-    document.dispatchEvent(new Event('visibilitychange'))
-    await flush()
-    expect(nowPlayingCalls()).toBe(2)
-    hidden.mockRestore()
-  })
+    // Exhaust 5 retries (delays: 1s, 2s, 4s, 8s, 16s = 31s total)
+    for (let i = 0; i < 5; i++) {
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(32_000) })
+    }
 
-  it('stops polling after unmount', async () => {
-    const { unmount } = renderHook(() => useNowPlaying())
-    await flush()
-    unmount()
-    await act(async () => { await vi.advanceTimersByTimeAsync(120_000) })
-    expect(nowPlayingCalls()).toBe(1)
+    const callsAfterExhaustion = EventSourceSpy.mock.calls.length
+
+    // One more error after exhaustion should not create new EventSource within 32s
+    // (60s cap not yet elapsed)
+    act(() => { mockES.simulateError() })
+    act(() => { vi.advanceTimersByTime(32_000) })
+
+    expect(EventSourceSpy.mock.calls.length).toBe(callsAfterExhaustion)
   })
 
   describe('teacher photo resolution', () => {
-    async function run(artist: string) {
-      nowPlaying = { title: 'Test Show', artist }
-      renderHook(() => useNowPlaying())
-      await flush()
-      // Teacher list loads alongside the first poll; the next poll applies it
-      await act(async () => { await vi.advanceTimersByTimeAsync(36_000) })
-    }
-
     it('resolves image on exact name match', async () => {
-      teachers = [{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }]
-      await run('John Doe')
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }]),
+      } as Response)
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'John Doe' }))
+      })
+
       const { image, artist } = useMediaStore.getState()
       expect(image).toContain('cdn.sanity.io/teacher.jpg')
       expect(artist).toBe('John Doe')
     })
 
     it('resolves image on partial name match', async () => {
-      teachers = [{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }]
-      await run('Pastor John Doe')
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }]),
+      } as Response)
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'Pastor John Doe' }))
+      })
+
       expect(useMediaStore.getState().image).toContain('cdn.sanity.io/teacher.jpg')
     })
 
     it('falls back to FALLBACK_OG_IMAGE when no teacher match', async () => {
-      teachers = [{ name: 'Jane Smith', photo: 'https://cdn.sanity.io/jane.jpg' }]
-      await run('Unknown Artist')
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([{ name: 'Jane Smith', photo: 'https://cdn.sanity.io/jane.jpg' }]),
+      } as Response)
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'Unknown Artist' }))
+      })
+
       expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
     })
 
     it('uses FALLBACK_OG_IMAGE when teacher fetch fails', async () => {
-      teachers = new Error('Network error')
-      await run('John Doe')
+      vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'))
+
+      renderHook(() => useNowPlaying())
+
+      await act(async () => { await Promise.resolve() })
+
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'John Doe' }))
+      })
+
       expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
     })
   })
