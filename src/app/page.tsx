@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
+import { AnnouncementBanner } from '@/components/home/AnnouncementBanner'
+import { HOME_BANNER } from '@/lib/banners'
 import { RadioPlayer } from '@/components/home/RadioPlayer'
 import { TodaySchedule } from '@/components/home/TodaySchedule'
 import { RadioPlayerSkeleton } from '@/components/skeletons/RadioPlayerSkeleton'
@@ -15,6 +17,8 @@ export default function HomePage() {
   return (
     <div className="px-4 md:px-8 pt-4 space-y-6 pb-32">
       <h1 className="sr-only">Reach Radio</h1>
+
+      {HOME_BANNER && <AnnouncementBanner banner={HOME_BANNER} />}
 
       <Suspense fallback={<RadioPlayerSkeleton />}>
         <RadioPlayer />
