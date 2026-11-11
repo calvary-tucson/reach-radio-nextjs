@@ -46,3 +46,16 @@ Use these exact scope names in conventional commits. PascalCase scopes are wrong
 **A11y fixes belong to the component scope being fixed**, not a separate `a11y` scope.
 Example: `fix(teachers): improve contrast on TeacherCard` not `fix(a11y): teachers contrast`.
 <!-- END:nextjs-agent-rules -->
+
+## UI mock adapter
+
+Read by the `ui-mock` skill (added after the 2026-11-11 banner work needed an ad-hoc setup).
+
+- `scaffold`: throwaway route `src/app/mock-<name>/page.tsx`; delete before committing. Not linked from the real site.
+- `fixtures`: inline static data in the mock route; no Sanity or Doppler data needed.
+- `styles`: `src/app/globals.css` (Tailwind v4 tokens, `light:`/`dark:` variants) plus `docs/design-system.md`. Reuse real class strings, e.g. the card `bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px]`.
+- `catalog`: none (grep `src/components`).
+- `theme`: dark default; force with `?theme=dark` or `?theme=light`.
+- `dev`: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (sandbox off, owner Yes/No); stop by PID.
+- `verify`: Playwright MCP Chromium is not installed here, so open with `orca tab create --url http://localhost:3100/<route>?theme=dark` and capture with `orca screenshot --json` (both sandbox off, owner Yes/No). Show 390 and ~1100 wide frames side by side.
+- Date-specific content: pages are cached (PPR), so check dates in a client component (`src/lib/date-window.ts`), never in the server render.
