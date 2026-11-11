@@ -3,16 +3,24 @@ import { renderHook, act } from '@testing-library/react'
 import { useNowPlaying } from '@/hooks/useNowPlaying'
 import { useMediaStore } from '@/lib/store/media-store'
 import { useTeachersStore } from '@/lib/store/teachers-store'
-import { FALLBACK_OG_IMAGE } from '@/lib/constants'
+import { DEFAULT_TITLE, FALLBACK_OG_IMAGE, NOW_PLAYING_SSE_URL } from '@/lib/constants'
 
 class MockEventSource {
   static OPEN = 1
   onmessage: ((e: { data: string }) => void) | null = null
   onerror: (() => void) | null = null
+  onopen: (() => void) | null = null
   close = vi.fn()
+  listeners: Record<string, (e: { data: string }) => void> = {}
   constructor(public url: string) {}
+  addEventListener(type: string, fn: (e: { data: string }) => void) {
+    this.listeners[type] = fn
+  }
   simulateMessage(data: string) {
     this.onmessage?.({ data })
+  }
+  simulateNamedEvent(type: string, data: string) {
+    this.listeners[type]?.({ data })
   }
   simulateError() {
     this.onerror?.()
@@ -46,6 +54,12 @@ describe('useNowPlaying', () => {
     vi.useRealTimers()
   })
 
+  it('connects to the stream Worker SSE endpoint, not the Vercel route', () => {
+    renderHook(() => useNowPlaying())
+    expect(mockES.url).toBe(NOW_PLAYING_SSE_URL)
+    expect(mockES.url).toMatch(/^https:\/\/stream\.reach\.radio\//)
+  })
+
   it('updates store when SSE message arrives', () => {
     renderHook(() => useNowPlaying())
 
@@ -56,6 +70,17 @@ describe('useNowPlaying', () => {
     const { title, artist } = useMediaStore.getState()
     expect(title).toBe('Test Show')
     expect(artist).toBe('John Doe')
+  })
+
+  it('updates store from named time-update events (Cloudflare endpoint format)', () => {
+    renderHook(() => useNowPlaying())
+
+    act(() => {
+      mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'CF Show', artist: 'Jane Roe' }))
+    })
+
+    expect(useMediaStore.getState().title).toBe('CF Show')
+    expect(useMediaStore.getState().artist).toBe('Jane Roe')
   })
 
   it('retains existing values on malformed SSE message', () => {
@@ -78,12 +103,61 @@ describe('useNowPlaying', () => {
     // Error handler closes the current connection immediately before scheduling retry
     expect(mockES.close).toHaveBeenCalledTimes(1)
 
-    // Advance past the 1s + up to 500ms jitter retry delay — a new EventSource is created
+    // Advance past the 1s + up to 2s jitter retry delay — a new EventSource is created
     act(() => {
-      vi.advanceTimersByTime(1600)
+      vi.advanceTimersByTime(3100)
     })
 
     expect(EventSource).toHaveBeenCalledTimes(2)
+  })
+
+  describe('reconnect backoff floor', () => {
+    it('does not reset backoff just because a message arrived before the close', () => {
+      renderHook(() => useNowPlaying())
+
+      // First failure -> reconnect (delay 1-3s)
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(3100) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+
+      // Connection delivers one message then closes: backoff must keep growing (2s+)
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'A' }))
+        mockES.simulateError()
+      })
+      act(() => { vi.advanceTimersByTime(1900) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+      act(() => { vi.advanceTimersByTime(2200) })
+      expect(EventSource).toHaveBeenCalledTimes(3)
+    })
+
+    it('resets backoff once the connection stayed open for 10s', () => {
+      renderHook(() => useNowPlaying())
+
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(3100) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+
+      act(() => { mockES.onopen?.() })
+      act(() => { vi.advanceTimersByTime(10_000) })
+      act(() => { mockES.simulateError() })
+      // Back to first-retry window (max 3s)
+      act(() => { vi.advanceTimersByTime(3100) })
+      expect(EventSource).toHaveBeenCalledTimes(3)
+    })
+
+    it('does not reset backoff when the connection closes before 10s', () => {
+      renderHook(() => useNowPlaying())
+
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(3100) })
+
+      act(() => { mockES.onopen?.() })
+      act(() => { vi.advanceTimersByTime(5_000) })
+      act(() => { mockES.simulateError() })
+      act(() => { vi.advanceTimersByTime(1900) })
+      expect(EventSource).toHaveBeenCalledTimes(2)
+    })
   })
 
   it('does not reconnect within remaining backoff window after exhausting short delays', async () => {
@@ -104,6 +178,80 @@ describe('useNowPlaying', () => {
     act(() => { vi.advanceTimersByTime(32_000) })
 
     expect(EventSourceSpy.mock.calls.length).toBe(callsAfterExhaustion)
+  })
+
+  describe('payload validation', () => {
+    it('ignores a non-string title and keeps the previous value', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: { x: 1 }, artist: 'Jane Roe' }))
+      })
+      expect(useMediaStore.getState().title).toBe('Reach Radio')
+      expect(useMediaStore.getState().artist).toBe('Jane Roe')
+    })
+
+    it('ignores a non-string artist and keeps the previous value', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 42 }))
+      })
+      expect(useMediaStore.getState().title).toBe('Show')
+      expect(useMediaStore.getState().artist).toBe('')
+    })
+
+    it('maps the Cloudflare fallback title "Reach Radio FM" to the store default', () => {
+      useMediaStore.setState({ title: 'Some Show' })
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Reach Radio FM', artist: '' }))
+      })
+      expect(useMediaStore.getState().title).toBe(DEFAULT_TITLE)
+      expect(DEFAULT_TITLE).toBe('Reach Radio')
+    })
+
+    it('caps title and artist at 200 characters', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'a'.repeat(500), artist: 'b'.repeat(500) }))
+      })
+      expect(useMediaStore.getState().title).toHaveLength(200)
+      expect(useMediaStore.getState().artist).toHaveLength(200)
+    })
+
+    it('ignores imageUrl from a disallowed host and falls back to client match', () => {
+      useTeachersStore.setState({ teachersList: [{ name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' }] })
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({
+          title: 'Show', artist: 'John Doe', imageUrl: 'https://evil.example/x.jpg', resolvedArtist: 'John Doe',
+        }))
+      })
+      expect(useMediaStore.getState().image).toContain('cdn.sanity.io/teacher.jpg')
+    })
+
+    it('accepts server-resolved imageUrl on the Sanity CDN', () => {
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateMessage(JSON.stringify({
+          title: 'Show', artist: 'John Doe', imageUrl: 'https://cdn.sanity.io/srv.jpg', resolvedArtist: 'John Doe',
+        }))
+      })
+      expect(useMediaStore.getState().image).toBe('https://cdn.sanity.io/srv.jpg')
+      expect(useMediaStore.getState().resolvedArtist).toBe('John Doe')
+    })
+
+    it('does not drop the title update when a matched teacher has a null photo', () => {
+      useTeachersStore.setState({
+        teachersList: [{ name: 'John Doe', photo: null as unknown as string }],
+      })
+      renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'John Doe' }))
+      })
+      expect(useMediaStore.getState().title).toBe('Show')
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+      expect(useMediaStore.getState().resolvedArtist).toBe('John Doe')
+    })
   })
 
   describe('teacher photo resolution', () => {
@@ -157,6 +305,40 @@ describe('useNowPlaying', () => {
         mockES.simulateMessage(JSON.stringify({ title: 'Test Show', artist: 'Unknown Artist' }))
       })
 
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+    })
+
+    it('re-resolves the teacher when the list loads after the first event', () => {
+      renderHook(() => useNowPlaying())
+
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'John Doe' }))
+      })
+      expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
+      expect(useMediaStore.getState().resolvedArtist).toBeNull()
+
+      act(() => {
+        useTeachersStore.getState().setTeachersList([
+          { name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' },
+        ])
+      })
+
+      expect(useMediaStore.getState().image).toContain('cdn.sanity.io/teacher.jpg')
+      expect(useMediaStore.getState().resolvedArtist).toBe('John Doe')
+      expect(useMediaStore.getState().title).toBe('Show')
+    })
+
+    it('stops re-resolving after unmount', () => {
+      const { unmount } = renderHook(() => useNowPlaying())
+      act(() => {
+        mockES.simulateNamedEvent('time-update', JSON.stringify({ title: 'Show', artist: 'John Doe' }))
+      })
+      unmount()
+      act(() => {
+        useTeachersStore.getState().setTeachersList([
+          { name: 'John Doe', photo: 'https://cdn.sanity.io/teacher.jpg' },
+        ])
+      })
       expect(useMediaStore.getState().image).toBe(FALLBACK_OG_IMAGE)
     })
 

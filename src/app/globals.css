@@ -331,14 +331,29 @@ body[data-app] [data-media-bar] {
   to { transform: translateY(100%); }
 }
 
+/* Teacher panel: slide plus a short fade (opacity settles by 60% on enter). */
 @keyframes panel-slide-in {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from { opacity: 0; transform: translateX(100%); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes panel-slide-out {
-  from { transform: translateX(0); }
-  to { transform: translateX(100%); }
+  from { opacity: 1; transform: translateX(0); }
+  40% { opacity: 1; }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes panel-sheet-up {
+  from { opacity: 0; transform: translateY(32px); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes panel-sheet-down {
+  from { opacity: 1; transform: translateY(0); }
+  40% { opacity: 1; }
+  to { opacity: 0; transform: translateY(32px); }
 }
 
 @keyframes fade-in {

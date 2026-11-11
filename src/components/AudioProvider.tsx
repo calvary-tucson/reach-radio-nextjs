@@ -95,9 +95,17 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
         setIsBuffering(false)
         reconnectAttempts.current = 0
       }}
-      onPause={() => {
+      onPause={(e) => {
+        // The browser fires pause then ended when the server closes the live stream.
+        // That is a dropped stream, not the listener pausing: onEnded reconnects.
+        if (e.currentTarget.ended) return
         setIsPlaying(false)
         setIsBuffering(false)
+      }}
+      onEnded={() => {
+        if (!useMediaStore.getState().isPlaying) return
+        setIsBuffering(true)
+        scheduleReconnect()
       }}
       onError={() => {
         if (useMediaStore.getState().isPlaying) {

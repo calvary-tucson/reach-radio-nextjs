@@ -1,4 +1,5 @@
 import { type RefObject, useCallback, useEffect, useRef } from 'react'
+import { prefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion'
 
 const DISMISS_THRESHOLD = 120
 const VELOCITY_THRESHOLD = 0.5
@@ -12,12 +13,6 @@ interface UseSheetDragOptions {
   onDismiss: () => void
   contentRef: RefObject<HTMLDivElement | null>
   axis?: 'y' | 'x'
-}
-
-function prefersReducedMotion(): boolean {
-  return typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
 export function useSheetDrag({ onDismiss, contentRef, axis = 'y' }: UseSheetDragOptions) {

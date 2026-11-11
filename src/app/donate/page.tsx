@@ -5,6 +5,8 @@ import { ShowMediaBar } from '@/components/media-bar/ShowMediaBar'
 import { TeacherInfoChip } from '@/components/teachers/primitives/TeacherInfoChip'
 import { DonatePageSkeleton } from '@/components/skeletons/DonatePageSkeleton'
 import { getDonateCtaCopy, PUSHPAY_GIVING_URL } from '@/lib/donate/cta'
+import { DONATE_CAMPAIGNS } from '@/lib/donate/campaigns'
+import { DonateCampaignCard } from '@/components/donate/DonateCampaignCard'
 
 async function DonateContent() {
   const isMobileApp = await detectMobileApp()
@@ -28,6 +30,8 @@ async function DonateContent() {
         <TeacherInfoChip label="24/7" variant="accent" />
         <TeacherInfoChip label="Tucson, AZ" variant="accent" />
       </div>
+
+      <DonateCampaignCard campaigns={DONATE_CAMPAIGNS} />
 
       <div className="bg-[#1c2128] light:bg-gray-50 border border-white/5 light:border-gray-200 rounded-[18px] p-5 md:p-6">
         <h2 className="border-l-4 pl-3 font-bold text-sm border-l-[#84b84f] uppercase text-white light:text-gray-900 tracking-wide">
@@ -69,6 +73,9 @@ async function DonateContent() {
 
         <p id="donate-cta-note" className="mt-3 text-center text-xs md:text-sm text-white/90 light:text-gray-600">
           {reassurance}
+        </p>
+        <p className="mt-2 text-center text-xs md:text-sm text-white/90 light:text-gray-600">
+          If you don&apos;t know what campus option to select then select &ldquo;Exclusively Online&rdquo;
         </p>
       </div>
     </>

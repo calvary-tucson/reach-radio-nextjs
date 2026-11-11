@@ -181,4 +181,58 @@ describe('AudioProvider', () => {
     })
     expect(play).not.toHaveBeenCalled()
   })
+
+  describe('clean stream end (server closes the live stream)', () => {
+    function markEnded(audio: HTMLAudioElement) {
+      Object.defineProperty(audio, 'ended', { configurable: true, value: true })
+    }
+
+    beforeEach(() => vi.useFakeTimers())
+    afterEach(() => vi.useRealTimers())
+
+    it('pause caused by the end of the stream does not stop playback state', () => {
+      useMediaStore.setState({ isPlaying: true, isBuffering: false })
+      const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+      const audio = container.querySelector('audio') as HTMLAudioElement
+      markEnded(audio)
+      act(() => {
+        audio.dispatchEvent(new Event('pause'))
+      })
+      expect(useMediaStore.getState().isPlaying).toBe(true)
+    })
+
+    it('ended while playing reconnects: reassigns src and calls play() after backoff', () => {
+      useMediaStore.setState({ isPlaying: true, isBuffering: false })
+      const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+      const audio = container.querySelector('audio') as HTMLAudioElement
+      const load = vi.spyOn(audio, 'load').mockImplementation(() => {})
+      play.mockClear()
+      markEnded(audio)
+      act(() => {
+        audio.dispatchEvent(new Event('pause'))
+        audio.dispatchEvent(new Event('ended'))
+      })
+      expect(useMediaStore.getState().isPlaying).toBe(true)
+      expect(useMediaStore.getState().isBuffering).toBe(true)
+      expect(play).not.toHaveBeenCalled()
+      act(() => {
+        vi.advanceTimersByTime(2000)
+      })
+      expect(load).toHaveBeenCalledTimes(1)
+      expect(play).toHaveBeenCalledTimes(1)
+    })
+
+    it('ended while not playing does nothing', () => {
+      useMediaStore.setState({ isPlaying: false, isBuffering: false })
+      const { container } = render(<AudioProvider streamUrl="https://stream.example.com/radio" />)
+      const audio = container.querySelector('audio') as HTMLAudioElement
+      play.mockClear()
+      act(() => {
+        audio.dispatchEvent(new Event('ended'))
+        vi.advanceTimersByTime(60_000)
+      })
+      expect(play).not.toHaveBeenCalled()
+      expect(useMediaStore.getState().isBuffering).toBe(false)
+    })
+  })
 })

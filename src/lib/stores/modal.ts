@@ -12,6 +12,11 @@ interface ModalStore {
   // (pushModal/prepareBack never touch it), so a detail sheet pushed on top
   // of the search sheet still resolves back to the search sheet when popped.
   rootSheet: 'search' | 'detail' | null
+  // One-shot signal for the panel content stage: which way the in-panel
+  // navigation just moved. Set by pushModal/prepareBack, consumed (cleared)
+  // by the stage once the animation is started.
+  navDirection: 'push' | 'pop' | null
+  clearNavDirection: () => void
   openModal: (title?: string) => void
   openSearchSheet: (title?: string) => void
   pushModal: (title?: string) => void
@@ -32,8 +37,11 @@ export const useModalStore = create<ModalStore>((set) => ({
   triggerRef: null,
   stackDepth: 0,
   rootSheet: null,
+  navDirection: null,
+  clearNavDirection: () => set({ navDirection: null }),
   openModal: (title) =>
     set({
+      navDirection: null,
       expectingRoute: true,
       expectingBack: false,
       isOpen: true,
@@ -44,6 +52,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     }),
   openSearchSheet: (title) =>
     set({
+      navDirection: null,
       expectingRoute: true,
       expectingBack: false,
       isOpen: true,
@@ -54,6 +63,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     }),
   pushModal: (title) =>
     set((state) => ({
+      navDirection: 'push' as const,
       expectingRoute: true,
       expectingBack: false,
       isOpen: true,
@@ -66,6 +76,7 @@ export const useModalStore = create<ModalStore>((set) => ({
   startClosing: () => set({ isClosing: true }),
   prepareBack: () =>
     set((state) => ({
+      navDirection: 'pop' as const,
       isClosing: false,
       expectingBack: true,
       expectingRoute: false,
@@ -73,6 +84,7 @@ export const useModalStore = create<ModalStore>((set) => ({
     })),
   clearBack: () => set({ expectingBack: false }),
   close: () => set({
+    navDirection: null,
     isOpen: false,
     expectingRoute: false,
     expectingBack: false,

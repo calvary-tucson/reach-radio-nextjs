@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<title>Mock: teacher panel push/pop + overlay</title>
+<!-- No UI mock adapter in this repo: standalone mock using the real Tailwind v4 class names,
+     real @custom-variant light, real keyframes (src/app/globals.css) and real chrome classes
+     (TeacherPanelChrome, MobileNav, Header). Colors/tokens are the real ones. -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @custom-variant light (&:where(.light, .light *));
+  @keyframes modal-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes panel-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes modal-slide-down { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(24px); } }
+  @keyframes panel-slide-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+  @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  /* NEW motion (proposed): content push/pop inside the panel */
+  @keyframes pg-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes pg-out-left { from { transform: translateX(0); filter: brightness(1); } to { transform: translateX(-28%); filter: brightness(.7); } }
+  @keyframes pg-in-left { from { transform: translateX(-28%); filter: brightness(.7); } to { transform: translateX(0); filter: brightness(1); } }
+  @keyframes pg-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+</style>
+</head>
+<body class="bg-neutral-950 light:bg-neutral-200 text-white light:text-gray-900 p-4 font-sans">
+  <div class="flex flex-wrap items-center gap-2 mb-4 text-sm">
+    <span class="font-bold mr-2">Controls</span>
+    <button class="px-3 h-9 rounded bg-white/15 light:bg-black/10 cursor-pointer" onclick="toggleTheme()">🌗 Theme: <b id="themeLbl">dark</b></button>
+    <button class="px-3 h-9 rounded bg-white/15 light:bg-black/10 cursor-pointer" onclick="toggleOverlay()">🎞️ Overlay: <b id="ovlLbl">current (fades in)</b></button>
+    <button class="px-3 h-9 rounded bg-green-600 text-white cursor-pointer" onclick="runAll('open')">▶️ 1 Open panel</button>
+    <button class="px-3 h-9 rounded bg-green-600 text-white cursor-pointer" onclick="runAll('push')">👆 2 Tap "Also on Reach Radio"</button>
+    <button class="px-3 h-9 rounded bg-green-600 text-white cursor-pointer" onclick="runAll('pop')">⬅️ 3 Back</button>
+    <button class="px-3 h-9 rounded bg-white/15 light:bg-black/10 cursor-pointer" onclick="runAll('close')">✕ Close / reset</button>
+  </div>
+  <p class="text-xs text-white/60 light:text-gray-600 mb-4 max-w-3xl">
+    Mobile (390) and desktop (right panel) side by side. Run 1 → 2 → 3. Shell (drag handle, ⬅️ and ✕ buttons) never moves; only the content area pushes/pops.
+    Toggle Overlay to compare today's fade-in (nav shows through for ~0.2s, most visible on light) against the proposed instant-opaque overlay.
+  </p>
+  <div class="flex flex-wrap items-start gap-8" id="stages"></div>
+
+<script>
+const TEACHERS = [
+  { n: 'Robert Furrow', t: 'Calvary Chapel Tucson', b: ['Pastor and Bible teacher. Verse-by-verse series through Scripture, airing weekdays.', 'Also teaches on prayer and the local church.'] },
+  { n: 'David Guzik', t: 'Enduring Word', b: ['Bible commentary author and teacher with daily studies.', 'Known for clear, practical teaching.'] },
+  { n: 'Skip Heitzig', t: 'Connect with Skip', b: ['Senior pastor and author. Expository teaching heard daily.', 'Founder of a large Bible study ministry.'] },
+]
+let ovlFixed = false
+const stages = []
+
+function avatar(sz) {
+  return `<div class="rounded-full overflow-hidden bg-gradient-to-br from-[#2d4a1a] to-[#1a2d0f] flex items-center justify-center text-[rgba(132,184,79,0.8)] font-bold" style="width:${sz}px;height:${sz}px">🙂</div>`
+}
+function pageHTML(i, mobile) {
+  const t = TEACHERS[i % TEACHERS.length]
+  const others = TEACHERS.filter((_, k) => k !== i % TEACHERS.length)
+  return `<div class="p-4">
+    <div class="flex items-center gap-3 mb-3">${avatar(mobile ? 72 : 88)}
+      <div><h2 class="text-xl font-bold text-white light:text-gray-900">${t.n}</h2>
+      <p class="text-sm text-white/80 light:text-gray-600">${t.t}</p></div></div>
+    ${t.b.map(p => `<p class="text-sm text-white/80 light:text-gray-700 mb-2">${p}</p>`).join('')}
+    <div class="h-px bg-white/10 light:bg-gray-200 my-3"></div>
+    <p class="text-sm font-bold uppercase tracking-[0.1em] text-white/80 light:text-gray-600 mb-3">Also on Reach Radio</p>
+    <div class="flex gap-3">${others.map(o => `<div class="w-[72px] flex flex-col items-center gap-1 text-center text-sm">${avatar(48)}<span class="text-white/80 light:text-gray-700 leading-tight">${o.n}</span></div>`).join('')}</div>
+  </div>`
+}
+
+function build(mobile) {
+  const w = mobile ? 390 : 760, h = mobile ? 760 : 520
+  const wrap = document.createElement('div')
+  wrap.innerHTML = `<p class="text-xs mb-1 text-white/70 light:text-gray-600">${mobile ? '📱 Mobile 390 (bottom sheet)' : '🖥️ Desktop (right panel, scaled 760)'}</p>
+  <div class="relative overflow-hidden border border-white/10 light:border-gray-300 text-white light:text-gray-900 bg-[#1a1d24] light:bg-gray-100" style="width:${w}px;height:${h}px">
+    ${mobile
+      ? `<header class="absolute top-0 z-50 flex items-center justify-between w-full min-h-[64px] px-4 bg-black light:bg-white border-b border-b-white/10 light:border-b-gray-200"><b>🎙️ Reach Radio</b><span>☰</span></header>
+         <nav class="absolute bottom-0 left-0 right-0 z-[60] flex items-center justify-around w-full h-16 text-white light:text-gray-900 bg-black light:bg-white border-t border-t-green-700 light:border-t-green-800"><span>🏠</span><span>📅</span><span>👤</span><span>💚</span></nav>`
+      : `<header class="absolute top-0 z-50 flex w-full h-16 items-center justify-between bg-gray-800 light:bg-white border-b border-b-green-500/20 light:border-b-gray-200 px-6"><b>🎙️ Reach Radio</b><span class="text-sm">Listen · Teachers · Schedule · Donate</span></header>`}
+    <div class="absolute inset-x-4 top-20 space-y-2"><div class="h-5 w-1/2 bg-white/10 light:bg-black/10 rounded"></div><div class="h-24 bg-white/5 light:bg-black/5 rounded-xl"></div><div class="h-24 bg-white/5 light:bg-black/5 rounded-xl"></div></div>
+    <div class="ovl absolute inset-0 z-[70] bg-black/80"></div>
+    <div class="hostEl absolute inset-0 z-[70] flex ${mobile ? 'items-end' : 'justify-end'}"></div>
+  </div>`
+  document.getElementById('stages').appendChild(wrap)
+  const root = wrap.querySelector('.relative')
+  const s = { mobile, root, ovl: root.querySelector('.ovl'), host: root.querySelector('.hostEl'), stack: [], idx: 0, panel: null, area: null }
+  stages.push(s)
+  return s
+}
+
+function shell(s) {
+  const m = s.mobile
+  const btn = 'flex h-11 w-11 items-center justify-center rounded-full cursor-pointer'
+  const panel = document.createElement('div')
+  panel.className = `relative flex flex-col overflow-hidden bg-[#0f1a0a] light:bg-white border-white/[0.08] light:border-gray-200 w-full ${m ? 'rounded-t-2xl border h-[92%]' : 'h-full w-[480px] rounded-l-2xl border-l'}`
+  panel.style.animation = m ? 'modal-slide-up .2s cubic-bezier(0.32,0.72,0,1) both' : 'panel-slide-in .25s cubic-bezier(0.32,0.72,0,1) both'
+  panel.innerHTML = `<div class="flex items-center justify-between px-3 pt-3 pb-2 shrink-0 z-10 bg-[#0f1a0a] light:bg-white">
+      <button class="back ${btn} bg-white/25 light:bg-gray-200 text-white/80 light:text-gray-500 opacity-0 pointer-events-none -translate-x-3 scale-75 motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)]" aria-label="Back" aria-hidden="true" onclick="one(this,'pop')">⬅️</button>
+      ${m ? '<div class="h-1 w-10 rounded-full bg-white/30 light:bg-gray-300"></div>' : '<span></span>'}
+      <button class="${btn} text-white/80 light:text-gray-500 hover:bg-white/10" aria-label="Close" onclick="one(this,'close')">✕</button>
+    </div>
+    <div class="area relative flex-1 min-h-0 overflow-hidden"></div>`
+  s.panel = panel; s.area = panel.querySelector('.area'); s.back = panel.querySelector('.back')
+  s.host.innerHTML = ''; s.host.appendChild(panel)
+}
+function mkPage(s, i) {
+  const el = document.createElement('div')
+  el.className = 'absolute inset-0 overflow-y-auto bg-[#0f1a0a] light:bg-white'
+  el.innerHTML = pageHTML(i, s.mobile)
+  return el
+}
+function showBack(s, on) {
+  const c = ['opacity-0','pointer-events-none','-translate-x-3','scale-75']
+  c.forEach(k => s.back.classList.toggle(k, !on))
+  s.back.setAttribute('aria-hidden', String(!on))
+}
+const EASE = '.3s cubic-bezier(0.32,0.72,0,1) both'
+function act(s, kind) {
+  if (kind === 'open') {
+    act(s, 'reset')
+    s.idx = 0
+    s.ovl.style.display = 'block'; s.host.style.display = 'flex'
+    s.ovl.style.animation = ovlFixed ? 'none' : 'fade-in .2s ease-out both'
+    shell(s)
+    const p = mkPage(s, 0); s.area.appendChild(p); s.stack = [p]
+  } else if (kind === 'push' && s.stack.length && s.stack.length < 3) {
+    const cur = s.stack[s.stack.length - 1]
+    s.idx++
+    const p = mkPage(s, s.idx); s.area.appendChild(p); s.stack.push(p)
+    p.style.animation = `pg-in-right ${EASE}`; cur.style.animation = `pg-out-left ${EASE}`
+    showBack(s, true)
+  } else if (kind === 'pop' && s.stack.length > 1) {
+    const cur = s.stack.pop(); const prev = s.stack[s.stack.length - 1]
+    s.idx--
+    cur.style.animation = `pg-out-right ${EASE}`; prev.style.animation = `pg-in-left ${EASE}`
+    setTimeout(() => cur.remove(), 300)
+    if (s.stack.length === 1) showBack(s, false)
+  } else if (kind === 'close' && s.stack.length) {
+    if (s.closing) return
+    s.closing = true
+    s.panel.style.animation = s.mobile ? 'modal-slide-down .2s cubic-bezier(0.32,0.72,0,1) both' : 'panel-slide-out .25s cubic-bezier(0.32,0.72,0,1) both'
+    s.ovl.style.animation = ovlFixed ? 'fade-out .25s ease-out both' : 'fade-out .2s ease-out both'
+    setTimeout(() => { act(s, 'reset'); s.closing = false }, 260)
+  } else if (kind === 'reset') {
+    s.ovl.style.display = 'none'; s.host.style.display = 'none'; s.host.innerHTML = ''; s.stack = []
+  }
+}
+function runAll(k) { stages.forEach(s => act(s, k)) }
+function one(el, k) { const s = stages.find(x => x.root.contains(el)); act(s, k) }
+function toggleTheme() {
+  const h = document.documentElement
+  const light = h.classList.toggle('light'); h.classList.toggle('dark', !light)
+  document.getElementById('themeLbl').textContent = light ? 'light' : 'dark'
+}
+function toggleOverlay() {
+  ovlFixed = !ovlFixed
+  document.getElementById('ovlLbl').textContent = ovlFixed ? 'proposed (opaque at once)' : 'current (fades in)'
+}
+build(true); build(false); stages.forEach(s => { s.ovl.style.display = 'none'; s.host.style.display = 'none' })
+</script>
+</body>
+</html>

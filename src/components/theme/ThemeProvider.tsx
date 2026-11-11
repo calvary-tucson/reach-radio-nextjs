@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, Suspense } from 'react'
 import { flushSync } from 'react-dom'
 import { useSearchParams } from 'next/navigation'
+import { REDUCED_MOTION_QUERY } from '@/lib/hooks/usePrefersReducedMotion'
 import { isTheme, pickTheme, resolveTheme, type Theme } from '@/lib/theme/resolve-theme'
 
 export type { Theme }
@@ -28,7 +29,6 @@ function setThemeCookie(theme: Theme) {
 }
 
 const LIGHT_QUERY = '(prefers-color-scheme: light)'
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
 let latestTransition = 0
 const noop = () => {}

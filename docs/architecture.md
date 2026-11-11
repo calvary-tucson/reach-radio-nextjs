@@ -34,7 +34,7 @@ Teacher detail (`/teachers/[slug]`) and teacher search also render as **intercep
 |---|---|
 | `GET /api/audio-stream` | Proxies the live radiojar stream to browser audio |
 | `GET /api/stream-info` | Current track title/artist (single fetch) |
-| `GET /api/stream-info-sse` | Server-Sent Events — pushes track updates to `NowPlayingProvider` |
+| `GET /api/stream-info-sse` | **Legacy** Server-Sent Events route, kept for iOS v4 native `NowPlayingService` and stale open tabs. The web client now reads the Cloudflare endpoint (`NOW_PLAYING_SSE_URL`, `https://stream.reach.radio/api/stream-info-sse`, the stream Worker) |
 | `GET /api/native-config` | Config endpoint for rebuilt native apps — stream URL, web URL, min version |
 | `GET /api/teachers-list` | JSON list of teachers for search |
 | `POST /api/revalidate` | Sanity webhook — revalidates ISR cache tags on publish |
@@ -48,7 +48,7 @@ All providers live in the root layout. Several are **suppressed in native mode**
 |---|---|---|
 | `ThemeProvider` | No | Dark/light/system theme via CSS class on `<html>` |
 | `AudioProvider` | **Yes** | Browser audio element, stream URL, play/pause/volume state |
-| `NowPlayingProvider` | No | SSE subscription to `/api/stream-info-sse`, writes to `useMediaStore` |
+| `NowPlayingProvider` | No | SSE subscription to the Cloudflare endpoint `NOW_PLAYING_SSE_URL` (title/artist only; teacher photo/name resolved client-side), writes to `useMediaStore` |
 | `SleepTimerProvider` | **Yes** | Countdown timer that stops playback |
 | `BridgeInit` | No (always mounted) | Native bridge setup, always runs |
 
@@ -343,7 +343,8 @@ Client hydration
                   focusin/out → showMobileNav/showMediaBar
 
 NowPlayingProvider (always)
-  └─ SSE → /api/stream-info-sse → useMediaStore.title/artist/image
+  └─ SSE → NOW_PLAYING_SSE_URL (Cloudflare; Vercel /api/stream-info-sse is legacy)
+       → useMediaStore.title/artist/resolvedArtist/image
 
 AudioProvider (browser only)
   └─ <audio> element → useMediaStore.isPlaying/isBuffering

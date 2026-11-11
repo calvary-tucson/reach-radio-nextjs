@@ -1,3 +1,6 @@
+// LEGACY: used only by the iOS v4 native NowPlayingService and stale open tabs.
+// The web client reads NOW_PLAYING_SSE_URL (Cloudflare) instead.
+// Do not remove until those clients are gone.
 import { RADIOJAR_URL } from '@/lib/constants'
 import { resolveArtist } from '@/lib/teacherCache'
 
