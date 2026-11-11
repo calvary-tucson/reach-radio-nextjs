@@ -20,15 +20,8 @@ export interface SiteBanner {
  * dismissed is shown. Add new entries with a new dated id (e.g. each year's silent drive);
  * remove old ones when they no longer matter.
  */
-export const HOME_BANNERS: readonly SiteBanner[] = [
-  {
-    id: '2026-11-11-signal-1067',
-    paragraphs: [
-      'We appreciate your patience and prayer as we try to figure out issues with our signal at 106.7FM. In the meantime, we encourage you to stream our app through your phone.',
-      'Thank you and God Bless!',
-    ],
-  },
-]
+export const HOME_BANNERS: readonly SiteBanner[] = []
+// The 2026-11-11 106.7FM signal notice was retired before launch; see git history (e17ea4f) for its text.
 
 export const BANNER_DISMISSED_PREFIX = 'banner-dismissed:'
 
