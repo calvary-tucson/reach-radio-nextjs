@@ -3,7 +3,8 @@
 import { useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { Calendar, Heart, Info, RadioTower, X, type LucideIcon } from 'lucide-react'
-import { BANNER_DISMISSED_PREFIX, isBannerInWindow, type BannerIcon, type SiteBanner } from '@/lib/banners'
+import { BANNER_DISMISSED_PREFIX, type BannerIcon, type SiteBanner } from '@/lib/banners'
+import { isInDateWindow, todayInPhoenix } from '@/lib/date-window'
 
 interface AnnouncementBannerProps {
   banners: readonly SiteBanner[]
@@ -47,14 +48,10 @@ function writeDismissed(id: string) {
   listeners.forEach((l) => l())
 }
 
-function todayInPhoenix(): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Phoenix' }).format(new Date())
-}
-
 /** Id of the first banner in its date window that was not dismissed, or '' for none. */
 function activeBannerId(banners: readonly SiteBanner[]): string {
   const today = todayInPhoenix()
-  return banners.find((b) => isBannerInWindow(b, today) && !readDismissed(b.id))?.id ?? ''
+  return banners.find((b) => isInDateWindow(b, today) && !readDismissed(b.id))?.id ?? ''
 }
 
 export function AnnouncementBanner({ banners }: AnnouncementBannerProps) {

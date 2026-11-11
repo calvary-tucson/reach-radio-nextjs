@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { AnnouncementBanner } from '@/components/home/AnnouncementBanner'
-import { BANNER_DISMISSED_PREFIX, isBannerInWindow, type SiteBanner } from '@/lib/banners'
+import { BANNER_DISMISSED_PREFIX, type SiteBanner } from '@/lib/banners'
+import { isInDateWindow } from '@/lib/date-window'
 
 const banner: SiteBanner = { id: '2026-01-01-test', paragraphs: ['Hello', 'God Bless!'] }
 const other: SiteBanner = { id: '2026-02-02-other', paragraphs: ['Second'] }
@@ -57,16 +58,16 @@ describe('AnnouncementBanner', () => {
   })
 })
 
-describe('isBannerInWindow', () => {
+describe('isInDateWindow', () => {
   it('is always in window without dates', () => {
-    expect(isBannerInWindow(banner, '2099-01-01')).toBe(true)
+    expect(isInDateWindow(banner, '2099-01-01')).toBe(true)
   })
 
   it('is inclusive of the start and expiry days', () => {
     const b = { ...banner, startsOn: '2026-11-10', expiresOn: '2026-11-20' }
-    expect(isBannerInWindow(b, '2026-11-09')).toBe(false)
-    expect(isBannerInWindow(b, '2026-11-10')).toBe(true)
-    expect(isBannerInWindow(b, '2026-11-20')).toBe(true)
-    expect(isBannerInWindow(b, '2026-11-21')).toBe(false)
+    expect(isInDateWindow(b, '2026-11-09')).toBe(false)
+    expect(isInDateWindow(b, '2026-11-10')).toBe(true)
+    expect(isInDateWindow(b, '2026-11-20')).toBe(true)
+    expect(isInDateWindow(b, '2026-11-21')).toBe(false)
   })
 })
