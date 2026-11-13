@@ -161,6 +161,22 @@ Command: `vercel usage --scope calvary-tucson-s-team --breakdown daily` and `--g
 - Health: stream.reach.radio 200 audio/mpeg; Worker SSE sends `imageUrl`/`resolvedArtist`; `/api/stream-info` ok; reach.radio 200; last prod deploys Ready.
 - Conclusion: the web SSE move worked as designed but is not the (only) memory driver. Suspects, unmeasured: `/api/audio-stream` proxy (maxDuration 780; Sanity `radioAudioURL` still points there for iOS v3, Android, Astro), old SSE route hit by iOS v3/v4 and Android, stale tabs. Next: read Vercel runtime logs per route for Nov 6-12 before changing anything.
 
+## 8i. Cause found Nov 13: stale tabs on the old SSE route; route retired with 204 (2026-11-13)
+
+Evidence (Vercel dashboard Request Logs, Last day, `environment:production`, Request Path `/api/stream-info-sse`):
+- 229 production requests in 24 h, all `GET 200`, all `/api/stream-info-sse`: the busiest route on the site. Hosts: mostly `reach.radio`, a few `reachradiotucson.com` / `www.reachradiotucson.com`.
+- Detail of one row (Nov 13 12:33, `reachradiotucson.com`): User Agent Android Chrome (no WebView marker), Execution Duration 11m 32s, 229 MB. A browser tab, not a native app.
+- Current web code only references the Worker (`NOW_PLAYING_SSE_URL`, `constants.ts:23`), so that tab runs pre-Nov 5 JS. EventSource reconnects after each 10-12 min close, so a forgotten tab bills Fluid memory all day.
+- Not explained: a Nov 12 ~2 min cadence from `reach.radio` (User Agent not read). Native apps ruled out for the sampled row only; iOS v4 is unreleased, iOS v3 and Android appear to use the old `pages.dev` site (unverified).
+- Log CLI limits: `vercel logs` has no User Agent or duration, caps at 50 rows, and keeps about 1 day. Use the dashboard Request Logs view, not Runtime Logs (which lists only requests that printed a message).
+
+Fix (local commit, not pushed or deployed): `src/app/api/stream-info-sse/route.ts` now returns 204 with `no-store` and `maxDuration = 5`. 204 makes EventSource stop reconnecting; never redirect. Tests in `tests/unit/api-stream-info-sse.test.ts` (3), full suite 453 passed, tsc and eslint clean.
+
+Follow-ups:
+- iOS v4 `NowPlayingService.swift:71` must be repointed to `https://stream.reach.radio/api/stream-info-sse` before v4 ships (its now-playing breaks otherwise).
+- After deploy, recheck `vercel usage --breakdown daily` for 2-3 days; expect Fluid memory well under $1/day. If not, look at other routes in the dashboard Route filter.
+- Side bug, untouched: `/ads.txt` falls into `[...catchAll]` and logs a React metadata-boundary error (Googlebot, status 200).
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
