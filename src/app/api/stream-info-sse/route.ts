@@ -1,104 +1,17 @@
-// LEGACY: used only by the iOS v4 native NowPlayingService and stale open tabs.
-// The web client reads NOW_PLAYING_SSE_URL (Cloudflare) instead.
-// Do not remove until those clients are gone.
-import { RADIOJAR_URL } from '@/lib/constants'
-import { resolveArtist } from '@/lib/teacherCache'
+// RETIRED 2026-11-13. Now-playing SSE lives on the Cloudflare Worker
+// (NOW_PLAYING_SSE_URL in @/lib/constants). This route used to hold each request
+// open for 10-12 min, and Vercel Fluid compute billed provisioned memory for all
+// of it; stale browser tabs kept reconnecting (Nov 13 log: Android Chrome tab,
+// 11m32s per connection). A 204 tells EventSource to stop reconnecting for good.
+// Never redirect: an EventSource would follow it and keep a connection open.
+// iOS v4 NowPlayingService must be repointed to the Worker before release.
+// Detail: docs/bugs/vercel-usage-spike-2026-11.md.
 
-export const maxDuration = 780
+export const maxDuration = 5
 
-const MAX_POLL_BACKOFF_MS = 5 * 60_000
-const MIN_CONNECTION_MS = 10 * 60_000
-const CONNECTION_JITTER_MS = 2 * 60_000
-
-function getConnectionTimeoutMs(): number {
-  return MIN_CONNECTION_MS + Math.random() * CONNECTION_JITTER_MS
-}
-
-export async function GET(): Promise<Response> {
-  const encoder = new TextEncoder()
-  let pollTimer: ReturnType<typeof setTimeout> | undefined
-  let keepaliveInterval: ReturnType<typeof setInterval> | undefined
-  let connectionTimeout: ReturnType<typeof setTimeout> | undefined
-  const abortController = new AbortController()
-  let cancelled = false
-  let consecutiveFailures = 0
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      function schedulePoll(delay: number) {
-        if (cancelled) return
-        pollTimer = setTimeout(() => void poll(), delay)
-      }
-
-      async function poll() {
-        if (cancelled) return
-        try {
-          const res = await fetch(RADIOJAR_URL, {
-            signal: AbortSignal.any([
-              AbortSignal.timeout(5_000),
-              abortController.signal,
-            ]),
-          })
-          const text = await res.text()
-          const stripped = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '')
-          const json = JSON.parse(stripped) as { title?: string; artist?: string }
-          const title = json.title || 'Reach Radio'
-          const artist = json.artist || ''
-          const { imageUrl, resolvedArtist } = await resolveArtist(artist)
-          consecutiveFailures = 0
-          if (!cancelled) {
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ title, artist, imageUrl, resolvedArtist })}\n\n`)
-            )
-          }
-          schedulePoll(30_000)
-        } catch {
-          if (!cancelled) {
-            consecutiveFailures++
-            const delay = Math.min(30_000 * Math.pow(2, consecutiveFailures - 1), MAX_POLL_BACKOFF_MS)
-            schedulePoll(delay)
-          }
-        }
-      }
-
-      // Keepalive comments every 15s prevent proxy/Vercel from closing idle connections
-      keepaliveInterval = setInterval(() => {
-        if (!cancelled) {
-          try {
-            controller.enqueue(encoder.encode(': keepalive\n\n'))
-          } catch {
-            cancelled = true
-          }
-        }
-      }, 15_000)
-
-      // Forces a client reconnect after a jittered 10-12 minute window, so
-      // connections opened around the same time (e.g. at broadcast start)
-      // don't all reconnect in the same instant.
-      connectionTimeout = setTimeout(() => {
-        cancelled = true
-        clearTimeout(pollTimer)
-        clearInterval(keepaliveInterval)
-        abortController.abort()
-        try { controller.close() } catch { /* already closed */ }
-      }, getConnectionTimeoutMs())
-
-      await poll()
-    },
-    cancel() {
-      cancelled = true
-      clearTimeout(pollTimer)
-      clearTimeout(connectionTimeout)
-      clearInterval(keepaliveInterval)
-      abortController.abort()
-    },
-  })
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-store',
-      Connection: 'keep-alive',
-    },
+export function GET(): Response {
+  return new Response(null, {
+    status: 204,
+    headers: { 'Cache-Control': 'no-store' },
   })
 }
