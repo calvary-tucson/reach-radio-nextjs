@@ -7,9 +7,15 @@
 // iOS v4 NowPlayingService must be repointed to the Worker before release.
 // Detail: docs/bugs/vercel-usage-spike-2026-11.md.
 
+import { connection } from 'next/server'
+
 export const maxDuration = 5
 
-export function GET(): Response {
+// connection() keeps this out of build-time prerendering: with cacheComponents a
+// plain GET is prerendered, and the build cannot store a bodiless 204 response
+// (`Invalid response status code 204`, failed the Nov 13 production deploy).
+export async function GET(): Promise<Response> {
+  await connection()
   return new Response(null, {
     status: 204,
     headers: { 'Cache-Control': 'no-store' },
