@@ -151,6 +151,16 @@ Survey of `src/app` routes plus an advisor review. Verdict: nothing else is wort
 - Still open: iOS repoint. Named events are safe for iOS: `NowPlayingService.swift:83` reads only lines starting `data: ` and skips `event:` and `id:` lines.
 - Vercel SSE route stays until iOS v4 is repointed.
 
+## 8h. Cost check Nov 13: SSE fix did NOT lower Fluid memory (2026-11-13)
+
+Command: `vercel usage --scope calvary-tucson-s-team --breakdown daily` and `--group-by project --from/--to`.
+
+- reach-radio-nextjs Fluid Provisioned Memory: Nov 1-5 = $5.61 (about $1.12/day, Nov 1 spike $2.75); Nov 6-12 = $7.56 (about $1.08/day). Daily Nov 6-12: 1.80, 1.53, 0.55, 1.24, 1.43, 0.34, 0.68. No drop.
+- Team usage credit ($20) ran out on Nov 7. Overage billed Nov 7-12 about $8.04. Month usage Nov 1-12 about $27.6 including Pro fee $7.74. Projection to the Nov 24 reset at about $1.0-1.9/day: overage about $22-23, plus the $20 Pro fee.
+- Nov 6-12 per project (billed): reach-radio-nextjs $5.87, svelte $2.00 (Function Duration), calvarytucson-nextjs $0.17.
+- Health: stream.reach.radio 200 audio/mpeg; Worker SSE sends `imageUrl`/`resolvedArtist`; `/api/stream-info` ok; reach.radio 200; last prod deploys Ready.
+- Conclusion: the web SSE move worked as designed but is not the (only) memory driver. Suspects, unmeasured: `/api/audio-stream` proxy (maxDuration 780; Sanity `radioAudioURL` still points there for iOS v3, Android, Astro), old SSE route hit by iOS v3/v4 and Android, stale tabs. Next: read Vercel runtime logs per route for Nov 6-12 before changing anything.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
