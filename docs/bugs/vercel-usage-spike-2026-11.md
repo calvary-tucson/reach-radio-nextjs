@@ -179,6 +179,16 @@ Follow-ups:
 - After deploy, recheck `vercel usage --breakdown daily` for 2-3 days; expect Fluid memory well under $1/day. If not, look at other routes in the dashboard Route filter.
 - Side bug, untouched: `/ads.txt` falls into `[...catchAll]` and logs a React metadata-boundary error (Googlebot, status 200).
 
+## 8j. Follow-through, Nov 13 evening (2026-11-13)
+
+- **iOS v4 repointed.** Commit `08dff14` (iOS branch `stream-url-worker`, fast-forwarded into local iOS `main`, not pushed): `AppConfig.nowPlayingSSEURL` = `https://stream.reach.radio/api/stream-info-sse`, baseURL plumbing removed, 2 URL tests. 250 unit tests pass; one UI test (`testKBDebugTeachersSearchDoneButton`) failed on simulator launch (`RequestDenied`), not re-run, probably unrelated.
+- **Side bug fixed.** `/ads.txt` is now a static `public/ads.txt` (`32f8e61`, pushed, deploy Ready): `GET` 200 `text/plain`, `POST` 405. Owner: "we don't run ads". Docs commit `60e89f6` also pushed.
+- **Retirement verified in the dashboard.** Request Logs filtered to the route: last real `200` Nov 13 13:16:33 local; after that only `204` rows (13:20:38 verification curls, 14:04:46 probe with UA `claude-triage-probe`). No real client hit it since.
+- **Nov 12 "2 min cadence" explained.** Row detail (Nov 12 22:29:50, `reach.radio`): Execution Duration 10m18s, 236 MB. Rows 2 min apart were start times of about 5 overlapping long-held connections, the same pattern as the Android row. Not a reconnect loop. Client type unknown (the detail panel has no User Agent); stale old-JS tabs most likely.
+- **Spend.** Usage page Nov 13: $28.22 total ($20 Pro + $8.22 on-demand), Fluid Provisioned Memory $17.62. Spend Management: team budget $30, notify at 50/75/100%, webhook off, "Pause production deployments" off (notify only). Projected month-end about $30. Recheck `vercel usage --breakdown daily` Nov 16-17.
+- **Triage (CAL-203).** Full table in `docs/bugs/vercel-log-triage-2026-11-13.md`. Open, not approved: soft 404 (200 on unmatched paths, cached, no function cost, `[...catchAll]` calls `notFound()`; real 404 via `global-not-found.tsx` or proxy, needs `next build`), duplicate robots meta on the 404 page, `/.well-known/assetlinks...` 31 hits (check the file exists).
+- **Still unmeasured:** Sanity `radioAudioURL` volume on `/api/audio-stream` (iOS v3 and Astro likely still use it), Android and iOS v3 published URLs, Cloudflare 100k req/day cap vs Worker traffic. Phase F flip stays gated on iOS v4 release plus real-device test.
+
 ## 9. Recipes and gotchas worth keeping
 
 - Dev server in an Orca worktree: `doppler run --project reach-radio-nextjs --config dev -- npx next dev -p 3100` (plain `npm run dev` fails because Doppler is not linked there; plain `next dev` returns 500 with no Sanity env). Stop only your own server by PID (`lsof -tiTCP:3100 -sTCP:LISTEN -P -n`), never `pkill -f next-server`.
