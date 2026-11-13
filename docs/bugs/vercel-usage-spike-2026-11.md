@@ -172,6 +172,8 @@ Evidence (Vercel dashboard Request Logs, Last day, `environment:production`, Req
 
 Fix (local commit, not pushed or deployed): `src/app/api/stream-info-sse/route.ts` now returns 204 with `no-store` and `maxDuration = 5`. 204 makes EventSource stop reconnecting; never redirect. Tests in `tests/unit/api-stream-info-sse.test.ts` (3), full suite 453 passed, tsc and eslint clean.
 
+Gotcha (Nov 13, first push of the 204 failed the production build, old deploy stayed live): with `cacheComponents` a plain `GET` route handler is prerendered at build time, and the build cannot store a bodiless 204 (`TypeError: Response constructor: Invalid response status code 204`, then 3 retries of 60 s each). Unit tests and tsc did not catch it. Fix: `await connection()` from `next/server` at the top of the handler (route shows as `ƒ Dynamic` in the build table); unit tests must mock `next/server` because `connection()` throws outside a request. Rule: run a real `doppler run --project reach-radio-nextjs --config dev -- npx next build` before pushing any route-handler change.
+
 Follow-ups:
 - iOS v4 `NowPlayingService.swift:71` must be repointed to `https://stream.reach.radio/api/stream-info-sse` before v4 ships (its now-playing breaks otherwise).
 - After deploy, recheck `vercel usage --breakdown daily` for 2-3 days; expect Fluid memory well under $1/day. If not, look at other routes in the dashboard Route filter.
