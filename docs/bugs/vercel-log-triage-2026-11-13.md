@@ -31,4 +31,6 @@ Not found: any 5xx, any warning-level row, any user-facing 4xx. Zero real error 
 2. Make unmatched paths return a real 404: add `src/app/global-not-found.tsx` with `experimental.globalNotFound` (check `node_modules/next/dist/docs` for the flag first), or reject unknown paths in `src/proxy.ts`. Needs `next build` before push (see memory: route changes).
 3. Remove the duplicate robots meta on the 404 page (`noindex` plus `index, follow`), folded into fix 2.
 
+Decision (owner, Nov 13): fixes 2 and 3 on HOLD. Research: Next docs (`loading.md` "Status Codes") say a streamed `notFound()` returns 200 with Next's own `noindex` meta and "does not lead to indexation"; value is cosmetic. `15eca2e` added the catch-all because the `@modal` slot's own `[...catchAll]` returned a blank 200, and `tests/e2e/not-found.spec.ts` guards it. If ever revisited: prefer a `src/proxy.ts` allowlist (already runs on every non-API request, no new invocations; needs `next build`, `next start`, `curl -I` on all real routes, e2e). `global-not-found.tsx` is experimental, skips the root layout, and is untested with `@modal`/`cacheComponents`. Revisit only if Search Console flags soft 404s.
+
 ads.txt needs no more work beyond watching for new `/ads.txt` error rows.
