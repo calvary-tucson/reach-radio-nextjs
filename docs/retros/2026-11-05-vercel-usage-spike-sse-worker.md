@@ -36,10 +36,10 @@
 - No global rule or skill change: each lesson is first occurrence and project-specific (see Pruned).
 
 ## Action items (owner | tracked in | due | done when)
-1. owner | this file | 2026-11-13 (owner returns; moved from Nov 7) | `vercel usage --scope calvary-tucson-s-team --breakdown daily` shows Fluid Provisioned Memory for Nov 6-12 sharply lower than about $0.78/day; result added to the bug doc.
+1. DONE 2026-11-13: cost check run, result in bug doc 8h. Fluid memory was NOT lower (about $1.08/day vs $1.12/day); cause found in 8i (stale tabs on the old SSE route), route retired with 204 (`36c62ab`). New check: `vercel usage --breakdown daily` around Nov 16-17, expect well under $1/day.
 2. owner | plan Task 3 step 5, roadmap row 20 | before iOS v4 ships | `NowPlayingService.swift` points at `https://stream.reach.radio/api/stream-info-sse`.
 3. DONE 2026-11-05: Worker repo pushed (`2965db5`, then `2965db5..240ab5a` with teacher resolution).
-4. owner | bug doc 8d | after the Nov 13 cost check | Yes/No decided on disabling the old Vercel SSE route (204 or tiny `maxDuration`).
+4. DONE 2026-11-13: owner Yes on 204; live on prod (`36c62ab`). First push `58ba9c6` failed the production build (cacheComponents cannot prerender a bodiless 204), fixed by `b0b07ce`; lesson in memory `feedback-run-next-build-before-route-push`.
 5. me | bug doc section 8 | after iOS v4 and stale tabs gone | Vercel SSE route retired, `pages.dev` removed from `media-src` plan reviewed.
 
 ## Pruned
