@@ -53,16 +53,26 @@ Content hash of the working state: temp `GIT_INDEX_FILE` in `$TMPDIR`, `git read
 `git add -A`, `git write-tree`. A clean tree equals `HEAD^{tree}`, so committing does
 not invalidate a receipt; any edit does. Verified to work inside the sandbox. No stash use.
 
-### harness-build (primary receipt path)
-Wrapper on PATH. Runs `buildGate.cmd` (through `rg-run --class build` when available),
-and on exit 0 writes a receipt `{key, cmd, time}` into `$(git rev-parse --git-dir)/harness/`.
-Claude and the owner both run it, so the owner's `! harness-build` counts (a bare `!` run
-fires no hooks). The git dir is writable from sandboxed Bash; `~/.claude` mostly is not.
+### harness-build (the only receipt path)
+Wrapper, symlinked into `~/.local/bin` like `rg-run`. Runs `buildGate.cmd` in the
+foreground (through `rg-run --class build`), and on exit 0 writes a receipt
+`{key, cmd, time}` into `$(git rev-parse --git-common-dir)/harness/`.
+- **Common dir, not git dir.** `--git-dir` is per-worktree (`.git/worktrees/<id>`), so a
+  worktree receipt would be invisible to the push guard in the main checkout. The common
+  dir is shared and is writable from sandboxed Bash (verified).
+- Claude and the owner both run it, so the owner's `! harness-build` counts (a bare `!`
+  run fires no hooks).
+- The build itself needs the sandbox off (doppler); the wrapper is run that way.
+- Never run it with `run_in_background`; the wrapper must exit 0 before the receipt exists.
+- Running the raw `doppler ... next build` directly writes no receipt. By design: the gate
+  then asks for `harness-build`. No PostToolUse receipt hook: the Bash `tool_response` has
+  no exit-code field and background timing is undocumented, so it cannot be trusted.
 
-### receipt.sh (secondary, PostToolUse Bash)
-If a successful, non-background Bash command equals `buildGate.cmd`, write the receipt.
-PostToolUse fires only on success; Bash `tool_response` has no exit-code field;
-failures go to PostToolUseFailure. Background-run timing is undocumented, so do not rely on it.
+### Threat model
+Guards against accidental misses, not an adversarial model. Hand-writing a receipt is
+blocked by a PreToolUse deny on Bash/Edit/Write targeting `*/.git/harness/*`
+(same pattern as `block-shell-source-edit`). Owner kill switch: file
+`~/.claude/harness/off` (like resource-guard's `off`); there is no env-var bypass.
 
 ### stop-gate.sh (Stop)
 Block when the change set touches `buildGate.paths` and no receipt matches the current key.
@@ -70,16 +80,29 @@ Block when the change set touches `buildGate.paths` and no receipt matches the c
   (so committing first cannot dodge the gate).
 - Exit 0 immediately if `stop_hook_active` is true.
 - Fire at most once per tree key.
-- Skip when `last_assistant_message` ends with a question or contains `WAITING ON`.
+- Skip when `last_assistant_message` ends with a question or contains `WAITING ON`
+  (orchestrated children that need the owner for a sandbox-off build end that way).
 - Shares the 8-consecutive-continuation cap with `next-me-check`.
 - Block reason names the exact `harness-build` command.
+- **Strength, stated honestly:** the Stop gate is a one-shot forced retry, not a wall.
+  Claude can ignore it once and the second stop passes. The hard gate is the push guard.
+  Once-per-key is deliberate: blocking forever risks a stuck session when the build
+  cannot run (queued, owner away).
+- Triggers only when the change set touches `buildGate.paths`, so docs-only and
+  research sessions are never blocked.
 
 ### push-guard.sh (PreToolUse Bash, `git push`)
 - Deny a feature-branch push (`blockFeaturePush`). Exit 2 with the reason on stderr.
 - When the pushed commits touch `buildGate.paths`, require a receipt whose key equals the
   tree of the commit being pushed (owner decision 2026-11-16). After the `--no-ff` merge in
   the main checkout this forces one rebuild there, so what ships is what was built.
+- Resolve what is pushed from the command: `git push`, `git push origin main`,
+  `HEAD:main`, `--force`. Source ref's tree via `git rev-parse <src>^{tree}`. Always deny
+  `--force`/`--force-with-lease` to the main branch. A push form the parser cannot
+  resolve is denied with the reason (fail closed), not guessed.
 - Runs bare; piped or compound push commands are already a known auth problem.
+- The tree is read in the main checkout; the receipt comes from the shared common dir, so a
+  worktree build counts only if the merged tree is byte-identical, otherwise rebuild.
 
 ### commit-scope.sh (PreToolUse Bash, `git commit`)
 - A scope, if present, must be in `commitScopes`. No scope is allowed.
@@ -100,6 +123,13 @@ which also runs outside Claude. Not chosen for v1; revisit if the grep false-pos
 5. Commit and merge to main. 6. Push guard compares the pushed tree to a receipt; missing
 means deny with "run harness-build in the main checkout".
 
+## Performance and contract
+
+- Tree key measured at 0.27 s on this repo (temp index, `git add -A`). Budget: every
+  hook under 1 s on a route-touching change, a no-op under 50 ms with no config.
+- Plan step 0: capture real Stop, PreToolUse and PostToolUse payloads from a live session
+  into fixtures, so tests match the harness and not the docs. Hook tests must use them.
+
 ## Testing
 
 Fixture-repo shell tests: no config is a no-op; receipt valid then voided by an edit;
@@ -114,7 +144,15 @@ Config-health size budget in `hooks/tests/test-config-health.sh` must stay green
 3. `settings.json` Yes/No. 4. reach-radio-nextjs `harness.json`. 5. Other repos opt in later.
 Plan then executes in a child session per owner rule (sonnet coordinator, haiku implementers).
 
+## Known limits (accepted)
+
+- Hooks run only in Claude sessions on this machine. A push from a plain terminal or
+  another tool bypasses them. CI is the off-machine gate and is a follow-up, not v1.
+- Receipt proves a build passed for that tree and command, not that the route table was
+  read. The "route shows ƒ Dynamic" check stays a human step in the push question.
+- UI grep rules are heuristic and warn only.
+
 ## Open items
 
-None blocking. Follow-ups: CI workflow as an off-machine gate; `package-lock.json` shows
-modified in this worktree (not caused by this work), check before the first commit.
+None blocking. `package-lock.json` shows modified in this worktree (not caused by this
+work); check before the next commit.
