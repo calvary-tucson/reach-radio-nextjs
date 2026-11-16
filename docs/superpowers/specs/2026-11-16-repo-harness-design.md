@@ -20,7 +20,8 @@ Logic is global and tested once. Each repo declares its own rules as data.
 
 - Engine: `claude-code-config/hooks/repo-harness/`, installed by `apply-repo-harness.sh`.
   The owner reads the diff first. Registering hooks in `settings.json` needs a
-  Yes/No naming the exact lines (back up to `$TMPDIR`, edit only those lines, verify `jq -e .`).
+  Yes/No naming the exact entries (back up to `$TMPDIR`, only added lines allowed, the
+  script aborts otherwise, verify `jq -e .`).
 - Rules: `<repo>/.claude/harness.json`, committed. Missing file means every hook is a no-op.
 - User and project hook entries merge (official hooks reference), so no conflict with existing global hooks.
 - Tests: `claude-code-config/hooks/tests/`, shell, against a throwaway fixture repo.
@@ -31,7 +32,8 @@ Logic is global and tested once. Each repo declares its own rules as data.
 {
   "buildGate": {
     "cmd": "doppler run --project reach-radio-nextjs --config dev -- npx next build",
-    "paths": ["src/app/**", "next.config.*", "package.json"]
+    "paths": ["src/**", "next.config.*", "package.json", "package-lock.json", "tsconfig.json"],
+    "ignore": []
   },
   "pushFlow": { "mainBranch": "main", "blockFeaturePush": true },
   "commitScopes": ["bridge","seo","teachers","schedule","theme","modal","player",
@@ -41,6 +43,12 @@ Logic is global and tested once. Each repo declares its own rules as data.
   ]
 }
 ```
+
+`paths` is `src/**`, not just `src/app/**`: `next build` fails on a TypeScript or
+"use client" error anywhere in the import graph. `ignore` is a list of pathspecs
+(for example a generated `next-env.d.ts`) removed from the tree key so a build that
+rewrites them cannot void its own receipt. `.claude/harness.json` is gitignored in
+reach-radio-nextjs (`.claude/*`), so the repo needs a `!.claude/harness.json` exception.
 
 ## Components
 
@@ -127,8 +135,11 @@ means deny with "run harness-build in the main checkout".
 
 - Tree key measured at 0.27 s on this repo (temp index, `git add -A`). Budget: every
   hook under 1 s on a route-touching change, a no-op under 50 ms with no config.
-- Plan step 0: capture real Stop, PreToolUse and PostToolUse payloads from a live session
-  into fixtures, so tests match the harness and not the docs. Hook tests must use them.
+- Test payloads reuse the shapes already proven by the existing `next-me-check` and
+  `commit-format` hook tests. The plan ends with a synthetic-payload smoke of the
+  installed hooks; the live in-session check (Stop block, push deny) is the owner's,
+  after restarting sessions. No live `git push` is ever used as a test.
+- Git forms parsed: `git push|commit` with optional `-C <path>` and `-c k=v` before the verb.
 
 ## Testing
 
