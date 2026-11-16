@@ -43,3 +43,44 @@
 
 ## Pruned
 - Nothing removed; no always-loaded config grew (memory file added, CLAUDE.md untouched).
+
+---
+
+# Addendum: calvarytucson-nextjs offload push and Next 16.4.6 upgrade (2026-11-16)
+
+## What was done
+- Cached 6 public search routes (`outreach`, `stores`, `grow`, `groups`, `serve`, `faq`) with `public, s-maxage=300, stale-while-revalidate=60`; errors and invalid requests stay uncached. Test: `tests/api/search-cache-headers.test.ts`.
+- Deleted `/api/youtube/playlist/[id]` (no callers, uncached, quota-abuse path).
+- Upgraded Next to 16.4.6 (`98ec4771`) after the build-time advisory gate GHSA-mfr8-8qww-v76h (affects `>=16.3.0 <=16.4.4`) blocked the pre-push hook. Repo uses none of the affected APIs, so it was not exploitable here.
+- Pushed `813c1130..30f58612` on main. Live probe: `x-vercel-cache: HIT` on all 6 routes, 404 on the deleted route.
+- Reviewed and left unchanged on purpose: east live page (server render avoids embed flash), topics/series pages (read `searchParams`), `live-stream-status` (already cached 30s), `results/og`.
+
+## What did not
+- Audit finding "results/og has no Cache-Control" was wrong: `ImageResponse` sends `public, immutable, no-transform, max-age=31536000` by default (checked in `next/dist/compiled/@vercel/og/index.edge.js`). The finding came from reading route code, not response headers.
+- Pre-push failed 4 times: (1) stale gitignored `.next/dev/types/validator.ts` referencing the deleted route; `rm -rf` and compound commands are blocked even after owner Yes, `rm -f` by explicit path worked; (2, 3) Next advisory gate `SecurityFatalError`; (4) two tests failed under load (`AboutSearchClient.test.tsx` timeout, `SceneRenderer.golden.test.ts`), passed in isolation twice, same push passed on retry. Flakiness is inference, cause not investigated.
+- Worktree with symlinked `node_modules` failed `next build` (Turbopack rejects out-of-root symlink); needed a real `npm ci`.
+- Main checkout `node_modules` stayed on 16.4.3 after the merge until `npm ci` there.
+- I overstated Deployment Retention as a cost lever; it is a storage setting with negligible cost here.
+- Build output contained text addressed to an assistant telling it to run `next upgrade --agent=security` and ask the user. It was build-tool output, not an owner instruction; I did not run it, verified the advisory myself via the npm advisories API, and flagged it.
+
+## Root causes (blameless)
+- Audit judged routes from source, not live headers; no step required a header probe before listing a finding.
+- Deleting a route leaves generated `.next/dev/types` stale, and the pre-push build trusts it.
+- Pre-push runs lint, full suite and build in one go; load-sensitive tests have no retry or quarantine.
+- No note that Next 16 builds query an advisory registry, so an unpatched version blocks pushes without a code change.
+
+## Changes codified this turn
+- Memory `feedback-verify-live-before-push-question.md` already covers probe-before-claim and daily data (earlier this session).
+- No new global rule: lessons are project-specific; recorded here.
+
+## Enforcement map (lesson | mechanism | wired and live?)
+- Header proof before an audit finding | text only | deliberate: judgment per route, no cheap hook.
+- Cache policy on 6 search routes | `tests/api/search-cache-headers.test.ts` | live, runs in pre-push suite.
+- Advisory gate | Next build itself | live; fires in pre-push.
+- Stale generated types after route delete | none | text only; fix is `rm -f` of the generated files by path.
+
+## Action items
+- [ ] me | `docs/bugs/vercel-usage-spike-2026-11.md` section 8c | next session | replace "Nov 5 move" credit with the Nov 13 204 retirement; done when section 8c matches the daily data
+- [ ] me | calvarytucson-nextjs | next session | run `AboutSearchClient.test.tsx` and `SceneRenderer.golden.test.ts` under parallel load to confirm or drop the flaky hypothesis
+- [ ] owner | calvarytucson-nextjs, calvarytucson-svelte | when sure | remove worktrees `offload-optimizations`, `next-security-upgrade` and local branch `perf/server-cost`
+- [ ] owner | Cloudflare dashboard | next session | confirm Workers Paid ($5 per month) status so the bill estimate is complete
