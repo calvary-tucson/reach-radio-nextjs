@@ -1,0 +1,13 @@
+{
+  "buildGate": {
+    "cmd": "doppler run --project reach-radio-nextjs --config dev -- npx next build",
+    "paths": ["src/**", "next.config.*", "package.json", "package-lock.json", "tsconfig.json"],
+    "ignore": []
+  },
+  "pushFlow": { "mainBranch": "main", "blockFeaturePush": true },
+  "commitScopes": ["bridge", "seo", "teachers", "schedule", "theme", "modal", "player", "sleep-timer", "donate", "about", "layout", "api", "global", "ppr", "test"],
+  "uiRules": [
+    { "glob": "src/components/**", "when": "<button|onClick|role=\"button\"", "mustHave": "cursor-pointer" },
+    { "glob": "src/components/**", "when": "animate-", "mustHave": "motion-safe:" }
+  ]
+}
