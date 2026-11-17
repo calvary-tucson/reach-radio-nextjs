@@ -21,6 +21,12 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Exclude git worktrees (isolated development branches):
     ".worktrees/**",
+    // Other checkouts and build output live under the main checkout; never lint them:
+    ".claude/worktrees/**",
+    "**/.next/**",
+    ".cutover-backup/**",
+    ".superpowers/**",
+    ".playwright-mcp/**",
     // Exclude third-party minified scripts:
     "public/**",
   ]),
