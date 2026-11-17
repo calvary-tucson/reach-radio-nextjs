@@ -84,6 +84,7 @@ export function AudioProvider({ streamUrl }: AudioProviderProps) {
   useEffect(() => () => clearReconnect(), [clearReconnect])
 
   return (
+    // eslint-disable-next-line jsx-a11y/media-has-caption -- live radio stream, aria-hidden, no captions exist
     <audio
       ref={audioRef}
       src={streamUrl}
