@@ -16,7 +16,8 @@
 - Child skipped the sonnet per-task and final reviews and relied on its own re-runs; orchestrator re-verified, but the brief's review step was not honored.
 - Stop hooks fired while the child still ran: SP1 (node `running` with commits) and the build-receipt gate each blocked a turn. Both were correct but noisy mid-delegation.
 - Resource guard queued the Doppler build behind another build (ticket t007813).
-- shellcheck not installed, so the hook scripts are unlinted.
+- Stubbed `npx` hid a real bug: `npx --no commitlint --edit` makes npx swallow `--edit`, so commitlint got no input and every commit failed once `core.hooksPath` went live. Found only by the first real commit; fixed in `ec3c0bb` (call `node_modules/.bin/commitlint` directly) and the test now stubs the binary and runs the real hook end to end.
+- shellcheck was not installed until the owner approved it; it then found 1 info item (SC2015), fixed.
 
 ## Root causes (blameless)
 - Plans describe review steps as prose; nothing forces a coordinator to dispatch them or say it skipped them.
@@ -30,19 +31,19 @@
 ## Enforcement map
 | Lesson | Mechanism | Wired and live? |
 |---|---|---|
-| Lint, typecheck, tests before push | `.githooks/pre-push` | Committed, executable, shell-tested; NOT live until `core.hooksPath` is set |
-| Canonical commit scopes | `.githooks/commit-msg` + `commitlint.config.mjs` | Same: committed and tested, not live until hooksPath |
+| Lint, typecheck, tests before push | `.githooks/pre-push` | Live since 2026-11-16 (`core.hooksPath` set); commit-msg proven by a real commit, pre-push not yet exercised on a real push |
+| Canonical commit scopes | `.githooks/commit-msg` + `commitlint.config.mjs` | Live; real commit accepted |
 | UI rules (cursor-pointer, motion-safe, aria-label) | `tests/unit/ui-rules.test.ts` | Live: runs in `npm test` and the pre-push hook |
 | a11y rules | jsx-a11y recommended in `eslint.config.mjs` | Live: runs in `npm run lint` |
 | Hooks installed on every checkout | npm `prepare` (`|| true`) | Runs on next `npm install` after merge to main |
 | Hook scripts lint-clean | shellcheck | Nothing: not installed (owner Yes/No) |
 
 ## Action items
-- [ ] owner | now | Yes/No: `git config core.hooksPath .githooks` (shared by all worktrees; no existing hooks found) | done when `git config --get core.hooksPath` prints `.githooks`
+- [x] owner | now | hooksPath activated 2026-11-16, verified: first real commit passed the live commit-msg hook (`ec3c0bb`)
 - [ ] owner | before push | Yes/No: push 12 unpushed commits via merge to main then `git push origin main` (deploys) | done when origin/main has them and apex host probed
 - [ ] me | next plan | add plan-checklist item: a review step in a plan must be dispatched or reported as skipped, and delegated-child runs need a note that SP1/build gates may fire mid-run | done when item 12/13 is in `~/.claude/docs/claude-md-reference.md`
 - [ ] me | next UI-rule change | teach `ui-rules.test.ts` to resolve same-file class constants, or document the blind spot in the test header | done when a constant-based button is flagged or the header says so
-- [ ] owner | optional | install shellcheck (Yes/No), then run it on `.githooks/*` and `tests/hooks/test-githooks.sh` | done when shellcheck prints nothing
+- [x] owner | shellcheck installed and clean on hooks and test
 
 ## Pruned
 - Nothing removed; no always-loaded text added.
