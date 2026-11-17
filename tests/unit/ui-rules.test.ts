@@ -1,3 +1,6 @@
+// Known blind spot: the scan reads literal `className` text only. Classes that come from a
+// shared or same-file constant (e.g. `className={BTN}`) are not resolved, so a button built
+// that way is neither flagged nor verified. Put the classes inline or extend the scanner.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import ts from 'typescript'

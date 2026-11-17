@@ -41,8 +41,8 @@
 ## Action items
 - [x] owner | now | hooksPath activated 2026-11-16, verified: first real commit passed the live commit-msg hook (`ec3c0bb`)
 - [ ] owner | before push | Yes/No: push 12 unpushed commits via merge to main then `git push origin main` (deploys) | done when origin/main has them and apex host probed
-- [ ] me | next plan | add plan-checklist item: a review step in a plan must be dispatched or reported as skipped, and delegated-child runs need a note that SP1/build gates may fire mid-run | done when item 12/13 is in `~/.claude/docs/claude-md-reference.md`
-- [ ] me | next UI-rule change | teach `ui-rules.test.ts` to resolve same-file class constants, or document the blind spot in the test header | done when a constant-based button is flagged or the header says so
+- [x] me | next plan | add plan-checklist item: a review step in a plan must be dispatched or reported as skipped, and delegated-child runs need a note that SP1/build gates may fire mid-run | done 2026-11-16: item 12 is in `~/.claude/docs/claude-md-reference.md`
+- [x] me | next UI-rule change | teach `ui-rules.test.ts` to resolve same-file class constants, or document the blind spot in the test header | done when a constant-based button is flagged or the header says so (header done)
 - [x] owner | shellcheck installed and clean on hooks and test
 
 ## Pruned
