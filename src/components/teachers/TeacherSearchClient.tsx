@@ -82,7 +82,7 @@ export function TeacherSearchClient({
               type="button"
               aria-pressed={urlDays.includes(day)}
               onClick={() => toggleDay(day)}
-              className={`${chipBase} ${urlDays.includes(day) ? chipActive : chipInactive}`}
+              className={`${chipBase} cursor-pointer ${urlDays.includes(day) ? chipActive : chipInactive}`}
             >
               {DAY_LABELS[day]}
             </button>
