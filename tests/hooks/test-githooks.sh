@@ -27,7 +27,8 @@ git clone -q "$T/remote.git" "$T/work" 2>/dev/null
 cd "$T/work" || exit 1
 git checkout -q -b main 2>/dev/null
 mkdir -p src docs node_modules/.bin
-touch node_modules/.bin/commitlint; chmod +x node_modules/.bin/commitlint
+# shellcheck disable=SC2016  # stub body must keep literal $ for runtime expansion
+printf '#!/bin/bash\necho "commitlint $*" >> "$CALLS_LOG"\nif [ -n "${FAIL_ON:-}" ]; then case "commitlint $*" in "commitlint $FAIL_ON"*) exit 1;; esac; fi\nexit 0\n' > node_modules/.bin/commitlint; chmod +x node_modules/.bin/commitlint
 echo a > README.md
 git add README.md
 git -c core.hooksPath=/dev/null commit -q -m "init"
@@ -60,9 +61,9 @@ mv node_modules.off node_modules; reset
 
 reset; echo m > src/e.ts; git add src/e.ts
 git commit -q -m "fix(teachers): e" 2>/dev/null; chk 0 "$?" "commit-msg passes when commitlint passes"
-case "$(calls)" in "npx --no commitlint --edit "*) r=ok;; *) r="$(calls)";; esac; chk ok "$r" "commit-msg calls commitlint --edit"
+case "$(calls)" in "commitlint --edit "*) r=ok;; *) r="$(calls)";; esac; chk ok "$r" "commit-msg calls commitlint --edit"
 reset; echo m2 > src/f.ts; git add src/f.ts
-FAIL_ON="--no commitlint" git commit -q -m "bad(scope): f" 2>/dev/null; chk 1 "$?" "commit-msg blocks when commitlint fails"
+FAIL_ON="--edit" git commit -q -m "bad(scope): f" 2>/dev/null; chk 1 "$?" "commit-msg blocks when commitlint fails"
 
 reset; mv node_modules/.bin/commitlint node_modules/.bin/commitlint.off; echo m3 > src/g.ts; git add src/g.ts
 err="$(git commit -q -m "anything goes here" 2>&1)"; chk 0 "$?" "commit-msg skips when commitlint is not installed"
@@ -76,6 +77,9 @@ if [ -x "$REAL/node_modules/.bin/commitlint" ]; then
   chk 0 "$(cl 'docs: x')" "commitlint accepts no scope"
   chk 1 "$(cl 'fix(Teachers): x')" "commitlint rejects a PascalCase scope"
   chk 1 "$(cl 'feat(nonsense): x')" "commitlint rejects an undocumented scope"
+  hk() { printf '%s\n' "$1" > "$T/msg"; (cd "$REAL" && .githooks/commit-msg "$T/msg" >/dev/null 2>&1); echo $?; }
+  chk 0 "$(hk 'fix(teachers): x')" "real commit-msg hook accepts a canonical scope (end to end)"
+  chk 1 "$(hk 'feat(nonsense): x')" "real commit-msg hook rejects an undocumented scope (end to end)"
 else
   echo "FAIL commitlint is not installed in the repo (run npm install)"; fail=1
 fi
@@ -84,4 +88,4 @@ pre="$(node -e 'console.log(require(process.argv[1]).scripts.prepare)' "$REAL/pa
 case "$pre" in *"|| true") r=ok;; *) r="$pre";; esac; chk ok "$r" "prepare never fails an install (|| true)"
 chk 100755 "$(cd "$REAL" && git ls-files -s .githooks/pre-push | cut -d' ' -f1)" "pre-push is executable in git"
 
-[ "$fail" = 0 ] && echo "ALL PASS" || { echo "FAILURES"; exit 1; }
+if [ "$fail" = 0 ]; then echo "ALL PASS"; else echo "FAILURES"; exit 1; fi

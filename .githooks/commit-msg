@@ -7,4 +7,5 @@ if [ ! -x node_modules/.bin/commitlint ]; then
   echo "commit-msg: commitlint not installed (run npm install); skipping" >&2
   exit 0
 fi
-exec npx --no commitlint --edit "$1"
+# Call the local binary, not npx: npx treats --edit as its own option and commitlint gets no input.
+exec node_modules/.bin/commitlint --edit "$1"
