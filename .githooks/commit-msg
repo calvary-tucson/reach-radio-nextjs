@@ -1,0 +1,11 @@
+#!/bin/bash
+# commit-msg: enforce the canonical commit scopes (AGENTS.md) with commitlint.
+# Skipped with a notice when node_modules is not installed. Bypass: git commit --no-verify
+set -u
+cd "$(git rev-parse --show-toplevel)" || exit 0
+if [ ! -x node_modules/.bin/commitlint ]; then
+  echo "commit-msg: commitlint not installed (run npm install); skipping" >&2
+  exit 0
+fi
+# Call the local binary, not npx: npx treats --edit as its own option and commitlint gets no input.
+exec node_modules/.bin/commitlint --edit "$1"

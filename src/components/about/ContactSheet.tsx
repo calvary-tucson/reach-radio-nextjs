@@ -62,6 +62,7 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
 
   return createPortal(
     <div
+      role="presentation"
       id="contact-sheet"
       data-testid="contact-sheet-backdrop"
       className={`fixed inset-0 z-[70] bg-black/80 [will-change:opacity] cursor-pointer ${
@@ -71,7 +72,7 @@ export function ContactSheet({ open, onClose }: ContactSheetProps) {
       }`}
       onClick={handleDismiss}
     >
-      <div onClick={(e) => e.stopPropagation()}>
+      <div role="presentation" onClick={(e) => e.stopPropagation()}>
         <ModalProvider
           onDismiss={handleDismiss}
           onBack={handleDismiss}

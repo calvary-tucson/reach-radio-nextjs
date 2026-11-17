@@ -1,0 +1,28 @@
+#!/bin/bash
+# pre-push gate: lint, typecheck, unit tests. Skipped when the push touches no code/config files.
+# Bypass (deliberate, visible in your shell history): git push --no-verify
+set -u
+ZERO=0000000000000000000000000000000000000000
+changed=""
+while read -r _lref lsha _rref rsha; do
+  [ "$lsha" = "$ZERO" ] && continue            # deleting a remote ref
+  if [ "$rsha" = "$ZERO" ]; then
+    base="$(git merge-base "$lsha" origin/main 2>/dev/null || true)"   # new branch: compare to main
+  else
+    base="$rsha"
+  fi
+  if [ -n "$base" ] && files="$(git diff --name-only "$base" "$lsha" 2>/dev/null)"; then
+    changed="$changed"$'\n'"$files"
+  else
+    changed="$changed"$'\n'"always"            # cannot tell what changed: run the checks
+  fi
+done
+printf '%s\n' "$changed" | grep -Eq '^(always$|src/|tests/|eslint\.config\.|package\.json$|package-lock\.json$|tsconfig\.json$|next\.config\.|vitest\.config\.|commitlint\.config\.)' || exit 0
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+[ -d node_modules ] || { echo "pre-push: node_modules missing; run npm install first" >&2; exit 1; }
+for cmd in "npm run lint" "npm run typecheck" "npm test"; do
+  echo "pre-push: $cmd"
+  $cmd || { echo "pre-push: '$cmd' failed; push blocked (fix it, or git push --no-verify to bypass)" >&2; exit 1; }
+done
+exit 0

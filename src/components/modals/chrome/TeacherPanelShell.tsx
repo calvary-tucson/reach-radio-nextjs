@@ -110,7 +110,7 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
             onClick={handleBackClick}
             onFocus={onBackFocus}
             onBlur={onBackBlur}
-            className={cn(backButtonClass, backStateClass)}
+            className={cn(backButtonClass, backStateClass, 'cursor-pointer')}
             aria-label="Back"
             {...backA11y}
           >
@@ -120,7 +120,7 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
           <button
             type="button"
             onClick={onDismiss}
-            className={closeButtonClass}
+            className={`${closeButtonClass} cursor-pointer`}
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -147,7 +147,7 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
             onBlur={onBackBlur}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
-            className={cn(backButtonClass, backStateClass)}
+            className={cn(backButtonClass, backStateClass, 'cursor-pointer')}
             aria-label="Back"
             {...backA11y}
           >
@@ -159,7 +159,7 @@ export function TeacherPanelShell({ children, onNavSettled }: TeacherPanelShellP
             onClick={onDismiss}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
-            className={closeButtonClass}
+            className={`${closeButtonClass} cursor-pointer`}
             aria-label="Close"
           >
             <X className="h-5 w-5" />

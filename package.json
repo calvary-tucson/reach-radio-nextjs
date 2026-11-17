@@ -10,7 +10,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -35,6 +37,8 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
@@ -47,6 +51,7 @@
     "concurrently": "^10.0.3",
     "eslint": "^9",
     "eslint-config-next": "^16.2.6",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "jsdom": "^29.1.1",
     "shadcn": "^4.8.1",
     "tailwindcss": "^4",
