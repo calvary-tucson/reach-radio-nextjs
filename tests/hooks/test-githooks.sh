@@ -70,6 +70,16 @@ chk "" "$(calls)" "skip path runs no npx"
 case "$err" in *"not installed"*) r=ok;; *) r="$err";; esac; chk ok "$r" "skip path prints a notice"
 mv node_modules/.bin/commitlint.off node_modules/.bin/commitlint; reset
 
+if [ -x "$REAL/node_modules/.bin/commitlint" ]; then
+  cl() { printf '%s\n' "$1" | (cd "$REAL" && ./node_modules/.bin/commitlint >/dev/null 2>&1); echo $?; }
+  chk 0 "$(cl 'fix(teachers): x')" "commitlint accepts a canonical scope"
+  chk 0 "$(cl 'docs: x')" "commitlint accepts no scope"
+  chk 1 "$(cl 'fix(Teachers): x')" "commitlint rejects a PascalCase scope"
+  chk 1 "$(cl 'feat(nonsense): x')" "commitlint rejects an undocumented scope"
+else
+  echo "FAIL commitlint is not installed in the repo (run npm install)"; fail=1
+fi
+
 pre="$(node -e 'console.log(require(process.argv[1]).scripts.prepare)' "$REAL/package.json")"
 case "$pre" in *"|| true") r=ok;; *) r="$pre";; esac; chk ok "$r" "prepare never fails an install (|| true)"
 chk 100755 "$(cd "$REAL" && git ls-files -s .githooks/pre-push | cut -d' ' -f1)" "pre-push is executable in git"
