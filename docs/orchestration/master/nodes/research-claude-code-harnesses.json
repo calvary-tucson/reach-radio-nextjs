@@ -1,0 +1,15 @@
+{
+  "id": "research-claude-code-harnesses",
+  "kind": "session",
+  "name": "reach-radio gates tier 3",
+  "worktree": "/Users/danielmccauley/orca/workspaces/reach-radio-nextjs/murex",
+  "branch": "calvary-tucson/research-claude-code-harnesses",
+  "plan": "docs/superpowers/plans/2026-11-16-reach-radio-gates.md",
+  "state": "running",
+  "next": {
+    "who": "me",
+    "what": "implement per plan"
+  },
+  "done_when": "Tier 3 gates built, verified, committed locally; owner activates hooksPath and approves push",
+  "updated_at": "2026-11-17T01:21:22Z"
+}
