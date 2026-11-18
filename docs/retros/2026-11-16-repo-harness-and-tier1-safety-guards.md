@@ -42,11 +42,11 @@
 | Child stays inside approved commands | none | Nothing |
 
 ## Action items
-- [ ] me | `~/.claude/docs/claude-md-reference.md` "Plan-writing checklist" | next plan written | add "shell tests: mktemp with prefix + existence check + prefix-guarded rm; fixtures must pass the installer's own checks" and re-run `test-config-health.sh`
-- [ ] me | claude-code-config `feat/repo-harness` worktree | next session | commit the uncommitted `settings.json` mirror entry for safety-guards (on `~/.claude/settings.json` already, not on origin)
-- [ ] me | claude-code-config | next push request | add a preflight step (main checkout ahead/behind, foreign commits) to the push flow text or a helper script; carries 2026-11-11 item 3
-- [ ] owner | open Claude sessions | now | restart so the new hooks load
-- [ ] me | video-studio-cli adapter tests | next session | reconcile the 87 vs 12 test count (which command runs the full suite)
+- [x] me | `~/.claude/docs/claude-md-reference.md` "Plan-writing checklist" | next plan written | add "shell tests: mktemp with prefix + existence check + prefix-guarded rm; fixtures must pass the installer's own checks" and re-run `test-config-health.sh` (2026-11-17: done: item 11 in the reference doc's Plan-writing checklist)
+- [x] me | claude-code-config `feat/repo-harness` worktree | next session | commit the uncommitted `settings.json` mirror entry for safety-guards (on `~/.claude/settings.json` already, not on origin) (2026-11-17: done: safety-guards entry is in claude-code-config settings.json, tree clean)
+- [x] me | claude-code-config | next push request | add a preflight step (main checkout ahead/behind, foreign commits) to the push flow text or a helper script; carries 2026-11-11 item 3 (2026-11-17: done as memory feedback-push-preflight-main-checkout, run before every push since; flow text skipped deliberately (CLAUDE.md size budget))
+- [x] owner | open Claude sessions | now | restart so the new hooks load (2026-11-17: dropped: wrong premise, hooks run fresh each call, no restart needed)
+- [ ] me | video-studio-cli adapter tests | next session | reconcile the 87 vs 12 test count (which command runs the full suite) (2026-11-17: carried: not checked yet)
 
 ## Pruned
 - Nothing removed; no always-loaded rule was shown stale.
