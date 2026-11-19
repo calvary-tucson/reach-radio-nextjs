@@ -34,10 +34,10 @@
 | Stale local main before push | Nothing | Not wired, see action item |
 
 ## Action items
-- [ ] owner | main checkout `~/Documents/Development/reach-radio-nextjs` | before next push | decide on the staged `docs/superpowers/plans/GO-TO-PRODUCTION.md` edit (commit it or discard it) so main stays clean; copy of the diff at `$TMPDIR/go-to-production-staged.patch` may be gone, so do not rely on it
-- [ ] me | this branch | next session | push the AGENTS.md adapter and this retro (docs-only, needs owner Yes/No push question) so the adapter is on main
-- [ ] me | next push request | next push | run `git rev-list --count main..origin/main` in the main checkout and surface a stale main in the first push question, not after
-- [ ] owner | Playwright MCP | when convenient | run `npx @playwright/mcp install-browser chrome-for-testing` so headless screenshots work without Orca, or confirm Orca-only is fine
+- [x] owner | main checkout `~/Documents/Development/reach-radio-nextjs` | before next push | decide on the staged `docs/superpowers/plans/GO-TO-PRODUCTION.md` edit (commit it or discard it) so main stays clean; copy of the diff at `$TMPDIR/go-to-production-staged.patch` may be gone, so do not rely on it (2026-11-17: done: main checkout status is clean)
+- [x] me | this branch | next session | push the AGENTS.md adapter and this retro (docs-only, needs owner Yes/No push question) so the adapter is on main (2026-11-17: done: adapter is on origin/main via ddeb051)
+- [x] me | next push request | next push | run `git rev-list --count main..origin/main` in the main checkout and surface a stale main in the first push question, not after (2026-11-17: done: fetch plus ahead/behind check run before each push, kept as memory feedback-push-preflight-main-checkout)
+- [ ] owner | Playwright MCP | when convenient | run `npx @playwright/mcp install-browser chrome-for-testing` so headless screenshots work without Orca, or confirm Orca-only is fine (2026-11-17: carried: owner, when convenient)
 
 ## Pruned
 - Nothing pruned: no rule or memory was contradicted; the AGENTS.md addition is about 10 lines of project config (not the always-loaded global budget).
